@@ -1,0 +1,47 @@
+corpus_id: irs_2025_broad_tax_prep
+tax_year: 2025
+agency: IRS
+status: draft
+source_url: https://www.irs.gov/downloads/irs-pdf
+
+ingestion_modes:
+  - mode_id: broad_current_year
+    description: Download all current IRS PDFs whose directory revision maps to tax year 2025.
+    command: >
+      python3 tax-knowledge/tools/download_irs_pdfs.py
+      --tax-year 2025
+      --kind all
+      --output-dir tax-knowledge/corpora/irs-2025/downloads
+      --manifest tax-knowledge/corpora/irs-2025/pdf-manifest.json
+      --download
+    review_notes:
+      - Broad mode captures forms, instructions, publications, notices, and other IRS PDFs.
+      - Relevance classification decides which chunks affect individual tax preparation.
+
+  - mode_id: individual_income_seed
+    description: Download the reviewed individual-income publication seed list first.
+    command: >
+      python3 tax-knowledge/tools/download_irs_pdfs.py
+      --tax-year 2025
+      --product-list tax-knowledge/corpora/irs-2025/publication-products.txt
+      --output-dir tax-knowledge/corpora/irs-2025/downloads
+      --manifest tax-knowledge/corpora/irs-2025/pdf-manifest.json
+      --download
+    review_notes:
+      - Seed mode is appropriate for prototype iteration.
+      - Broad mode is required before claiming full federal tax-prep coverage.
+
+relevance_policy:
+  principle: Download broadly, generate narrowly, and approve before runtime use.
+  artifact_targets:
+    - factgraph
+    - validation
+    - interview
+    - evidence_map
+    - conflict
+    - pdf_config
+    - scenario
+    - explanation
+  approval_rule: >
+    Runtime packages may only consume artifacts with exact source_refs pointing to reviewed
+    source chunks and human approvals from tax, product/content, and engineering owners.

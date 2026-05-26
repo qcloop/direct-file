@@ -1,0 +1,69 @@
+tax_year: 2025
+jurisdiction: federal
+status: draft
+
+conflicts:
+  - conflict_id: w2_document_present_but_user_says_no_w2
+    status: draft
+    when:
+      all:
+        - fact: /hasW2
+          equals: false
+          status: confirmed
+        - evidence: form_w2
+          exists: true
+    severity: review_required
+    message: A W-2 document is present, but the taxpayer said they did not receive a W-2.
+    resolution_prompt: Confirm whether this W-2 belongs to the taxpayer for tax year 2025, or remove/reject the document.
+    source_ids:
+      - irs_form_1040_2025
+    owner: federal_individual_income_tax_specialist
+
+  - conflict_id: no_self_employment_but_1099_nec_present
+    status: draft
+    when:
+      all:
+        - fact: /hasSelfEmploymentIncome
+          equals: false
+          status: confirmed
+        - evidence: form_1099_nec
+          exists: true
+    severity: review_required
+    message: A Form 1099-NEC is present, but the taxpayer said they did not have self-employment income.
+    resolution_prompt: Ask whether the 1099-NEC income was for business, gig, freelance, hobby, or another activity.
+    source_ids:
+      - irs_instruction_1040_schedule_c_2025
+    owner: small_business_tax_specialist
+
+  - conflict_id: prior_year_schedule_c_but_current_year_denied
+    status: draft
+    when:
+      all:
+        - profile: prior_year_topics
+          contains: self_employment
+        - fact: /hasSelfEmploymentIncome
+          equals: false
+          status: confirmed
+    severity: info
+    message: Prior-year profile indicates Schedule C activity, but current-year self-employment was denied.
+    resolution_prompt: Confirm that the business or gig work ended before or during 2025 and there was no income or deductible activity to report.
+    source_ids:
+      - irs_instruction_1040_schedule_c_2025
+    owner: small_business_tax_specialist
+
+  - conflict_id: digital_asset_document_present_but_user_says_no_activity
+    status: draft
+    when:
+      all:
+        - fact: /hasDigitalAssetActivity
+          equals: false
+          status: confirmed
+        - evidence: form_1099_b
+          exists: true
+          asset_class: digital_asset
+    severity: review_required
+    message: A digital asset disposition document is present, but the taxpayer answered no to digital asset activity.
+    resolution_prompt: Review the document and confirm whether it reports digital assets for tax year 2025.
+    source_ids:
+      - irs_form_1040_2025
+    owner: investment_tax_specialist

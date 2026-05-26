@@ -1,0 +1,26 @@
+schema_id: question
+description: Relevance-gated taxpayer question definition.
+required:
+  - question_id
+  - topic_id
+  - tax_year
+  - jurisdiction
+  - status
+  - writes
+fields:
+  question_id: stable question id
+  topic_id: owning topic
+  tax_year: tax year
+  jurisdiction: federal or state code
+  status: draft | reviewed | approved | retired
+  prompt: taxpayer-facing prompt
+  help_text: optional taxpayer-facing help text
+  why_we_ask: explanation shown on request
+  writes: fact paths written by the answer
+  confirms: candidate facts confirmed by the answer
+  asks_when: conditions that make the question relevant
+  skip_when: conditions that suppress the question
+  priority: gateway | detail | review | optional
+  source_ids: source ids or rule ids supporting the question
+  source_refs: exact chunk citations required before reviewed or approved status
+  owner: content or tax owner

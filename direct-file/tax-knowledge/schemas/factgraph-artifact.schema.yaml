@@ -1,0 +1,20 @@
+schema_id: factgraph_artifact
+description: Draft fact graph artifact generated from reviewed source chunks.
+required:
+  - artifact_id
+  - tax_year
+  - jurisdiction
+  - status
+  - source_refs
+  - generated_files
+fields:
+  artifact_id: stable id for the generated fact graph work item
+  tax_year: tax year
+  jurisdiction: federal or state code
+  status: draft | reviewed | approved | compiled | rejected
+  source_refs: exact source chunk citations that support the fact graph change
+  generated_files: draft XML, validation, tests, or configuration paths
+  fact_paths: fact paths added, changed, or validated
+  rule_ids: tax-knowledge rules that produced this artifact
+  scenario_ids: scenarios that must pass before approval
+  reviewers: tax and engineering reviewers

@@ -10,6 +10,8 @@ Although the utility name was not changed to reflect their addition, the other t
 - the PDF fields format populates the PDF form fields to displaying their own internal name 
 - the modified PDF format supports easier generation of fact expressions in `configuration.yml` files
 
+The companion `PdfToSourceText` main class extracts page-marked text from IRS source PDFs for the tax-knowledge artifact pipeline.
+
 ## Value maps
 
 The `--value-map` output format coverts a PDF form populated with data into a YAML format used by scenario tests. Adding the YAML file to the test scenarios folder defines the expected result for a new scenario. (A corresponding JSON file of fact data is needed to drive the scenario test, but this utility isn't relevant to that.)
@@ -154,6 +156,24 @@ Modify the previous command, placing your desired arguments inside the empty pai
 - Output files are written to the directory given as the second argument with the filename(s) based on the input PDF(s). 
   - For `--modified-pdf` and `--pdf-fields`, the output directory must be different from the location of the input PDF(s). Overwriting a PDF in place can corrupt the file.
   - For other output formats, the file(s) will have `.yml` extension in place of the `.pdf` on the input file(s).
+
+### Source text extraction
+
+For IRS publications and instructions used as tax-knowledge sources, extract page-marked text:
+
+```bash
+./mvnw exec:java \
+  -Dexec.mainClass=gov.irs.directfile.pdftoyaml.PdfToSourceText \
+  -Dexec.args="../../tax-knowledge/corpora/irs-2025/downloads ../../tax-knowledge/corpora/irs-2025/text"
+```
+
+This writes one `.txt` file per PDF. Each page begins with a marker like:
+
+```text
+----- IRS_SOURCE_PAGE 12 -----
+```
+
+The downstream `tax-knowledge/tools/segment_irs_sources.py` utility uses those markers to create source chunks with page citations.
 
 ---
 [^*]: Unfortunately, many PDF tools will modify the form structure of the PDF when you save your inputs, which will break the workflows described here. Use Adobe Acrobat or take care to check all outputs until your alternative PDF tool is proven safe.

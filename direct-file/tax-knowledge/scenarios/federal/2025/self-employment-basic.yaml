@@ -1,0 +1,60 @@
+scenario_id: se_driver_standard_mileage_basic
+tax_year: 2025
+jurisdiction: federal
+status: draft
+description: Gig driver with confirmed self-employment income and standard mileage vehicle expense.
+
+taxpayer_profile:
+  prior_year_topics:
+    - self_employment
+  prior_year_states:
+    - CA
+
+documents:
+  - document_type: form_1099_nec
+    status: candidate
+    extracted_fields:
+      nonemployee_compensation: "32000.00"
+
+facts:
+  /hasSelfEmploymentIncome:
+    value: true
+    status: confirmed
+    source: user_answer
+  /usesVehicleForBusiness:
+    value: true
+    status: confirmed
+    source: user_answer
+  /seGrossReceipts:
+    value: "32000.00"
+    status: confirmed
+    source: document_confirmed_by_user
+  /seVehicleBusinessMiles:
+    value: 10000
+    status: confirmed
+    source: user_answer
+  /standardMileageRate:
+    value: "0.70"
+    status: system
+    source: se_standard_mileage_vehicle_deduction_ty2025
+
+expected:
+  computed_facts:
+    /seVehicleDeduction: "7000.00"
+  relevant_topics:
+    - self_employment
+  suppressed_topics: []
+  conflicts: []
+  questions_asked:
+    - has_self_employment_income
+    - uses_vehicle_for_business
+    - se_vehicle_business_miles
+
+covers:
+  - self_employment
+  - se_standard_mileage_vehicle_deduction_ty2025
+  - form_1099_nec_self_employment_2025
+
+reviewers:
+  - small_business_tax_specialist
+  - qa_engineer

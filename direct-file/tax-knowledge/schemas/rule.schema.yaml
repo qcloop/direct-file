@@ -1,0 +1,24 @@
+schema_id: rule
+description: Draft or approved tax rule model. This may later compile into fact graph XML, validation rules, or planner rules.
+required:
+  - rule_id
+  - tax_year
+  - jurisdiction
+  - status
+  - rule_type
+  - source_ids
+fields:
+  rule_id: stable rule id
+  tax_year: tax year
+  jurisdiction: federal or state code
+  status: draft | reviewed | approved | retired
+  rule_type: eligibility | calculation | validation | evidence_requirement | applicability
+  topic_id: owning topic
+  source_ids: authoritative source ids
+  source_refs: exact chunk citations required before reviewed or approved status
+  inputs: input fact paths
+  output: output fact path or review item
+  logic: structured or prose rule logic
+  generated_artifacts: fact graph XML, validations, tests, or planner artifacts
+  reviewers: required human reviewers
+  scenario_ids: scenario coverage

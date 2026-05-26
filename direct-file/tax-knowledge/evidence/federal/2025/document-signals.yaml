@@ -1,0 +1,83 @@
+tax_year: 2025
+jurisdiction: federal
+status: draft
+
+evidence_maps:
+  - evidence_map_id: form_w2_wages_2025
+    document_type: form_w2
+    status: draft
+    signals:
+      - topic_id: w2_income
+        confidence: high
+        reason: Form W-2 reports wages and withholding.
+    candidate_facts:
+      - path: /hasW2
+        value: true
+        source_field: document_type
+        requires_confirmation: true
+      - path: /formW2s/*/wages
+        source_field: box_1_wages_tips_other_compensation
+        requires_confirmation: true
+      - path: /formW2s/*/federalWithholding
+        source_field: box_2_federal_income_tax_withheld
+        requires_confirmation: true
+    source_fields:
+      - box_1_wages_tips_other_compensation
+      - box_2_federal_income_tax_withheld
+      - box_15_state
+      - box_16_state_wages
+      - box_17_state_income_tax
+    confirmation_policy: always
+    conflict_rules:
+      - w2_document_present_but_user_says_no_w2
+    source_ids:
+      - irs_form_1040_2025
+
+  - evidence_map_id: form_1099_nec_self_employment_2025
+    document_type: form_1099_nec
+    status: draft
+    signals:
+      - topic_id: self_employment
+        confidence: high
+        reason: Nonemployee compensation commonly opens Schedule C review.
+    candidate_facts:
+      - path: /hasSelfEmploymentIncome
+        value: true
+        source_field: document_type
+        requires_confirmation: true
+      - path: /seGrossReceipts
+        source_field: nonemployee_compensation
+        requires_confirmation: true
+    source_fields:
+      - nonemployee_compensation
+      - payer_tin
+      - recipient_tin
+      - federal_income_tax_withheld
+    confirmation_policy: always
+    conflict_rules:
+      - no_self_employment_but_1099_nec_present
+    source_ids:
+      - irs_instruction_1040_schedule_c_2025
+
+  - evidence_map_id: crypto_or_brokerage_1099_b_2025
+    document_type: form_1099_b
+    status: draft
+    signals:
+      - topic_id: digital_assets
+        confidence: medium
+        reason: Brokerage or exchange statements can indicate asset dispositions requiring follow-up.
+    candidate_facts:
+      - path: /hasDigitalAssetActivity
+        source_field: asset_type
+        requires_confirmation: true
+    source_fields:
+      - proceeds
+      - cost_basis
+      - date_acquired
+      - date_sold
+      - asset_description
+    confirmation_policy: always
+    conflict_rules:
+      - digital_asset_document_present_but_user_says_no_activity
+    source_ids:
+      - irs_form_1040_2025

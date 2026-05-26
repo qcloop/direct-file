@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>gov.irs.directfile.boot</groupId>
+        <artifactId>irs-spring-boot-starter-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../../boms/irs-spring-boot-starter-parent</relativePath>
+    </parent>
+
+    <groupId>gov.irs.directfile</groupId>
+    <artifactId>loaders</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Direct File Fact-Dictionary Loaders</name>
+    <description>Library containing the XML fact-dictionary loader and the
+        Java-side FactConfig implementations of the Scala fact-graph traits.
+        Extracted from backend/ so other services (df-plan-service, future
+        tooling) can load and operate on the fact graph without depending
+        on the backend's Spring Boot fat jar.</description>
+
+    <dependencies>
+        <!-- Scala 3 fact-graph engine (publishes the FactDictionary,
+             FactConfigTrait, and related types this lib implements). -->
+        <dependency>
+            <groupId>gov.irs</groupId>
+            <artifactId>factgraph_3</artifactId>
+        </dependency>
+
+        <!-- For org.springframework.core.io.Resource used by XmlProcessor.
+             spring-core is small and dep-free relative to spring-boot, so
+             this stays a lightweight library. -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+
+        <!-- Lombok @Slf4j on FactGraphLoader; slf4j-api is the runtime target -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- @JsonIgnore on TaxFact, @JsonValue on TaxLimitLevel -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- This is a library, not an executable app. The starter-parent's
+                 spring-boot-maven-plugin defaults to a 'repackage' execution
+                 that fails when there's no main class — disable it here. -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>repackage</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

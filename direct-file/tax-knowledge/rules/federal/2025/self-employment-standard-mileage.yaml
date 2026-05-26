@@ -1,0 +1,33 @@
+rule_id: se_standard_mileage_vehicle_deduction_ty2025
+tax_year: 2025
+jurisdiction: federal
+status: draft
+rule_type: calculation
+topic_id: self_employment
+source_ids:
+  - irs_instruction_1040_schedule_c_2025
+inputs:
+  - /usesVehicleForBusiness
+  - /seVehicleBusinessMiles
+  - /standardMileageRate
+output: /seVehicleDeduction
+logic:
+  summary: Business miles multiplied by the 2025 standard mileage rate.
+  standard_mileage_rate:
+    value: "0.70"
+    unit: dollars_per_mile
+    tax_year: 2025
+  expression: round(/seVehicleBusinessMiles * /standardMileageRate)
+generated_artifacts:
+  fact_graph_xml: pending
+  validation_rules: pending
+  tests:
+    - se_driver_standard_mileage_basic
+reviewers:
+  - small_business_tax_specialist
+  - tax_platform_engineer
+scenario_ids:
+  - se_driver_standard_mileage_basic
+notes:
+  - Schedule C instructions for 2025 identify a 70 cents per mile business standard mileage rate.
+  - This prototype rule assumes the taxpayer is eligible to use the standard mileage method. Actual-expense method and first-year election rules require additional artifacts.

@@ -1,0 +1,26 @@
+schema_id: source_chunk
+description: Page-cited text chunk generated from an authoritative source PDF.
+required:
+  - source_id
+  - product_id
+  - tax_year
+  - source_url
+  - chunks
+fields:
+  source_id: stable source id, such as irs_p334_2025
+  product_id: IRS product id or filename stem
+  tax_year: tax year the source revision applies to
+  title: source title or IRS directory description
+  source_url: official source PDF URL
+  pdf_sha256: hash of the downloaded PDF, if downloaded
+  text_path: local extracted text path
+  generated_at: generation timestamp
+  chunking: chunking parameters
+  chunks:
+    chunk_id: stable chunk id
+    pages: source page numbers
+    heading: detected heading, if any
+    text: cited chunk text
+    text_sha256: hash of chunk text
+    source_url: official source URL
+    pdf_sha256: hash of source PDF, if available

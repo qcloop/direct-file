@@ -1,0 +1,31 @@
+schema_id: source
+description: Metadata for an authoritative tax source document or source listing.
+required:
+  - source_id
+  - agency
+  - jurisdiction
+  - tax_year
+  - document_type
+  - title
+  - source_url
+  - status
+fields:
+  source_id: stable unique id
+  agency: IRS or state/local revenue agency
+  jurisdiction: federal or state code
+  tax_year: tax year the source applies to
+  document_type: listing | static_pdf_directory | download_manifest | form | instruction | publication | notice | revenue_procedure | schema | schema_package | business_rules | release_memo | attachment_listing | html_instruction
+  product_number: IRS product number or agency equivalent
+  title: source title
+  source_url: official URL
+  listing_url: official listing page URL
+  revision_date: agency revision date
+  posted_date: agency posted date
+  retrieved_at: date the catalog entry was created or refreshed
+  checksum: optional file checksum for downloaded corpus files
+  manifest_path: optional local path to generated ingestion manifest
+  access: public | restricted
+  effective_dates: optional ATS and production effective dates for versioned e-file artifacts
+  status: discovered | segmented | reviewed | approved | superseded
+  owner: human domain owner
+  notes: reviewer notes

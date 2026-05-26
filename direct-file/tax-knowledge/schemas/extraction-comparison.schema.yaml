@@ -1,0 +1,22 @@
+schema_id: extraction_comparison
+description: Comparison between two text extraction strategies, such as PDFBox and vision/OCR.
+required:
+  - document_id
+  - primary_extraction
+  - secondary_extraction
+  - page_comparisons
+fields:
+  document_id: source document id or filename stem
+  primary_extraction: name of primary extraction strategy
+  secondary_extraction: name of secondary extraction strategy
+  compared_at: comparison timestamp
+  page_comparisons:
+    page: page number
+    primary_words: count of normalized primary words
+    secondary_words: count of normalized secondary words
+    word_jaccard: token-set similarity
+    length_ratio: smaller/larger character length ratio
+    needs_review: true when similarity or length ratio is below threshold
+  summary:
+    pages_compared: number of pages compared
+    pages_needing_review: number of pages below quality thresholds

@@ -1,0 +1,207 @@
+workflow_id: irs_2025_artifact_production
+name: IRS 2025 artifact production prototype
+status: draft
+tax_year: 2025
+jurisdiction: federal
+corpus: irs_2025_individual_income
+
+stages:
+  - stage: source_ingestion
+    owner_agent: tax-research-agent
+    human_reviewers:
+      - federal_individual_income_tax_specialist
+    outputs:
+      - corpora/irs-2025/source-catalog.yaml
+      - corpora/irs-2025/pdf-manifest.json
+      - corpora/irs-2025/downloads/*.pdf
+    automation:
+      - command: >
+          python3 tax-knowledge/tools/download_irs_pdfs.py
+          --tax-year 2025
+          --product-list tax-knowledge/corpora/irs-2025/publication-products.txt
+          --output-dir tax-knowledge/corpora/irs-2025/downloads
+          --manifest tax-knowledge/corpora/irs-2025/pdf-manifest.json
+          --download
+    gates:
+      - official_irs_sources_only
+      - tax_year_and_posted_dates_recorded
+      - downloaded_pdfs_have_sha256_hashes
+      - missing_expected_publications_are_reviewed
+
+  - stage: source_segmentation
+    owner_agent: document-understanding-agent
+    supporting_agents:
+      - tax-research-agent
+    human_reviewers:
+      - federal_individual_income_tax_specialist
+    outputs:
+      - corpora/irs-2025/text/*.txt
+      - sources/irs/2025/*.yaml
+    automation:
+      - command: >
+          cd utils/pdf-to-yaml
+          && ./mvnw exec:java
+          -Dexec.mainClass=gov.irs.directfile.pdftoyaml.PdfToSourceText
+          -Dexec.args="../../tax-knowledge/corpora/irs-2025/downloads ../../tax-knowledge/corpora/irs-2025/text"
+      - command: >
+          python3 tax-knowledge/tools/segment_irs_sources.py
+          --tax-year 2025
+          --manifest tax-knowledge/corpora/irs-2025/pdf-manifest.json
+          --text-dir tax-knowledge/corpora/irs-2025/text
+          --output-dir tax-knowledge/sources/irs/2025
+          --require-downloaded
+          --require-text
+    gates:
+      - every_chunk_has_source_url_and_page
+      - every_chunk_has_text_sha256
+      - chunk_boundaries_reviewed_for_context
+
+  - stage: extraction_quality_review
+    owner_agent: document-understanding-agent
+    human_reviewers:
+      - federal_individual_income_tax_specialist
+      - tax_platform_engineer
+    outputs:
+      - corpora/irs-2025/extraction-comparison.json
+    automation:
+      - command: >
+          python3 tax-knowledge/tools/compare_extractions.py
+          --primary-text-dir tax-knowledge/corpora/irs-2025/text
+          --secondary-text-dir tax-knowledge/corpora/irs-2025/vision-text
+          --output tax-knowledge/corpora/irs-2025/extraction-comparison.json
+    gates:
+      - low_similarity_pages_are_reviewed
+      - corrected_text_is_used_for_source_chunks_when_needed
+
+  - stage: relevance_classification
+    owner_agent: tax-research-agent
+    supporting_agents:
+      - rule-modeling-agent
+    human_reviewers:
+      - federal_individual_income_tax_specialist
+      - tax_platform_engineer
+    outputs:
+      - relevance/federal/2025/source-relevance.yaml
+    automation:
+      - command: >
+          python3 tax-knowledge/tools/classify_source_chunks.py
+          --tax-year 2025
+          --sources-dir tax-knowledge/sources/irs/2025
+          --rules tax-knowledge/relevance/federal/2025/classification-rules.yaml
+          --output tax-knowledge/relevance/federal/2025/source-relevance.yaml
+    gates:
+      - classifications_have_source_refs
+      - factgraph_relevant_chunks_reviewed
+      - irrelevant_chunks_are_excluded_from_generation
+
+  - stage: topic_modeling
+    owner_agent: rule-modeling-agent
+    supporting_agents:
+      - tax-research-agent
+    human_reviewers:
+      - federal_individual_income_tax_specialist
+      - tax_platform_engineer
+    outputs:
+      - topics/federal/2025/individual-income-core.yaml
+    gates:
+      - topic_has_gateway_facts
+      - topic_has_source_citations
+
+  - stage: rule_drafting
+    owner_agent: rule-modeling-agent
+    human_reviewers:
+      - domain_specialist_for_rule
+      - tax_platform_engineer
+    outputs:
+      - rules/federal/2025/self-employment-standard-mileage.yaml
+    gates:
+      - rule_has_source_citation
+      - rule_has_exact_source_refs_before_review
+      - rule_has_fact_paths
+      - rule_has_scenario_coverage
+
+  - stage: factgraph_artifact_drafting
+    owner_agent: rule-modeling-agent
+    supporting_agents:
+      - release-agent
+      - scenario-test-agent
+    human_reviewers:
+      - domain_specialist_for_rule
+      - tax_platform_engineer
+    outputs:
+      - factgraph/federal/2025/*.yaml
+      - draft fact graph XML patches
+      - draft validation XML patches
+    gates:
+      - generated_factgraph_artifacts_have_exact_source_refs
+      - fact_paths_and_types_are_engineer_reviewed
+      - source_backed_scenarios_exist
+
+  - stage: interview_authoring
+    owner_agent: procedure-interview-agent
+    human_reviewers:
+      - content_designer
+      - domain_specialist_for_topic
+    outputs:
+      - questions/federal/2025/gateway-questions.yaml
+    gates:
+      - every_question_writes_or_confirms_fact
+      - every_question_has_asks_when_or_is_gateway
+
+  - stage: evidence_mapping
+    owner_agent: document-understanding-agent
+    human_reviewers:
+      - domain_specialist_for_document_type
+      - data_import_engineer
+    outputs:
+      - evidence/federal/2025/document-signals.yaml
+    gates:
+      - candidate_facts_require_confirmation
+      - source_fields_are_traceable
+
+  - stage: conflict_authoring
+    owner_agent: reviewer-agent
+    supporting_agents:
+      - scenario-test-agent
+    human_reviewers:
+      - domain_specialist_for_topic
+      - product_owner
+    outputs:
+      - conflicts/federal/2025/document-answer-conflicts.yaml
+    gates:
+      - conflict_has_resolution_prompt
+      - severity_is_reviewed
+
+  - stage: scenario_generation
+    owner_agent: scenario-test-agent
+    human_reviewers:
+      - domain_specialist_for_topic
+      - qa_engineer
+    outputs:
+      - scenarios/federal/2025/self-employment-basic.yaml
+    gates:
+      - ordinary_case_present
+      - boundary_or_negative_case_present
+      - expected_outcomes_reviewed
+
+  - stage: release_packaging
+    owner_agent: release-agent
+    supporting_agents:
+      - reviewer-agent
+      - simulation-agent
+    human_reviewers:
+      - tax_owner
+      - compliance_owner
+      - engineering_owner
+    outputs:
+      - reviews/federal/2025/release-readiness.md
+    gates:
+      - all_artifacts_approved
+      - provenance_validator_has_zero_errors
+      - regression_suite_passes
+      - unresolved_questions_are_blockers_or_waived
+    automation:
+      - command: >
+          python3 tax-knowledge/tools/validate_artifact_provenance.py
+          --root tax-knowledge
+          --sources-dir tax-knowledge/sources/irs/2025

@@ -1,0 +1,29 @@
+# Initial federal individual-income publication corpus.
+# Values can be product ids or filenames. The downloader normalizes both forms.
+p17
+p334
+p463
+p501
+p502
+p503
+p504
+p505
+p525
+p526
+p527
+p535
+p536
+p538
+p550
+p559
+p560
+p570
+p575
+p587
+p590a
+p590b
+p596
+p721
+p926
+p936
+p970

@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: df-plan-service
+  main:
+    banner-mode: off
+  ai:
+    mcp:
+      server:
+        # Identity advertised in the MCP initialize handshake.
+        name: df-plan-service
+        version: 0.0.1
+        # SYNC dispatches tool calls on the request thread. ASYNC switches to
+        # Reactor scheduling (only useful if individual tools become non-blocking).
+        type: SYNC
+        # WebMVC + SSE: the starter publishes /mcp/sse (event stream) and
+        # /mcp/message (POST for client requests). An LLM gateway connects over
+        # SSE and posts JSON-RPC framed tool calls.
+        sse-endpoint: /mcp/sse
+        sse-message-endpoint: /mcp/message
+        capabilities:
+          tool: true
+          resource: false
+          prompt: false
+          completion: false
+
+server:
+  port: 8090
+
+df-plan:
+  tax-knowledge-root: ${DF_TAX_KNOWLEDGE_ROOT:../tax-knowledge}
+  fact-xml-patterns:
+    - classpath*:/tax/*.xml
+    - classpath*:/tax-plan/*.xml
+
+# The production FactGraphService is reused for its XML processor; we disable its
+# own @PostConstruct loader so the planning service can control patterns itself.
+direct-file:
+  loader:
+    load-at-startup: false
+    fact-dictionary-xml-pattern: "classpath:/tax/*.xml"
+
+logging:
+  level:
+    gov.irs.directfile.planservice: INFO

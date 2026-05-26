@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>gov.irs.directfile.boot</groupId>
+        <artifactId>irs-spring-boot-starter-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../boms/irs-spring-boot-starter-parent</relativePath>
+    </parent>
+
+    <groupId>gov.irs.directfile</groupId>
+    <artifactId>df-plan-service</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Direct File Planning Service</name>
+    <description>Tax-planning agent backend: extends the fact graph with self-employment
+        facts and exposes MCP tools (get_fact, set_fact, explain, estimate_quarterly_payment)
+        that an LLM gateway can call to drive a conversational tax-planning experience.</description>
+
+    <properties>
+        <config-folder.path>${project.basedir}/../config</config-folder.path>
+    </properties>
+
+    <dependencies>
+        <!-- Fact graph engine, standalone repo (Scala 3 artifact published as
+             gov.irs:factgraph_3:3.1.0-SNAPSHOT by `make publish` in the
+             /fact-graph repo). -->
+        <dependency>
+            <groupId>gov.irs</groupId>
+            <artifactId>factgraph_3</artifactId>
+        </dependency>
+
+        <!-- Shared XML loader + digest types + FactConfig impl. Extracted from
+             backend/ into libs/loaders/ so this service can load fact-dictionary
+             XML identically to production without depending on the backend's
+             Spring Boot fat jar. -->
+        <dependency>
+            <groupId>gov.irs.directfile</groupId>
+            <artifactId>loaders</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>gov.irs.directfile</groupId>
+            <artifactId>data-models</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!--
+            Spring AI MCP server. Provides JSON-RPC framing, capabilities negotiation,
+            tool discovery (tools/list, tools/call), error semantics, and a typed
+            tool callback model (@Tool method scanning + JSON-schema generation).
+
+            We pull in BOTH transports:
+              * webmvc-sse  — HTTP+SSE, used when running as a network service
+                              (default profile, port 8090).
+              * core        — STDIO transport, used when the service is launched as
+                              a subprocess by a desktop MCP host (Spring profile
+                              "stdio", web auto-config disabled in application-stdio.yaml).
+        -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

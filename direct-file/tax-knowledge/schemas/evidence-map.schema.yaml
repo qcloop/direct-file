@@ -1,0 +1,21 @@
+schema_id: evidence_map
+description: Mapping from taxpayer documents or data imports to topic signals and candidate facts.
+required:
+  - evidence_map_id
+  - tax_year
+  - jurisdiction
+  - document_type
+  - status
+fields:
+  evidence_map_id: stable map id
+  tax_year: tax year
+  jurisdiction: federal or state code
+  document_type: normalized document type
+  status: draft | reviewed | approved | retired
+  signals: topic relevance signals with confidence
+  candidate_facts: proposed facts extracted from source fields
+  source_fields: source fields or OCR anchors used by extraction
+  confirmation_policy: always | if_low_confidence | not_required_for_trusted_import
+  conflict_rules: conflict ids to evaluate when this document appears
+  source_ids: supporting instructions or form source ids
+  source_refs: exact chunk citations required before reviewed or approved status

@@ -1,4 +1,6 @@
 *.class
+*.py[cod]
+__pycache__/
 maven-wrapper.jar
 *.log
 *.log.*
@@ -65,4 +67,3 @@ direct-file/scripts/*.csv
 
 # files created when building sbom.json files
 sbom.json
-

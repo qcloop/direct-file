@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.10</version>
+        <version>3.4.10</version>
         <relativePath/>
         <!-- lookup parent from repository -->
     </parent>
@@ -26,6 +26,7 @@
         <!-- https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/setup-project-maven.html#sdk-as-dependency -->
         <directfile-bom.version>0.0.1-SNAPSHOT</directfile-bom.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
+        <spring-ai.version>1.0.0</spring-ai.version>
         <logstash.version>7.4</logstash.version>
         <modelmapper.version>3.1.0</modelmapper.version>
         <modelmapper-module-record.version>1.0.0</modelmapper-module-record.version>
@@ -86,7 +87,8 @@
         <starter-test.version>0.0.1-SNAPSHOT</starter-test.version>
         <starter-openfeature.version>0.0.1-SNAPSHOT</starter-openfeature.version>
         <data-models.version>0.0.1-SNAPSHOT</data-models.version>
-        <fact-graph.version>0.1.0-SNAPSHOT</fact-graph.version>
+        <fact-graph.version>3.1.0-SNAPSHOT</fact-graph.version>
+        <loaders.version>0.0.1-SNAPSHOT</loaders.version>
         <mef-client-sdk.version>1.0</mef-client-sdk.version>
         <webservices.version>4.0.4</webservices.version>
         <xmlsec.version>4.0.2</xmlsec.version>
@@ -98,6 +100,13 @@
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>bom</artifactId>
                 <version>${aws-sdk.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -262,9 +271,14 @@
                 <version>${data-models.version}</version>
             </dependency>
             <dependency>
-                <groupId>gov.irs.factgraph</groupId>
-                <artifactId>fact-graph_3</artifactId>
+                <groupId>gov.irs</groupId>
+                <artifactId>factgraph_3</artifactId>
                 <version>${fact-graph.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>gov.irs.directfile</groupId>
+                <artifactId>loaders</artifactId>
+                <version>${loaders.version}</version>
             </dependency>
 
             <dependency>

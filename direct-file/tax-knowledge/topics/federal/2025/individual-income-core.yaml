@@ -1,0 +1,89 @@
+tax_year: 2025
+jurisdiction: federal
+status: draft
+
+topics:
+  - topic_id: filing_status
+    name: Filing status
+    domain_owner: federal_individual_income_tax_specialist
+    source_ids:
+      - irs_form_1040_2025
+      - irs_instruction_1040_2025
+    gateway_facts:
+      - /filingStatus
+    opened_facts:
+      - /isMarried
+      - /livedApartFromSpouseLastSixMonths
+      - /hasQualifyingPersonForHeadOfHousehold
+    evidence_triggers: []
+    suppression_facts: []
+    review_triggers:
+      - married_filing_separately_with_spouse_itemizes
+
+  - topic_id: digital_assets
+    name: Digital asset activity
+    domain_owner: investment_tax_specialist
+    source_ids:
+      - irs_form_1040_2025
+      - irs_instruction_1040_2025
+    gateway_facts:
+      - /hasDigitalAssetActivity
+    opened_facts:
+      - /digitalAssetDispositions
+      - /digitalAssetIncome
+    evidence_triggers:
+      - form_1099_b
+      - crypto_exchange_statement
+    suppression_facts:
+      - /hasDigitalAssetActivity=false
+    review_triggers:
+      - document_detected_but_taxpayer_denies_digital_asset_activity
+
+  - topic_id: w2_income
+    name: W-2 wages and withholding
+    domain_owner: federal_individual_income_tax_specialist
+    source_ids:
+      - irs_form_1040_2025
+      - irs_instruction_1040_2025
+    gateway_facts:
+      - /hasW2
+    opened_facts:
+      - /formW2s
+      - /formW2s/*/wages
+      - /formW2s/*/federalWithholding
+      - /formW2s/*/stateWages
+    evidence_triggers:
+      - form_w2
+    suppression_facts:
+      - /hasW2=false
+    review_triggers:
+      - w2_document_present_but_user_says_no_w2
+
+  - topic_id: self_employment
+    name: Self-employment and Schedule C
+    domain_owner: small_business_tax_specialist
+    source_ids:
+      - irs_instruction_1040_schedule_c_2025
+      - irs_publication_334_2025
+      - irs_form_1040_schedule_1_2025
+      - irs_form_1040_schedule_2_2025
+    gateway_facts:
+      - /hasSelfEmploymentIncome
+    opened_facts:
+      - /seGrossReceipts
+      - /usesVehicleForBusiness
+      - /seVehicleBusinessMiles
+      - /sePlatformFees
+      - /seSuppliesAndOther
+      - /seNetProfit
+      - /seTax
+    evidence_triggers:
+      - form_1099_nec
+      - form_1099_k
+      - form_1099_misc_nonemployee_or_business_income
+      - prior_year_schedule_c
+    suppression_facts:
+      - /hasSelfEmploymentIncome=false
+    review_triggers:
+      - no_self_employment_but_1099_nec_present
+      - prior_year_schedule_c_but_current_year_denied

@@ -1,0 +1,536 @@
+<?xml-model href="../../../../../backend/src/main/resources/tax/FactDictionaryModule.rng"?>
+<FactDictionaryModule>
+  <Facts>
+
+    <!-- ============================================================
+         TY2024 CONSTANTS for self-employment + estimated tax
+         ============================================================ -->
+    <Fact path="/seSocialSecurityRate">
+      <Description>Social Security portion of SE tax (12.4%)</Description>
+      <TaxYear>2024</TaxYear>
+      <Derived>
+        <Rational>124/1000</Rational>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seMedicareRate">
+      <Description>Medicare portion of SE tax (2.9%)</Description>
+      <TaxYear>2024</TaxYear>
+      <Derived>
+        <Rational>29/1000</Rational>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seWageMultiplier">
+      <Description>Net earnings multiplier (92.35%) — removes employer-equivalent FICA from the SE base.</Description>
+      <TaxYear>2024</TaxYear>
+      <Derived>
+        <Rational>9235/10000</Rational>
+      </Derived>
+    </Fact>
+
+    <Fact path="/socialSecurityWageBase">
+      <Description>Social Security wage base, TY2024.</Description>
+      <TaxYear>2024</TaxYear>
+      <Derived>
+        <Dollar>168600</Dollar>
+      </Derived>
+    </Fact>
+
+    <Fact path="/standardMileageRate">
+      <Description>Business standard mileage rate, TY2024 ($0.67/mi).</Description>
+      <TaxYear>2024</TaxYear>
+      <Derived>
+        <Dollar>0.67</Dollar>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seFilingThreshold">
+      <Description>Net SE earnings at or above this trigger SE tax ($400).</Description>
+      <TaxYear>2024</TaxYear>
+      <Derived>
+        <Dollar>400</Dollar>
+      </Derived>
+    </Fact>
+
+    <Fact path="/highIncomeSafeHarborThreshold">
+      <Description>Prior-year AGI above this requires 110% (not 100%) safe-harbor coverage.</Description>
+      <TaxYear>2024</TaxYear>
+      <Derived>
+        <Dollar>150000</Dollar>
+      </Derived>
+    </Fact>
+
+
+    <!-- ============================================================
+         SCHEDULE C — single trade or business (MVP simplification)
+
+         Real Schedule C is a Collection per filer, but for the
+         planning-agent MVP we model ONE consolidated SE business per
+         taxpayer. Most gig workers combining Uber/Lyft/DoorDash
+         legitimately file a single Schedule C since the activities are
+         related. Extending to multi-business is additive (add a
+         Collection wrapper and re-roll the sums).
+         ============================================================ -->
+
+    <Fact path="/seGrossReceipts">
+      <Name>Gross receipts (Schedule C Line 1)</Name>
+      <Description>Total gross income from self-employment across all platforms
+        (1099-NEC + business portion of 1099-K +
+        cash).</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seVehicleBusinessMiles">
+      <Name>Business miles driven</Name>
+      <Description>Business miles for the year, standard-mileage method.</Description>
+      <Writable>
+        <Int />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seVehicleDeduction">
+      <Name>Vehicle deduction (standard mileage method)</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/seVehicleBusinessMiles" />
+            <Dependency path="/standardMileageRate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/sePlatformFees">
+      <Name>Platform / commission fees</Name>
+      <Description>Service fees withheld by Uber/Lyft/DoorDash/Instacart, etc.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seSuppliesAndOther">
+      <Name>Supplies and other expenses</Name>
+      <Description>Catch-all for supplies, phone business portion, insurance, etc.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seTotalExpenses">
+      <Derived>
+        <Add>
+          <Dependency path="/seVehicleDeduction" />
+          <Dependency path="/sePlatformFees" />
+          <Dependency path="/seSuppliesAndOther" />
+        </Add>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seNetProfit">
+      <Name>Net profit (Schedule C Line 31)</Name>
+      <Description>Gross receipts minus total expenses. Negative values are losses;
+        for the planning MVP we clip at zero
+        for SE-tax purposes.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/seGrossReceipts" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/seTotalExpenses" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+
+    <!-- ============================================================
+         SCHEDULE SE — self-employment tax
+         ============================================================ -->
+
+    <Fact path="/seNetEarnings">
+      <Name>Net earnings from self-employment (Schedule SE Line 4a)</Name>
+      <Description>Net profit × 92.35% — removes employer-equivalent FICA from the SE base.</Description>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/seNetProfit" />
+            <Dependency path="/seWageMultiplier" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seTaxRequired">
+      <Description>True if net SE earnings are at or above the $400 SE-filing threshold.</Description>
+      <Derived>
+        <Not>
+          <LessThan>
+            <Left>
+              <Dependency path="/seNetEarnings" />
+            </Left>
+            <Right>
+              <Dependency path="/seFilingThreshold" />
+            </Right>
+          </LessThan>
+        </Not>
+      </Derived>
+    </Fact>
+
+    <!-- W-2 SS wages already paid this year, written by the agent (or imported).
+         Used to compute how much of the SS wage base is still subject to the
+         12.4% portion of SE tax. -->
+    <Fact path="/seSocialSecurityWagesFromW2">
+      <Name>Social Security wages already reported on W-2s</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/ssWageBaseRemaining">
+      <Description>SS wage base minus W-2 SS wages already paid.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/socialSecurityWageBase" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/seSocialSecurityWagesFromW2" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seSocialSecurityTax">
+      <Derived>
+        <Multiply>
+          <LesserOf>
+            <Dependency path="/seNetEarnings" />
+            <Dependency path="/ssWageBaseRemaining" />
+          </LesserOf>
+          <Dependency path="/seSocialSecurityRate" />
+        </Multiply>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seMedicareTax">
+      <Description>Medicare portion of SE tax. Excludes the Additional Medicare
+        0.9% surtax that applies above $200K
+        (single) / $250K (MFJ) — that's
+        on Form 8959 and is out of scope for this MVP.</Description>
+      <Derived>
+        <Multiply>
+          <Dependency path="/seNetEarnings" />
+          <Dependency path="/seMedicareRate" />
+        </Multiply>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seTax">
+      <Name>Self-employment tax (Schedule 2 Line 4)</Name>
+      <Derived>
+        <Round>
+          <Switch>
+            <Case>
+              <When>
+                <Dependency path="/seTaxRequired" />
+              </When>
+              <Then>
+                <Add>
+                  <Dependency path="/seSocialSecurityTax" />
+                  <Dependency path="/seMedicareTax" />
+                </Add>
+              </Then>
+            </Case>
+            <Case>
+              <When>
+                <True />
+              </When>
+              <Then>
+                <Dollar>0</Dollar>
+              </Then>
+            </Case>
+          </Switch>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/deductibleHalfOfSETax">
+      <Name>Deductible half of SE tax (Schedule 1 adjustment)</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/seTax" />
+            <Rational>1/2</Rational>
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+
+    <!-- ============================================================
+         QUARTERLY ESTIMATED TAX (Form 1040-ES)
+
+         The agent gathers prior-year tax / AGI / YTD payments, then
+         reads /planning/nextQuarterlyPaymentSuggested. The graph picks
+         the lower of (100/110% prior-year tax) and (90% current-year
+         projected) per IRC 6654(d), subtracts YTD payments already
+         made, and divides across the remaining quarters of the year.
+         ============================================================ -->
+
+    <Fact path="/planning">
+      <Description>Parent node for planning-only facts.</Description>
+      <Derived>
+        <True />
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/priorYearTotalTax">
+      <Name>Prior-year total tax (Form 1040 Line 24)</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/priorYearAGI">
+      <Name>Prior-year AGI (Form 1040 Line 11)</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/highIncomeSafeHarborApplies">
+      <Description>If prior-year AGI exceeded the threshold, safe harbor requires
+        110% of prior-year tax. Otherwise 100%
+        suffices.</Description>
+      <Derived>
+        <Not>
+          <LessThan>
+            <Left>
+              <Dependency path="/planning/priorYearAGI" />
+            </Left>
+            <Right>
+              <Dependency path="/highIncomeSafeHarborThreshold" />
+            </Right>
+          </LessThan>
+        </Not>
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/priorYearSafeHarborTarget">
+      <Description>100% or 110% of prior-year tax, depending on AGI tier.</Description>
+      <Derived>
+        <Round>
+          <Switch>
+            <Case>
+              <When>
+                <Dependency path="/planning/highIncomeSafeHarborApplies" />
+              </When>
+              <Then>
+                <Multiply>
+                  <Dependency path="/planning/priorYearTotalTax" />
+                  <Rational>110/100</Rational>
+                </Multiply>
+              </Then>
+            </Case>
+            <Case>
+              <When>
+                <True />
+              </When>
+              <Then>
+                <Dependency path="/planning/priorYearTotalTax" />
+              </Then>
+            </Case>
+          </Switch>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <!-- The agent supplies a projected current-year total tax. In a richer
+         build this would derive from the full graph's /taxLiability + /seTax;
+         for the MVP it's user-provided so we don't transitively require every
+         income/credit fact to be populated. -->
+    <Fact path="/planning/projectedCurrentYearTax">
+      <Name>Projected current-year total tax</Name>
+      <Description>Estimated total federal tax for the current year, including SE tax.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/currentYearSafeHarborTarget">
+      <Description>90% of projected current-year tax — the alternative safe-harbor leg.</Description>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/planning/projectedCurrentYearTax" />
+            <Rational>90/100</Rational>
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/safeHarborTarget">
+      <Name>Safe-harbor target</Name>
+      <Description>Lesser of (100%/110% prior-year tax) and (90% projected current-year tax).
+        Paying at least this much
+        across the year avoids underpayment penalty.</Description>
+      <Derived>
+        <LesserOf>
+          <Dependency path="/planning/priorYearSafeHarborTarget" />
+          <Dependency path="/planning/currentYearSafeHarborTarget" />
+        </LesserOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/ytdWithholding">
+      <Name>YTD federal withholding</Name>
+      <Description>Federal income tax already withheld by employers and platforms YTD.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/ytdEstimatedPaymentsMade">
+      <Name>Quarterly estimated payments already made YTD</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/ytdPaymentsApplied">
+      <Derived>
+        <Add>
+          <Dependency path="/planning/ytdWithholding" />
+          <Dependency path="/planning/ytdEstimatedPaymentsMade" />
+        </Add>
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/remainingPaymentDue">
+      <Name>Remaining payment needed to hit safe harbor</Name>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/planning/safeHarborTarget" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/planning/ytdPaymentsApplied" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <!-- The agent computes "how many quarterly deadlines are still ahead"
+         from today's date and writes it here. Splitting in the XML keeps the
+         division logic declarative without needing a Divide operator. -->
+    <Fact path="/planning/remainingQuarters">
+      <Name>Number of quarterly deadlines still upcoming</Name>
+      <Description>1 through 4 — written by the planning agent based on the current date.</Description>
+      <Writable>
+        <Int />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/nextQuarterlyPaymentSuggested">
+      <Name>Suggested next quarterly payment</Name>
+      <Description>Remaining payment due, divided evenly across remaining quarters.</Description>
+      <Derived>
+        <Round>
+          <Switch>
+            <Case>
+              <When>
+                <Equal>
+                  <Left>
+                    <Dependency path="/planning/remainingQuarters" />
+                  </Left>
+                  <Right>
+                    <Int>4</Int>
+                  </Right>
+                </Equal>
+              </When>
+              <Then>
+                <Multiply>
+                  <Dependency path="/planning/remainingPaymentDue" />
+                  <Rational>1/4</Rational>
+                </Multiply>
+              </Then>
+            </Case>
+            <Case>
+              <When>
+                <Equal>
+                  <Left>
+                    <Dependency path="/planning/remainingQuarters" />
+                  </Left>
+                  <Right>
+                    <Int>3</Int>
+                  </Right>
+                </Equal>
+              </When>
+              <Then>
+                <Multiply>
+                  <Dependency path="/planning/remainingPaymentDue" />
+                  <Rational>1/3</Rational>
+                </Multiply>
+              </Then>
+            </Case>
+            <Case>
+              <When>
+                <Equal>
+                  <Left>
+                    <Dependency path="/planning/remainingQuarters" />
+                  </Left>
+                  <Right>
+                    <Int>2</Int>
+                  </Right>
+                </Equal>
+              </When>
+              <Then>
+                <Multiply>
+                  <Dependency path="/planning/remainingPaymentDue" />
+                  <Rational>1/2</Rational>
+                </Multiply>
+              </Then>
+            </Case>
+            <Case>
+              <When>
+                <Equal>
+                  <Left>
+                    <Dependency path="/planning/remainingQuarters" />
+                  </Left>
+                  <Right>
+                    <Int>1</Int>
+                  </Right>
+                </Equal>
+              </When>
+              <Then>
+                <Dependency path="/planning/remainingPaymentDue" />
+              </Then>
+            </Case>
+            <Case>
+              <When>
+                <True />
+              </When>
+              <Then>
+                <Dollar>0</Dollar>
+              </Then>
+            </Case>
+          </Switch>
+        </Round>
+      </Derived>
+    </Fact>
+
+  </Facts>
+</FactDictionaryModule>

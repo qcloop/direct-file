@@ -1,0 +1,15 @@
+schema_id: source_ref
+description: Exact citation from an artifact back to a reviewed source chunk.
+required:
+  - source_id
+  - chunk_id
+  - pages
+  - text_sha256
+fields:
+  source_id: source document id, usually generated from the IRS product id and tax year
+  chunk_id: stable chunk id from sources/<agency>/<tax-year>/*.yaml
+  pages: page numbers in the source PDF
+  text_sha256: hash of the cited chunk text at the time the artifact was drafted or reviewed
+  quote: optional short excerpt used for reviewer orientation
+  relevance_ids: optional relevance-classification ids that led to this artifact
+  reviewer_notes: optional notes about interpretation or context boundaries

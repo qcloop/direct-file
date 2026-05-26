@@ -1,0 +1,21 @@
+schema_id: conflict
+description: Rule that detects contradictions between documents, profile, answers, and confirmed facts.
+required:
+  - conflict_id
+  - tax_year
+  - jurisdiction
+  - status
+  - when
+  - severity
+fields:
+  conflict_id: stable conflict id
+  tax_year: tax year
+  jurisdiction: federal or state code
+  status: draft | reviewed | approved | retired
+  when: conditions over facts, evidence, profile, or prior answers
+  severity: info | review_required | blocker
+  message: taxpayer-facing or reviewer-facing summary
+  resolution_prompt: question or instruction to resolve the conflict
+  source_ids: supporting source ids
+  source_refs: exact chunk citations required before reviewed or approved status
+  owner: human owner

@@ -1,0 +1,18 @@
+schema_id: relevance
+description: Classification linking source chunks to tax-preparation artifact targets.
+required:
+  - relevance_id
+  - source_ref
+  - topic_ids
+  - artifact_targets
+  - confidence
+fields:
+  relevance_id: stable id for this source-chunk classification
+  source_ref: source_ref object for the classified chunk
+  topic_ids: applicable tax topics
+  artifact_targets: factgraph | validation | interview | evidence_map | conflict | pdf_config | scenario | explanation
+  confidence: low | medium | high
+  matched_terms: keywords, headings, forms, or fact concepts that matched
+  reason: concise explanation of why this chunk matters
+  owner: domain owner expected to review the classification
+  status: draft | reviewed | approved | rejected

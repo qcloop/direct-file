@@ -1,0 +1,22 @@
+schema_id: scenario
+description: Synthetic taxpayer scenario used for regression testing and rule review.
+required:
+  - scenario_id
+  - tax_year
+  - jurisdiction
+  - status
+  - facts
+  - expected
+fields:
+  scenario_id: stable scenario id
+  tax_year: tax year
+  jurisdiction: federal or state code
+  status: draft | reviewed | approved | retired
+  description: scenario description
+  taxpayer_profile: durable profile hints used for relevance only
+  documents: optional document signals or candidate facts
+  facts: confirmed facts
+  expected: expected computed facts, question behavior, conflicts, or form outputs
+  covers: rule, topic, question, evidence, and conflict ids covered by the scenario
+  source_refs: exact chunk citations used to derive expected outputs, required before reviewed or approved status
+  reviewers: required human reviewers

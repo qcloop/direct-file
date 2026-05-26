@@ -1,0 +1,137 @@
+tax_year: 2025
+jurisdiction: federal
+status: draft
+
+rules:
+  - topic_id: filing_status
+    owner: federal_individual_income_tax_specialist
+    terms:
+      - filing status
+      - married filing jointly
+      - married filing separately
+      - head of household
+      - qualifying surviving spouse
+    artifact_targets:
+      - factgraph
+      - interview
+      - validation
+      - scenario
+
+  - topic_id: dependents
+    owner: federal_individual_income_tax_specialist
+    terms:
+      - dependent
+      - qualifying child
+      - qualifying relative
+      - child tax credit
+      - credit for other dependents
+    artifact_targets:
+      - factgraph
+      - interview
+      - validation
+      - scenario
+
+  - topic_id: w2_income
+    owner: federal_individual_income_tax_specialist
+    terms:
+      - form w-2
+      - wages
+      - salary
+      - federal income tax withheld
+      - tips
+    artifact_targets:
+      - factgraph
+      - evidence_map
+      - interview
+      - pdf_config
+
+  - topic_id: self_employment
+    owner: small_business_tax_specialist
+    terms:
+      - schedule c
+      - self-employment
+      - business income
+      - nonemployee compensation
+      - standard mileage
+      - business miles
+    artifact_targets:
+      - factgraph
+      - interview
+      - evidence_map
+      - validation
+      - scenario
+
+  - topic_id: retirement_income
+    owner: retirement_tax_specialist
+    terms:
+      - form 1099-r
+      - pension
+      - annuity
+      - ira distribution
+      - required minimum distribution
+    artifact_targets:
+      - factgraph
+      - interview
+      - evidence_map
+      - validation
+      - pdf_config
+
+  - topic_id: social_security
+    owner: retirement_tax_specialist
+    terms:
+      - social security benefits
+      - form ssa-1099
+      - taxable social security
+      - railroad retirement benefits
+    artifact_targets:
+      - factgraph
+      - interview
+      - evidence_map
+      - validation
+
+  - topic_id: investment_income
+    owner: investment_tax_specialist
+    terms:
+      - interest income
+      - ordinary dividends
+      - qualified dividends
+      - capital gain
+      - schedule d
+      - form 1099-b
+    artifact_targets:
+      - factgraph
+      - interview
+      - evidence_map
+      - validation
+      - scenario
+
+  - topic_id: digital_assets
+    owner: investment_tax_specialist
+    terms:
+      - digital asset
+      - virtual currency
+      - cryptocurrency
+      - form 1099-da
+      - exchange digital assets
+    artifact_targets:
+      - factgraph
+      - interview
+      - evidence_map
+      - conflict
+
+  - topic_id: credits_and_deductions
+    owner: credits_deductions_tax_specialist
+    terms:
+      - credit
+      - deduction
+      - earned income credit
+      - child and dependent care
+      - education credit
+      - standard deduction
+      - itemized deduction
+    artifact_targets:
+      - factgraph
+      - interview
+      - validation
+      - scenario
+      - pdf_config

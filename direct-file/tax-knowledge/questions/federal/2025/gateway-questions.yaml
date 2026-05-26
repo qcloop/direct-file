@@ -1,0 +1,93 @@
+tax_year: 2025
+jurisdiction: federal
+status: draft
+
+questions:
+  - question_id: has_w2_income
+    topic_id: w2_income
+    prompt: Did you receive any W-2 forms for wages, salary, or tips in 2025?
+    why_we_ask: W-2 wages and withholding are reported on Form 1040.
+    writes:
+      - /hasW2
+    asks_when:
+      all: []
+    skip_when:
+      any:
+        - evidence: form_w2
+          status: confirmed_absent
+    priority: gateway
+    source_ids:
+      - irs_form_1040_2025
+
+  - question_id: has_self_employment_income
+    topic_id: self_employment
+    prompt: Did you earn money from freelance, gig, contractor, or business work in 2025?
+    help_text: This can include income reported on Form 1099-NEC, Form 1099-K, cash payments, or platform income.
+    why_we_ask: Self-employment income may need Schedule C and self-employment tax calculations.
+    writes:
+      - /hasSelfEmploymentIncome
+    asks_when:
+      all: []
+    skip_when:
+      any:
+        - fact: /hasSelfEmploymentIncome
+          equals: false
+          status: confirmed
+    priority: gateway
+    source_ids:
+      - irs_instruction_1040_schedule_c_2025
+
+  - question_id: uses_vehicle_for_business
+    topic_id: self_employment
+    prompt: Did you use a car or other vehicle for this business or gig work in 2025?
+    why_we_ask: Vehicle use can affect deductible business expenses.
+    writes:
+      - /usesVehicleForBusiness
+    asks_when:
+      all:
+        - fact: /hasSelfEmploymentIncome
+          equals: true
+    skip_when:
+      any:
+        - fact: /hasSelfEmploymentIncome
+          equals: false
+    priority: gateway
+    source_ids:
+      - irs_instruction_1040_schedule_c_2025
+
+  - question_id: se_vehicle_business_miles
+    topic_id: self_employment
+    prompt: How many business miles did you drive for this work in 2025?
+    help_text: Do not include commuting miles or personal driving.
+    why_we_ask: Business miles are needed to calculate the standard mileage deduction.
+    writes:
+      - /seVehicleBusinessMiles
+    asks_when:
+      all:
+        - fact: /hasSelfEmploymentIncome
+          equals: true
+        - fact: /usesVehicleForBusiness
+          equals: true
+    skip_when:
+      any:
+        - fact: /hasSelfEmploymentIncome
+          equals: false
+        - fact: /usesVehicleForBusiness
+          equals: false
+    priority: detail
+    source_ids:
+      - se_standard_mileage_vehicle_deduction_ty2025
+
+  - question_id: has_digital_asset_activity
+    topic_id: digital_assets
+    prompt: At any time during 2025, did you receive, sell, exchange, or otherwise dispose of digital assets?
+    why_we_ask: Form 1040 asks every filer about digital asset activity.
+    writes:
+      - /hasDigitalAssetActivity
+    asks_when:
+      all: []
+    skip_when:
+      any: []
+    priority: gateway
+    source_ids:
+      - irs_form_1040_2025

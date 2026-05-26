@@ -1,0 +1,22 @@
+schema_id: topic
+description: Tax topic or interview branch metadata used by the applicability and question planner.
+required:
+  - topic_id
+  - tax_year
+  - jurisdiction
+  - status
+  - gateway_facts
+fields:
+  topic_id: stable topic id
+  name: human readable name
+  tax_year: tax year
+  jurisdiction: federal or state code
+  status: draft | reviewed | approved | retired
+  domain_owner: specialist role or person
+  source_ids: authoritative source ids
+  source_refs: exact chunk citations required before reviewed or approved status
+  gateway_facts: facts that open or suppress the topic
+  opened_facts: facts collected or computed after relevance is established
+  evidence_triggers: document or import signals that make the topic potentially relevant
+  suppression_facts: negative facts that suppress the topic
+  review_triggers: conditions that require human or taxpayer review
