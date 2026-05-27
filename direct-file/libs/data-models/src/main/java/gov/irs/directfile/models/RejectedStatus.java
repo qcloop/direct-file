@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @SuppressFBWarnings(
-        value = {"NM_FIELD_NAMING_CONVENTION", "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"},
+        value = "NM_FIELD_NAMING_CONVENTION",
         justification = "Initial Spotbugs Setup")
 @EqualsAndHashCode
 @ToString

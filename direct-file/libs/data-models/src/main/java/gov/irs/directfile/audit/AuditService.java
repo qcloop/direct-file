@@ -2,7 +2,6 @@ package gov.irs.directfile.audit;
 
 import java.util.Map;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.slf4j.spi.LoggingEventBuilder;
@@ -13,7 +12,6 @@ import gov.irs.directfile.audit.events.EventStatus;
 
 @Service
 @Slf4j
-@SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED", justification = "Initial Spotbugs Setup")
 public class AuditService {
 
     public void addAuditPropertiesToMDC(final Event event) {

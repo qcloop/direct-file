@@ -2,7 +2,7 @@
 
 This repo holds the Scala code that is compiled to Java and transpiled to JS. The project uses
 
-- Java 21
+- Java 25
 - Scala 3
 - ScalaJS to transpile to JS
 - SBT
@@ -11,7 +11,7 @@ This repo holds the Scala code that is compiled to Java and transpiled to JS. Th
 
 - (this section needs some love)
 - install coursier (will download, and run AdoptOpenJDK11)
-- change to version 21 with `eval "$(cs java --jvm 21 --env)"`
+- change to version 25 with `eval "$(cs java --jvm 25 --env)"`
 - set up sbt using coursier
 - install [metals](https://marketplace.visualstudio.com/items?itemName=scalameta.metals) extension for your IDE
 

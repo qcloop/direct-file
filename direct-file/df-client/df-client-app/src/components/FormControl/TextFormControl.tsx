@@ -1,7 +1,6 @@
-import { Dispatch, SetStateAction, useId } from 'react';
+import { ComponentProps, Dispatch, SetStateAction, useId } from 'react';
 import { ConcretePath, JSeither } from '@irs/js-factgraph-scala';
 import { FormGroup, InputGroup, InputPrefix, TextInput, InputSuffix } from '@trussworks/react-uswds';
-import type { TextInputProps } from '@trussworks/react-uswds/lib/components/forms/TextInput/TextInput.js';
 import { useFactControl } from '../../hooks/useFactControl.js';
 import { buildControlErrorId, buildFormControlId, buildHintId, buildHintKey, sanitizeString } from './helpers.js';
 import Translation from '../Translation/index.js';
@@ -12,6 +11,10 @@ import { Path } from '../../fact-dictionary/Path.js';
 import { DFTextInputMask } from './DFTextInputMask.js';
 import { FormFieldWrapperWithConfigurableLabel } from './FormFieldWrapperWithConfigurableLabel.js';
 import { FormFieldLabel } from './FormFieldLabel.js';
+
+// @trussworks/react-uswds v8 no longer exports TextInputProps via a subpath, so
+// derive the props type from the root-exported TextInput component.
+type TextInputProps = ComponentProps<typeof TextInput>;
 
 export type LabelConfig =
   | {

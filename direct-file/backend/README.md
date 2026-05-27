@@ -131,7 +131,7 @@ For troubleshooting you can open a shell in the localstack container (```docker 
 ### Application
 
 Requirements:
-* Java 21 JDK
+* Java 25 JDK
 * [SBT](https://www.scala-sbt.org/) (1.9)
 
 #### Initial Setup

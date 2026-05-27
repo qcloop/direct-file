@@ -1,7 +1,11 @@
 import React, { forwardRef, useEffect, useState } from 'react';
 import classnames from 'classnames';
-import type { TextInputProps } from '@trussworks/react-uswds/lib/components/forms/TextInput/TextInput.js';
+import type { TextInput } from '@trussworks/react-uswds';
 import { DFTextInput } from './DFTextInput.js';
+
+// @trussworks/react-uswds v8 no longer exports TextInputProps via a subpath, so
+// derive the props type from the root-exported TextInput component.
+type TextInputProps = React.ComponentProps<typeof TextInput>;
 
 export type AllProps = TextInputProps & {
   mask: string;

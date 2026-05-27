@@ -1,6 +1,6 @@
 #syntax=docker/dockerfile:1.7-labs
 # build factgraph since it will be a dependency in share-libs-builder
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.3.3 AS factgraph-builder
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-25.0.1_8_1.12.11_3.8.3 AS factgraph-builder
 WORKDIR /build/
 COPY --from=factgraph-repo js/src/ js/src/
 COPY --from=factgraph-repo jvm/src/ jvm/src/
@@ -10,7 +10,7 @@ COPY --from=factgraph-repo build.sbt .
 RUN sbt compile package publishM2
 
 # build shared dependencies
-FROM eclipse-temurin:21-jdk-alpine AS shared-dependencies-builder
+FROM eclipse-temurin:25-jdk-alpine AS shared-dependencies-builder
 COPY --from=factgraph-builder /root/.m2/repository/gov/irs/factgraph/fact-graph_3/ /root/.m2/repository/gov/irs/factgraph/fact-graph_3/
 ARG MAVEN_OPTS=""
 WORKDIR /build/
@@ -39,7 +39,7 @@ COPY src/ src/
 RUN ./mvnw package
 
 # bundle backend api jar into runnable image
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 ENV SPRING_PROFILES_ACTIVE=development
 COPY --from=email-service-builder /build/target/email-service-0.0.1-SNAPSHOT.jar /app.jar
 RUN adduser --system --no-create-home jar-runner
