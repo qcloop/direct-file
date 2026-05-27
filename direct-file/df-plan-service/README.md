@@ -81,8 +81,8 @@ on `PlanningTools` (camelCase, not snake_case).
 This module depends on two things the open-source Direct File repo does not
 publish to Maven Central:
 
-1. **`gov.irs.factgraph:fact-graph_3`** — the Scala 3 engine, lives in
-   [`../fact-graph-scala/`](../fact-graph-scala/) and ships via sbt.
+1. **`gov.irs:factgraph_3`** — the Scala 3 engine, lives in the standalone
+   fact-graph repo ([`../../../fact-graph/`](../../../fact-graph/)) and ships via sbt.
 2. **`gov.irs.directfile:loaders`** — the shared XML loader extracted from
    the backend, lives in [`../libs/loaders/`](../libs/loaders/).
 
@@ -93,8 +93,8 @@ publish to Maven Central:
 brew install sbt
 
 # 2. Publish the fact graph to your local Maven repo:
-cd ../fact-graph-scala
-sbt publishM2          # writes to ~/.m2/repository/gov/irs/factgraph/...
+cd ../../../fact-graph
+sbt publishM2          # writes to ~/.m2/repository/gov/irs/factgraph_3/...
 
 # 3. Install Direct File's BOMs and shared libs:
 cd ../boms && ../backend/mvnw install -N

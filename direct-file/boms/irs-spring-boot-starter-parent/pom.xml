@@ -18,6 +18,13 @@
         <!-- maven properties-->
         <java.version>25</java.version>
 
+        <!-- Spring Boot 3.4.x ships Mockito 5.14.2 / ByteBuddy 1.15.11, which cannot
+             instrument mocks on JDK 25. Bump to a coherent JDK-25-capable pair
+             (Mockito 5.23.0 is built against ByteBuddy 1.17.7). The byte-buddy.version
+             property also drives byte-buddy-agent. -->
+        <mockito.version>5.23.0</mockito.version>
+        <byte-buddy.version>1.17.7</byte-buddy.version>
+
         <!-- dependency management versions-->
         <amazon-sqs-java-messaging-lib.version>2.1.1</amazon-sqs-java-messaging-lib.version>
         <aws-encryption-sdk.version>3.0.1</aws-encryption-sdk.version>

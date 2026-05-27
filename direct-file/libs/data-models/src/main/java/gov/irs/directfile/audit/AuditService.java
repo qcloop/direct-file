@@ -59,7 +59,11 @@ public class AuditService {
                         ? log.atInfo()
                         : log.atError();
 
-        eventData.getEventData().forEach((k, v) -> builder.addKeyValue(k.toString(), v));
+        // LoggingEventBuilder is a fluent (potentially immutable) API, so thread the
+        // returned builder through each call rather than discarding the return value.
+        for (var entry : eventData.getEventData().entrySet()) {
+            builder = builder.addKeyValue(entry.getKey().toString(), entry.getValue());
+        }
 
         // Add `cyberOnly`: the property that indicates event should be forwarded to XXXX
         builder.addKeyValue(AuditLogElement.cyberOnly.toString(), true).log();

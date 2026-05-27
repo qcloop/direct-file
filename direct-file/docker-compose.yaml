@@ -67,7 +67,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile-local
       additional_contexts:
-        factgraph-repo: ./fact-graph-scala
+        factgraph-repo: ../../fact-graph
         shared-libs: ./libs
         boms: ./boms
         config: ./config
@@ -157,7 +157,7 @@ services:
       context: ./email-service
       dockerfile: Dockerfile-local
       additional_contexts:
-        factgraph-repo: ./fact-graph-scala
+        factgraph-repo: ../../fact-graph
         shared-libs: ./libs
         boms: ./boms
         config: ./config
@@ -187,7 +187,7 @@ services:
       context: ./state-api
       dockerfile: Dockerfile-local
       additional_contexts:
-        factgraph-repo: ./fact-graph-scala
+        factgraph-repo: ../../fact-graph
         boms: ./boms
         shared-libs: ./libs
         config: ./config
