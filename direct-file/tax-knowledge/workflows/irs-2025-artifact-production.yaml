@@ -19,6 +19,7 @@ stages:
           python3 tax-knowledge/tools/download_irs_pdfs.py
           --tax-year 2025
           --product-list tax-knowledge/corpora/irs-2025/publication-products.txt
+          --carry-forward-product-list tax-knowledge/corpora/irs-2025/publication-carryforward-products.txt
           --output-dir tax-knowledge/corpora/irs-2025/downloads
           --manifest tax-knowledge/corpora/irs-2025/pdf-manifest.json
           --download
@@ -27,6 +28,7 @@ stages:
       - tax_year_and_posted_dates_recorded
       - downloaded_pdfs_have_sha256_hashes
       - missing_expected_publications_are_reviewed
+      - carry_forward_publications_are_domain_reviewed
 
   - stage: source_segmentation
     owner_agent: document-understanding-agent
@@ -94,6 +96,23 @@ stages:
       - factgraph_relevant_chunks_reviewed
       - irrelevant_chunks_are_excluded_from_generation
 
+  - stage: runtime_resource_mapping
+    owner_agent: release-agent
+    supporting_agents:
+      - rule-modeling-agent
+    human_reviewers:
+      - tax_platform_engineer
+      - federal_individual_income_tax_specialist
+      - product_owner
+    outputs:
+      - runtime-resources/direct-file-resource-map.yaml
+      - RUNTIME_RESOURCE_DEPENDENCY_MAP.md
+    gates:
+      - backend_resource_groups_are_classified
+      - source_dependent_runtime_targets_are_identified
+      - non_tax_infrastructure_is_excluded_from_generation
+      - unsupported_scope_dependencies_are_marked_as_product_policy
+
   - stage: topic_modeling
     owner_agent: rule-modeling-agent
     supporting_agents:
@@ -130,12 +149,43 @@ stages:
       - tax_platform_engineer
     outputs:
       - factgraph/federal/2025/*.yaml
-      - draft fact graph XML patches
-      - draft validation XML patches
+      - draft patches for backend/src/main/resources/tax/*.xml
+      - draft patches for df-plan-service/src/main/resources/tax-plan/*.xml
+      - regenerated draft backend/src/main/resources/factgraphservice/xmlFactPaths
     gates:
       - generated_factgraph_artifacts_have_exact_source_refs
       - fact_paths_and_types_are_engineer_reviewed
+      - draft_xml_conforms_to_fact_dictionary_schema
+      - mef_exports_and_validations_are_reviewed
       - source_backed_scenarios_exist
+    automation:
+      - command: >
+          python3 tax-knowledge/tools/generate_factgraph_work_items.py
+          --tax-year 2025
+          --rules-dir tax-knowledge/rules/federal/2025
+          --relevance tax-knowledge/relevance/federal/2025/source-relevance.yaml
+          --sources-dir tax-knowledge/sources/irs/2025
+          --runtime-resource-map tax-knowledge/runtime-resources/direct-file-resource-map.yaml
+          --output tax-knowledge/factgraph/federal/2025/generated-factgraph-work-items.yaml
+
+  - stage: pdf_configuration_drafting
+    owner_agent: document-understanding-agent
+    supporting_agents:
+      - release-agent
+      - rule-modeling-agent
+    human_reviewers:
+      - forms_pdf_engineer
+      - tax_platform_engineer
+      - federal_individual_income_tax_specialist
+      - bilingual_content_reviewer_when_needed
+    outputs:
+      - draft patches for backend/src/main/resources/pdf/2025/*/*/configuration.yml
+      - PDF field mapping review packets
+    gates:
+      - pdf_field_names_are_extracted_or_reviewed
+      - field_to_fact_path_mappings_have_source_refs
+      - weak_pdf_extractions_have_vision_or_ocr_comparison
+      - localized_configs_are_reviewed_by_language_owner
 
   - stage: interview_authoring
     owner_agent: procedure-interview-agent

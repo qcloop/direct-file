@@ -1,0 +1,4 @@
+# Publications whose latest older revision is treated as applicable to TY2025
+# until IRS publishes a replacement, obsoletes the product, or moves the rules
+# into a newer form/instruction source.
+p538

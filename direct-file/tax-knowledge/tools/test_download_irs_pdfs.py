@@ -1,6 +1,7 @@
 import unittest
+from argparse import Namespace
 
-from download_irs_pdfs import parse_entries
+from download_irs_pdfs import matches_filters, parse_entries
 
 
 FIXTURE = """
@@ -42,6 +43,25 @@ class DownloadIrsPdfsTest(unittest.TestCase):
         self.assertEqual(entries[0].description, "2025 Publ 334 (PDF)")
         self.assertEqual(entries[1].product_kind, "form")
         self.assertEqual(anchors[-1].href, "https://www.irs.gov/downloads/irs-pdf?page=1")
+
+    def test_carry_forward_products_can_bypass_revision_filter(self):
+        entries, _ = parse_entries(
+            """
+            <table>
+              <tr>
+                <td><a href="/pub/irs-pdf/p538.pdf">p538.pdf</a></td>
+                <td>2024-01-01 10:10:10</td>
+                <td>1.00 MB</td>
+                <td>2022 Publ 538 (PDF)</td>
+              </tr>
+            </table>
+            """,
+            "https://www.irs.gov/downloads/irs-pdf",
+        )
+        args = Namespace(kind="publication", revision_year=2025, filename_regex=None)
+
+        self.assertFalse(matches_filters(entries[0], args, {"p538"}))
+        self.assertTrue(matches_filters(entries[0], args, {"p538"}, {"p538"}))
 
 
 if __name__ == "__main__":

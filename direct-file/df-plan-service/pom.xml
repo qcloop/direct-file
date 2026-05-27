@@ -58,24 +58,14 @@
         </dependency>
 
         <!--
-            Spring AI MCP server. Provides JSON-RPC framing, capabilities negotiation,
-            tool discovery (tools/list, tools/call), error semantics, and a typed
-            tool callback model (@Tool method scanning + JSON-schema generation).
-
-            We pull in BOTH transports:
-              * webmvc-sse  — HTTP+SSE, used when running as a network service
-                              (default profile, port 8090).
-              * core        — STDIO transport, used when the service is launched as
-                              a subprocess by a desktop MCP host (Spring profile
-                              "stdio", web auto-config disabled in application-stdio.yaml).
+            Spring AI MCP server. The webmvc-sse starter transitively pulls in the
+            core mcp-server starter (which carries STDIO support), so we only need
+            this one declaration. STDIO is enabled at runtime via
+            `spring.ai.mcp.server.stdio=true` in application-stdio.yaml.
         -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-mcp-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -83,14 +73,8 @@
             <optional>true</optional>
         </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
+        <!-- jackson-core/databind arrive transitively via spring-boot-starter-web;
+             only jackson-dataformat-yaml needs an explicit declaration. -->
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>

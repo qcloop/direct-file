@@ -1,0 +1,257 @@
+map_id: direct_file_runtime_resource_dependency_map
+status: draft
+scope:
+  backend_resources: backend/src/main/resources
+  plan_service_resources: df-plan-service/src/main/resources
+  inspected_on: 2026-05-26
+
+resource_groups:
+  - group_id: backend_tax_fact_dictionary_modules
+    paths:
+      - backend/src/main/resources/tax/*.xml
+    current_inventory:
+      count: 36
+      examples:
+        - backend/src/main/resources/tax/taxCalculations.xml
+        - backend/src/main/resources/tax/formW2s.xml
+        - backend/src/main/resources/tax/form1099Rs.xml
+        - backend/src/main/resources/tax/standardDeduction.xml
+        - backend/src/main/resources/tax/eitc.xml
+        - backend/src/main/resources/tax/ptc.xml
+        - backend/src/main/resources/tax/validations.xml
+    source_dependency: direct
+    generation_feasibility: partial
+    authoritative_inputs:
+      - IRS forms and instructions for the active tax year
+      - IRS publications that explain eligibility, definitions, worksheets, and limits
+      - IRS revenue procedures, notices, or official pages for yearly constants
+      - IRS MeF schemas and business rules for e-file export names and validation behavior
+      - Direct File product scope decisions for unsupported or blocked situations
+    pipeline_inputs:
+      - sources/irs/<tax-year>/*.yaml
+      - relevance/federal/<tax-year>/source-relevance.yaml
+      - topics/federal/<tax-year>/*.yaml
+      - rules/federal/<tax-year>/*.yaml
+      - evidence/federal/<tax-year>/*.yaml
+      - conflicts/federal/<tax-year>/*.yaml
+      - scenarios/federal/<tax-year>/*.yaml
+      - factgraph/federal/<tax-year>/*.yaml
+    pipeline_outputs:
+      - draft patches for backend/src/main/resources/tax/*.xml
+      - source-backed factgraph work items in factgraph/federal/<tax-year>/*.yaml
+      - scenario regression tests for changed fact paths and calculations
+    human_review:
+      - tax specialist for the rule domain
+      - tax platform engineer
+      - MeF/export engineer when Export nodes or e-file validations change
+      - product owner when blockers or unsupported-scope behavior changes
+    notes:
+      - IRS publications alone are not sufficient; forms, instructions, MeF material, and product scope are also required.
+      - Constants, worksheets, calculations, derived facts, validations, exports, blockers, and writable fact definitions can be drafted from the corpus.
+      - Final XML should be generated as reviewed patches, not auto-applied runtime changes.
+
+  - group_id: backend_fact_dictionary_schema
+    paths:
+      - backend/src/main/resources/tax/FactDictionaryModule.rng
+    current_inventory:
+      count: 1
+    source_dependency: platform
+    generation_feasibility: validate_only
+    authoritative_inputs:
+      - Fact graph engine grammar
+      - backend loader constraints
+    pipeline_inputs:
+      - factgraph/federal/<tax-year>/*.yaml
+    pipeline_outputs:
+      - validation that generated fact graph XML conforms to FactDictionaryModule.rng
+    human_review:
+      - tax platform engineer
+    notes:
+      - This schema controls fact graph syntax; it is not derived from IRS publications.
+
+  - group_id: backend_pdf_form_configurations
+    paths:
+      - backend/src/main/resources/pdf/<tax-year>/<form>/<language>/configuration.yml
+    current_inventory:
+      count: 76
+      tax_years:
+        "2024": 38
+        "2025": 38
+      examples:
+        - backend/src/main/resources/pdf/2025/IRS1040/en/configuration.yml
+        - backend/src/main/resources/pdf/2025/IRS1040S1/en/configuration.yml
+        - backend/src/main/resources/pdf/2025/SCHEDULE_R/en/configuration.yml
+        - backend/src/main/resources/pdf/2025/IRS8889/en/configuration.yml
+        - backend/src/main/resources/pdf/2025/IRSW2/en/configuration.yml
+    source_dependency: direct
+    generation_feasibility: partial
+    authoritative_inputs:
+      - IRS fillable form PDFs
+      - IRS form instructions and line descriptions
+      - approved fact paths from backend/src/main/resources/tax/*.xml
+      - locale-specific form PDFs and translations when available
+    pipeline_inputs:
+      - corpora/irs-<tax-year>/downloads/*.pdf
+      - corpora/irs-<tax-year>/text/*.txt
+      - sources/irs/<tax-year>/*.yaml
+      - relevance/federal/<tax-year>/source-relevance.yaml
+      - factgraph/federal/<tax-year>/*.yaml
+    pipeline_outputs:
+      - draft patches for backend/src/main/resources/pdf/<tax-year>/<form>/<language>/configuration.yml
+      - PDF-field-to-fact-path review packets
+      - visual or OCR extraction comparison notes for weak PDF field detection
+    human_review:
+      - forms/PDF engineer
+      - tax platform engineer
+      - bilingual content reviewer for non-English configurations
+      - tax specialist for line-to-fact semantics
+    notes:
+      - Field names and page structure can be extracted from PDFs, but field-to-fact-path matching needs source citations and review.
+      - Vision/OCR should be used as a sanity check when PDF metadata or text extraction is ambiguous.
+
+  - group_id: backend_xml_fact_path_index
+    paths:
+      - backend/src/main/resources/factgraphservice/xmlFactPaths
+    current_inventory:
+      count: 1
+    source_dependency: derived
+    generation_feasibility: full
+    authoritative_inputs:
+      - approved backend/src/main/resources/tax/*.xml modules
+    pipeline_inputs:
+      - approved fact graph XML modules
+    pipeline_outputs:
+      - regenerated backend/src/main/resources/factgraphservice/xmlFactPaths
+    human_review:
+      - tax platform engineer
+    notes:
+      - This is a mechanical index and should be regenerated after fact graph XML changes.
+
+  - group_id: plan_service_tax_plan_modules
+    paths:
+      - df-plan-service/src/main/resources/tax-plan/*.xml
+    current_inventory:
+      count: 1
+      examples:
+        - df-plan-service/src/main/resources/tax-plan/selfEmployment.xml
+    source_dependency: direct
+    generation_feasibility: partial
+    authoritative_inputs:
+      - IRS Schedule C, Schedule SE, Form 1040-ES, and instructions
+      - IRS publications for self-employment income, business expenses, recordkeeping, and estimated taxes
+      - yearly constants such as mileage rates, wage bases, and safe-harbor thresholds
+      - Direct File planning product scope
+    pipeline_inputs:
+      - sources/irs/<tax-year>/*.yaml
+      - relevance/federal/<tax-year>/source-relevance.yaml
+      - rules/federal/<tax-year>/*.yaml
+      - factgraph/federal/<tax-year>/*.yaml
+      - scenarios/federal/<tax-year>/*.yaml
+    pipeline_outputs:
+      - draft patches for df-plan-service/src/main/resources/tax-plan/*.xml
+      - source-backed planning scenarios
+    human_review:
+      - domain specialist for the planning topic
+      - tax platform engineer
+      - product owner for planning scope and assumptions
+    notes:
+      - Planning fact graphs may intentionally model a simplified or advisory view; that simplification must be explicit in source-backed artifacts.
+
+  - group_id: backend_data_import_gating
+    paths:
+      - backend/src/main/resources/data-import-gating-sample.json
+    current_inventory:
+      count: 1
+    source_dependency: indirect
+    generation_feasibility: partial
+    authoritative_inputs:
+      - IRS information return forms and instructions
+      - data import provider payload contracts
+      - approved topic, evidence, and conflict rules
+      - Direct File import support policy
+    pipeline_inputs:
+      - evidence/federal/<tax-year>/*.yaml
+      - conflicts/federal/<tax-year>/*.yaml
+      - questions/federal/<tax-year>/*.yaml
+      - scenarios/federal/<tax-year>/*.yaml
+    pipeline_outputs:
+      - draft data import gating configuration or examples
+      - document-answer conflict test cases
+    human_review:
+      - data import engineer
+      - tax specialist for document semantics
+      - product owner for unsupported document behavior
+    notes:
+      - These artifacts depend on tax-source semantics and provider schemas, but they are not direct transcriptions of IRS publications.
+
+  - group_id: backend_data_import_mocks
+    paths:
+      - backend/src/main/resources/dataimportservice/mocks/*.json
+    current_inventory:
+      count: 22
+      examples:
+        - backend/src/main/resources/dataimportservice/mocks/lisa.json
+        - backend/src/main/resources/dataimportservice/mocks/krusty.json
+        - backend/src/main/resources/dataimportservice/mocks/abe.json
+    source_dependency: indirect
+    generation_feasibility: partial
+    authoritative_inputs:
+      - approved scenario artifacts
+      - IRS information return forms and instructions
+      - data import provider payload contracts
+    pipeline_inputs:
+      - scenarios/federal/<tax-year>/*.yaml
+      - evidence/federal/<tax-year>/*.yaml
+      - conflicts/federal/<tax-year>/*.yaml
+    pipeline_outputs:
+      - synthetic import mock payloads for tests and demos
+    human_review:
+      - QA engineer
+      - data import engineer
+      - tax specialist for realistic document semantics
+    notes:
+      - Mocks should be generated from scenarios and provider contracts, not treated as authoritative tax rules.
+
+  - group_id: backend_database_migrations
+    paths:
+      - backend/src/main/resources/db/**/*.yaml
+    current_inventory:
+      examples:
+        - backend/src/main/resources/db/changelog.yaml
+        - backend/src/main/resources/db/migrations/000-initial-schema.yaml
+    source_dependency: none
+    generation_feasibility: not_generated
+    authoritative_inputs:
+      - backend persistence model
+      - application release requirements
+    pipeline_inputs: []
+    pipeline_outputs: []
+    human_review:
+      - backend engineer
+    notes:
+      - These files can be affected by new artifact storage needs, but they are not generated from IRS publications.
+
+  - group_id: backend_application_and_tooling_resources
+    paths:
+      - backend/src/main/resources/application*.yaml
+      - backend/src/main/resources/logback*.xml
+      - backend/src/main/resources/banner.txt
+      - backend/src/main/resources/pmd/static-analysis-ruleset.xml
+      - df-plan-service/src/main/resources/application*.yaml
+    current_inventory:
+      examples:
+        - backend/src/main/resources/application.yaml
+        - backend/src/main/resources/logback.xml
+        - df-plan-service/src/main/resources/application.yaml
+    source_dependency: none
+    generation_feasibility: not_generated
+    authoritative_inputs:
+      - application deployment requirements
+      - engineering operational requirements
+    pipeline_inputs: []
+    pipeline_outputs: []
+    human_review:
+      - backend engineer
+      - operations owner when applicable
+    notes:
+      - These resources are outside the tax corpus generation path.

@@ -1,0 +1,147 @@
+review_id: irs_2025_skipped_publications_due_diligence
+status: draft
+reviewed_on: 2026-05-27
+tax_year: 2025
+scope:
+  skipped_seed_products:
+    - p505
+    - p535
+    - p536
+    - p926
+  reason_for_review: >
+    These products were listed in the individual-income seed list but were not
+    downloaded by the initial current-directory run because the downloader
+    required IRS directory revision_year 2025.
+
+directory_scan:
+  current_directory_url: https://www.irs.gov/downloads/irs-pdf
+  current_directory_filter:
+    kind: publication
+    revision_year: 2025
+  result:
+    matched_products:
+      - p538
+    excluded_products:
+      - p505
+      - p535
+      - p536
+      - p926
+
+publications:
+  - product_id: p505
+    title: Tax Withholding and Estimated Tax
+    initial_skip_reason: >
+      The stable current PDF URL in the IRS static PDF directory has advanced
+      to the 2026 revision, so it is excluded by revision_year 2025.
+    current_directory_metadata:
+      filename: p505.pdf
+      revision_year: 2026
+      description: 2026 Publ 505 (PDF)
+      modified_at: 2026-04-03 15:10:59
+      url: https://www.irs.gov/pub/irs-pdf/p505.pdf
+    authoritative_2025_source:
+      source_type: exact_prior_year_pdf
+      url: https://www.irs.gov/pub/irs-prior/p505--2025.pdf
+      evidence: >
+        IRS has a 2025 Publication 505 prior-year PDF and an IRS-hosted HTML
+        publication page for Publication 505 (2025).
+    disposition: include_exact_2025_prior_pdf
+    pipeline_action:
+      - Add `p505--2025` to prior-year publication supplements.
+      - Do not use the 2026 stable current PDF for TY2025 filing artifacts.
+    artifact_relevance:
+      - estimated_tax
+      - withholding
+      - underpayment_penalty
+      - self_employment_planning
+
+  - product_id: p535
+    title: Business Expenses
+    initial_skip_reason: >
+      Publication 535 is no longer present in the current IRS static PDF
+      directory as a 2025 publication.
+    current_directory_metadata:
+      matched_current_pdf: false
+    replacement_source:
+      source_type: irs_html_resource_map
+      url: https://www.irs.gov/forms-pubs/guide-to-business-expense-resources
+      evidence: >
+        IRS says Publication 535 has been discontinued, the last revision was
+        for 2022, and the guide maps Publication 535 topics to current forms,
+        instructions, publications, and online resources.
+    historical_source:
+      source_type: prior_year_pdf_for_cross_reference
+      url: https://www.irs.gov/pub/irs-prior/p535--2022.pdf
+      revision_year: 2022
+    disposition: do_not_carry_forward_as_primary_authority
+    pipeline_action:
+      - Ingest the IRS guide to business expense resources as the current source.
+      - Use `p535--2022` only as a historical cross-reference when reviewers need the old topic structure.
+      - Add mapped replacement sources by topic before authoring business-expense rules.
+    artifact_relevance:
+      - schedule_c_business_expenses
+      - self_employed_health_insurance
+      - business_interest
+      - amortization
+      - bad_debts
+      - depletion
+
+  - product_id: p536
+    title: Net Operating Losses (NOLs) for Individuals, Estates, and Trusts
+    initial_skip_reason: >
+      Publication 536 is no longer revised for current tax years.
+    replacement_source:
+      source_type: irs_html_notice_and_form_instructions
+      url: https://www.irs.gov/forms-pubs/publication-536-will-no-longer-be-revised
+      evidence: >
+        IRS says Publication 536 will no longer be revised after tax year 2023,
+        and NOL information is now included in the Instructions for Form 172.
+    disposition: obsolete_for_primary_2025_authoring
+    pipeline_action:
+      - Do not include Publication 536 as a carry-forward publication.
+      - Add Form 172 and Instructions for Form 172 as primary 2025 NOL sources.
+      - Retain prior Publication 536 only as historical comparison if needed.
+    artifact_relevance:
+      - net_operating_loss
+      - carryback
+      - carryforward
+      - form_172
+
+  - product_id: p926
+    title: Household Employer's Tax Guide
+    initial_skip_reason: >
+      The stable current PDF URL in the IRS static PDF directory has advanced
+      to the 2026 revision, so it is excluded by revision_year 2025.
+    current_directory_metadata:
+      filename: p926.pdf
+      revision_year: 2026
+      description: 2026 Publ 926 (PDF)
+      modified_at: 2025-12-12 08:10:44
+      url: https://www.irs.gov/pub/irs-pdf/p926.pdf
+    authoritative_2025_source:
+      source_type: exact_prior_year_pdf
+      url: https://www.irs.gov/pub/irs-prior/p926--2025.pdf
+      evidence: >
+        IRS prior-year directory contains Publication 926 (2025), Household
+        Employer's Tax Guide.
+    disposition: include_exact_2025_prior_pdf
+    pipeline_action:
+      - Add `p926--2025` to prior-year publication supplements.
+      - Do not use the 2026 stable current PDF for TY2025 filing artifacts.
+    artifact_relevance:
+      - household_employee
+      - schedule_h
+      - household_employment_tax
+
+summary:
+  filters_too_strict: true
+  details: >
+    The current-directory revision_year filter is correct for annual current
+    products, but it is too strict by itself. The pipeline also needs exact
+    prior-year supplements for products whose stable current URL has advanced,
+    and replacement-source handling for discontinued publications.
+  recommended_pipeline_changes:
+    - Keep the current-year directory scan for primary current products.
+    - Keep carry-forward exceptions for reviewed older-but-still-current products such as Pub. 538.
+    - Add exact prior-year supplements for `p505--2025` and `p926--2025`.
+    - Add replacement-source ingestion for discontinued products such as Pub. 535 and Pub. 536.

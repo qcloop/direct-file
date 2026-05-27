@@ -24,7 +24,7 @@ import org.mockito.Mock;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.GetQueueUrlRequest;
@@ -54,16 +54,16 @@ class SendEmailMessageQueueListenerTest {
 
     SendEmailMessageQueueListener sendEmailMessageQueueListener;
 
-    @MockBean
+    @MockitoBean
     SqsConnectionSetupService sqsConnectionSetupService;
 
-    @MockBean
+    @MockitoBean
     ISendService sendService;
 
-    @MockBean
+    @MockitoBean
     SqsClient sqsClient;
 
-    @MockBean
+    @MockitoBean
     TemplateService templateService;
 
     @Mock

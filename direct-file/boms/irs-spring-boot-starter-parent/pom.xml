@@ -24,17 +24,12 @@
         <!-- https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/java.html#java-installation -->
         <aws-sdk.version>2.30.19</aws-sdk.version>
         <!-- https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/setup-project-maven.html#sdk-as-dependency -->
-        <directfile-bom.version>0.0.1-SNAPSHOT</directfile-bom.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <spring-ai.version>1.0.0</spring-ai.version>
         <logstash.version>7.4</logstash.version>
         <modelmapper.version>3.1.0</modelmapper.version>
         <modelmapper-module-record.version>1.0.0</modelmapper-module-record.version>
         <spotbugs.version>4.8.6</spotbugs.version>
-        <!-- <spring-cloud.version>2023.0.1</spring-cloud.version> -->
-        <!-- https://github.com/spring-cloud/spring-cloud-release/wiki/Supported-Versions -->
-        <!-- <spring-cloud-aws.version>3.1.1</spring-cloud-aws.version> -->
-        <!-- https://github.com/awspring/spring-cloud-aws?tab=readme-ov-file#compatibility-with-spring-project-versions -->
         <springdoc.version>2.1.0</springdoc.version>
 
         <pdfbox.version>3.0.3</pdfbox.version>
@@ -47,6 +42,9 @@
         <guava-version>33.0.0-jre</guava-version>
         <wiremock.version>3.9.1</wiremock.version>
         <openfeature.version>1.14.1</openfeature.version>
+        <!-- Boot 3.3 transitively managed okhttp3; Boot 3.4 removed that
+             management entry, so state-api needs an explicit pin here. -->
+        <okhttp3.version>4.12.0</okhttp3.version>
 
         <!-- maven plugin versions-->
         <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
@@ -78,19 +76,14 @@
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.language>java</sonar.language>
 
-        <!--TODO remove directfile-bom props once CircleCi config issue is resolved-->
+        <!-- IRS-internal artifact versions (built locally / via the standalone fact-graph repo) -->
         <starter-boilerplate.version>0.0.1-SNAPSHOT</starter-boilerplate.version>
         <starter-validation.version>0.0.1-SNAPSHOT</starter-validation.version>
-        <starter-ebcid.version>0.0.1-SNAPSHOT</starter-ebcid.version>
-        <starter-ping.version>0.0.1-SNAPSHOT</starter-ping.version>
-        <starter-eag.version>0.0.1-SNAPSHOT</starter-eag.version>
         <starter-test.version>0.0.1-SNAPSHOT</starter-test.version>
         <starter-openfeature.version>0.0.1-SNAPSHOT</starter-openfeature.version>
         <data-models.version>0.0.1-SNAPSHOT</data-models.version>
         <fact-graph.version>3.1.0-SNAPSHOT</fact-graph.version>
         <loaders.version>0.0.1-SNAPSHOT</loaders.version>
-        <mef-client-sdk.version>1.0</mef-client-sdk.version>
-        <webservices.version>4.0.4</webservices.version>
         <xmlsec.version>4.0.2</xmlsec.version>
     </properties>
     <dependencyManagement>
@@ -110,28 +103,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency> -->
-            <!-- <dependency>
-                <groupId>io.awspring.cloud</groupId>
-                <artifactId>spring-cloud-aws-dependencies</artifactId>
-                <version>${spring-cloud-aws.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency> -->
-            <!-- TODO uncomment once CircleCi can import this from local maven repo
-            <dependency>
-				<groupId>gov.irs.directfile</groupId>
-				<artifactId>directfile-bom</artifactId>
-				<version>${directfile-bom.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency> -->
 
             <!-- dependencies not managed by a BOM -->
             <dependency>
@@ -221,6 +192,16 @@
                 <version>${openfeature.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>mockwebserver</artifactId>
+                <version>${okhttp3.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>gov.irs.boot</groupId>
                 <artifactId>irs-spring-boot-starter-openfeature</artifactId>
                 <version>${starter-openfeature.version}</version>
@@ -248,8 +229,7 @@
             </dependency>
             <!-- end of security pins -->
 
-            <!-- TODO remove directfile-bom dependencies once CircleCi config issues resolved -->
-            <!-- IRS and DirectFile packages -->
+            <!-- IRS and DirectFile packages (built locally; see ONBOARDING.md) -->
             <dependency>
                 <groupId>gov.irs.boot</groupId>
                 <artifactId>irs-spring-boot-starter-boilerplate</artifactId>

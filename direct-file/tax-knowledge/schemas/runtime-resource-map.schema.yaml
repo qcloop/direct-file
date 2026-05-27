@@ -1,0 +1,26 @@
+schema_id: runtime_resource_map
+description: >
+  Map from checked-in runtime resource groups to the authoritative tax sources
+  and tax-knowledge pipeline artifacts that can generate or validate them.
+required:
+  - map_id
+  - status
+  - scope
+  - resource_groups
+fields:
+  map_id: stable identifier for the resource dependency map
+  status: draft | reviewed | approved
+  scope: repository resource roots covered by this map
+  resource_groups:
+    type: list
+    item_fields:
+      group_id: stable group identifier
+      paths: glob-style paths relative to the direct-file project root
+      current_inventory: observed resource counts or examples
+      source_dependency: direct | indirect | derived | platform | none
+      generation_feasibility: full | partial | validate_only | not_generated
+      authoritative_inputs: source families required to draft or validate the group
+      pipeline_inputs: tax-knowledge artifact families consumed by generators
+      pipeline_outputs: implementation artifacts emitted or validated
+      human_review: required tax, product, content, or engineering reviewers
+      notes: special constraints, review caveats, or non-source dependencies

@@ -11,6 +11,7 @@
     <modules>
         <module>../boms</module>
         <module>data-models</module>
+        <module>loaders</module>
         <module>starters</module>
     </modules>
 </project>

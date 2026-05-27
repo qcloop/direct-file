@@ -9,7 +9,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>directfile-bom</module>
         <module>irs-spring-boot-starter-parent</module>
     </modules>
 </project>

@@ -24,12 +24,43 @@ ingestion_modes:
       python3 tax-knowledge/tools/download_irs_pdfs.py
       --tax-year 2025
       --product-list tax-knowledge/corpora/irs-2025/publication-products.txt
+      --carry-forward-product-list tax-knowledge/corpora/irs-2025/publication-carryforward-products.txt
       --output-dir tax-knowledge/corpora/irs-2025/downloads
       --manifest tax-knowledge/corpora/irs-2025/pdf-manifest.json
       --download
     review_notes:
       - Seed mode is appropriate for prototype iteration.
+      - Products in `publication-carryforward-products.txt` may bypass the tax-year revision filter only after domain review.
       - Broad mode is required before claiming full federal tax-prep coverage.
+
+  - mode_id: exact_prior_year_publication_supplements
+    description: >
+      Download exact prior-year PDFs when the stable current IRS PDF URL has
+      already advanced to a later revision but the TY2025 source still exists
+      in the IRS prior-year directory.
+    command: >
+      python3 tax-knowledge/tools/download_irs_pdfs.py
+      --tax-year 2025
+      --source-url https://www.irs.gov/downloads/irs-prior
+      --revision-year 0
+      --product-list tax-knowledge/corpora/irs-2025/prior-year-publication-products.txt
+      --output-dir tax-knowledge/corpora/irs-2025/prior-downloads
+      --manifest tax-knowledge/corpora/irs-2025/prior-pdf-manifest.json
+      --download
+    review_notes:
+      - Prior-year supplements are exact tax-year sources, not carry-forward exceptions.
+      - Use this for products like `p505--2025` and `p926--2025`.
+      - A broad prior-year crawl can be slow; known exact prior URLs may need a direct-URL ingestion path.
+
+  - mode_id: discontinued_publication_replacement_review
+    description: >
+      Record products that should not be carried forward because IRS has
+      discontinued them and moved the current authority to forms, instructions,
+      or resource-map pages.
+    review_artifact: corpora/irs-2025/skipped-publications-review.yaml
+    review_notes:
+      - Pub. 535 should be replaced by the IRS guide to business expense resources plus mapped sources.
+      - Pub. 536 should be replaced by Form 172 and Instructions for Form 172.
 
 relevance_policy:
   principle: Download broadly, generate narrowly, and approve before runtime use.

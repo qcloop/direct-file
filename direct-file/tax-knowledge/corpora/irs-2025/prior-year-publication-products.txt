@@ -1,0 +1,7 @@
+# Exact prior-year publication PDFs needed for the TY2025 corpus when the
+# stable current IRS PDF URL has already advanced to a later revision.
+#
+# These are not carry-forward publications. They are exact TY2025 source PDFs
+# from the IRS prior-year directory.
+p505--2025
+p926--2025

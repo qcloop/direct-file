@@ -16,7 +16,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import gov.irs.a2a.mef.mefheader.TestCdType;
 import gov.irs.mef.exception.ServiceException;
@@ -101,16 +101,16 @@ class AcknowledgementServiceTest {
     @Autowired
     StatusProperties statusProperties;
 
-    @MockBean
+    @MockitoBean
     private StatusChangeMessageService statusChangeMessageService;
 
-    @MockBean
+    @MockitoBean
     MeFAcksMTOMClientService mockGetAcksClientService;
 
-    @MockBean
+    @MockitoBean
     MeFLoginClientService mockLoginClientService;
 
-    @MockBean
+    @MockitoBean
     MeFLogoutClientService mockLogoutClientService;
 
     AcknowledgementService acknowledgementService;

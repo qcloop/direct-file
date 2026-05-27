@@ -283,10 +283,16 @@ def load_product_filter(path: pathlib.Path | None) -> set[str]:
     return products
 
 
-def matches_filters(entry: PdfEntry, args: argparse.Namespace, product_filter: set[str]) -> bool:
+def matches_filters(
+    entry: PdfEntry,
+    args: argparse.Namespace,
+    product_filter: set[str],
+    carry_forward_filter: set[str] | None = None,
+) -> bool:
+    carry_forward_filter = carry_forward_filter or set()
     if args.kind != "all" and entry.product_kind != args.kind:
         return False
-    if args.revision_year and entry.revision_year != args.revision_year:
+    if args.revision_year and entry.revision_year != args.revision_year and entry.product_id not in carry_forward_filter:
         return False
     if product_filter and entry.product_id not in product_filter:
         return False
@@ -332,6 +338,7 @@ def download_entry(entry: PdfEntry, output_dir: pathlib.Path, args: argparse.Nam
 
 def discover(args: argparse.Namespace) -> tuple[list[PdfEntry], int]:
     product_filter = load_product_filter(args.product_list)
+    carry_forward_filter = load_product_filter(args.carry_forward_product_list)
     selected: list[PdfEntry] = []
     seen_urls: set[str] = set()
 
@@ -352,7 +359,7 @@ def discover(args: argparse.Namespace) -> tuple[list[PdfEntry], int]:
             if entry.url in seen_urls:
                 continue
             seen_urls.add(entry.url)
-            if matches_filters(entry, args, product_filter):
+            if matches_filters(entry, args, product_filter, carry_forward_filter):
                 selected.append(entry)
                 if args.limit and len(selected) >= args.limit:
                     return selected, page + 1
@@ -372,6 +379,9 @@ def write_manifest(entries: list[PdfEntry], pages_scanned: int, args: argparse.N
             "revision_year": args.revision_year,
             "filename_regex": args.filename_regex,
             "product_list": str(args.product_list) if args.product_list else None,
+            "carry_forward_product_list": str(args.carry_forward_product_list)
+            if args.carry_forward_product_list
+            else None,
             "limit": args.limit,
         },
         "entries": [asdict(entry) for entry in entries],
@@ -389,6 +399,14 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--kind", choices=["all", "publication", "form", "instruction", "notice"], default="publication")
     parser.add_argument("--revision-year", type=int, help="Defaults to --tax-year. Use 0 to disable revision filtering.")
     parser.add_argument("--product-list", type=pathlib.Path, help="Text file of product ids or filenames to include.")
+    parser.add_argument(
+        "--carry-forward-product-list",
+        type=pathlib.Path,
+        help=(
+            "Text file of product ids allowed through the revision-year filter because "
+            "the latest older revision is still treated as authoritative for this corpus."
+        ),
+    )
     parser.add_argument("--filename-regex", help="Optional regex applied to PDF filenames.")
     parser.add_argument("--max-pages", type=int, help="Maximum listing pages to scan. Defaults to listing's last page.")
     parser.add_argument("--limit", type=int, help="Stop after N matching PDFs.")

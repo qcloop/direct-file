@@ -2,7 +2,7 @@ package gov.irs.directfile.submit;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import gov.irs.directfile.submit.config.SnsClientTestConfiguration;
@@ -13,7 +13,7 @@ import gov.irs.directfile.submit.service.SqsConnectionSetupService;
 @Import({SynchronousS3TestConfiguration.class, SnsClientTestConfiguration.class})
 public class ApplicationContextTest {
 
-    @MockBean
+    @MockitoBean
     SqsConnectionSetupService sqsConnectionSetupService;
 
     /**

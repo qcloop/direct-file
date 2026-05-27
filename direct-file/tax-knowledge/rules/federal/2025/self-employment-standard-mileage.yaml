@@ -6,6 +6,8 @@ rule_type: calculation
 topic_id: self_employment
 source_ids:
   - irs_instruction_1040_schedule_c_2025
+  - irs_publication_334_2025
+  - irs_publication_463_2025
 inputs:
   - /usesVehicleForBusiness
   - /seVehicleBusinessMiles

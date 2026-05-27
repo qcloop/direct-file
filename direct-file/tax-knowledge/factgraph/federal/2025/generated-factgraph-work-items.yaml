@@ -1,0 +1,145 @@
+tax_year: 2025
+jurisdiction: "federal"
+status: "draft"
+generated_at: "2026-05-27T18:40:43.236581+00:00"
+inputs:
+  rules_dir: "direct-file/tax-knowledge/rules/federal/2025"
+  relevance: "direct-file/tax-knowledge/relevance/federal/2025/source-relevance.yaml"
+  sources_dir: "direct-file/tax-knowledge/sources/irs/2025"
+  runtime_resource_map: "direct-file/tax-knowledge/runtime-resources/direct-file-resource-map.yaml"
+artifacts:
+  - artifact_id: "fg_se_standard_mileage_vehicle_deduction_ty2025_49b0a630"
+    tax_year: 2025
+    jurisdiction: "federal"
+    status: "draft"
+    rule_ids:
+      - "se_standard_mileage_vehicle_deduction_ty2025"
+    rule_type: "calculation"
+    topic_id: "self_employment"
+    generated_files:
+      - "backend/src/main/resources/tax/*.xml"
+      - "df-plan-service/src/main/resources/tax-plan/*.xml"
+      - "backend/src/main/resources/factgraphservice/xmlFactPaths"
+    fact_paths:
+      inputs:
+        - "/usesVehicleForBusiness"
+        - "/seVehicleBusinessMiles"
+        - "/standardMileageRate"
+      output: "/seVehicleDeduction"
+    source_refs:
+      - source_id: "irs_p334_2025"
+        chunk_id: "irs_p334_2025_chunk_0005"
+        pages:
+          - 5
+        text_sha256: "4da42cc6b93f26ca526d4ad65753cceecb988ca735e84b7902c36baedc4ecce4"
+        relevance_id: "rel_self_employment_9ca7205789"
+        confidence: "high"
+        matched_terms:
+          - "schedule c"
+          - "self-employment"
+          - "business income"
+          - "standard mileage"
+        selection_score: 80
+      - source_id: "irs_p334_2025"
+        chunk_id: "irs_p334_2025_chunk_0004"
+        pages:
+          - 4
+        text_sha256: "a4cd7afedcf7fc79ce557c7376411c3fa46d75947636952a289e423e01da3433"
+        relevance_id: "rel_self_employment_4d1537aefc"
+        confidence: "high"
+        matched_terms:
+          - "schedule c"
+          - "self-employment"
+          - "business income"
+          - "standard mileage"
+        selection_score: 78
+      - source_id: "irs_p334_2025"
+        chunk_id: "irs_p334_2025_chunk_0040"
+        pages:
+          - 40
+        text_sha256: "67d01b88c8b3d09b39821953670d4bfb209bd63c0f3ce4e6e1766cdf35745a4d"
+        relevance_id: "rel_self_employment_eebed396df"
+        confidence: "high"
+        matched_terms:
+          - "schedule c"
+          - "standard mileage"
+          - "business miles"
+        selection_score: 74
+      - source_id: "irs_p463_2025"
+        chunk_id: "irs_p463_2025_chunk_0035"
+        pages:
+          - 34
+        text_sha256: "dbb72ee0debf6a58a9edd209064c2c0d60685308a49e4a6fdf52f67fa2eeb613"
+        relevance_id: "rel_self_employment_8da45fe7e7"
+        confidence: "high"
+        matched_terms:
+          - "schedule c"
+          - "standard mileage"
+          - "business miles"
+        selection_score: 74
+      - source_id: "irs_p334_2025"
+        chunk_id: "irs_p334_2025_chunk_0057"
+        pages:
+          - 57
+        text_sha256: "f8f146585508d211f88982de1491220e8b8bb529b4a2638718b7344e27592c35"
+        relevance_id: "rel_self_employment_b06ddb8df6"
+        confidence: "medium"
+        matched_terms:
+          - "self-employment"
+          - "standard mileage"
+        selection_score: 72
+      - source_id: "irs_p334_2025"
+        chunk_id: "irs_p334_2025_chunk_0043"
+        pages:
+          - 43
+        text_sha256: "e7f4f6ff41925d4900045b77062901be6aee5b16e3dbd66590de5baa78705d37"
+        relevance_id: "rel_self_employment_1b3cdc55dc"
+        confidence: "high"
+        matched_terms:
+          - "schedule c"
+          - "self-employment"
+          - "business income"
+        selection_score: 60
+      - source_id: "irs_p463_2025"
+        chunk_id: "irs_p463_2025_chunk_0022"
+        pages:
+          - 21
+        text_sha256: "5a5f03b3bfc3a0f624c7abde4c1ef3a03c3bd93f8a541e1ec7f53b9d6b2e9c12"
+        relevance_id: "rel_self_employment_e7a7558f3b"
+        confidence: "medium"
+        matched_terms:
+          - "schedule c"
+          - "standard mileage"
+        selection_score: 60
+      - source_id: "irs_p463_2025"
+        chunk_id: "irs_p463_2025_chunk_0060"
+        pages:
+          - 60
+        text_sha256: "5e3ba81839538eed52ce67cd48540dca7bc0666065159d1c0b050da02aa9679b"
+        relevance_id: "rel_self_employment_843b6a3a9e"
+        confidence: "high"
+        matched_terms:
+          - "schedule c"
+          - "business income"
+          - "standard mileage"
+        selection_score: 60
+    draft_changes:
+      - target: "backend/src/main/resources/tax/*.xml"
+        change_type: "draft_or_update_fact"
+        fact_path: "/seVehicleDeduction"
+        rationale: "Business miles multiplied by the 2025 standard mileage rate."
+      - target: "df-plan-service/src/main/resources/tax-plan/*.xml"
+        change_type: "draft_or_update_planning_fact"
+        fact_path: "/seVehicleDeduction"
+        rationale: "Planning graph target if the rule is in planning scope."
+    scenario_ids:
+      - "se_driver_standard_mileage_basic"
+    reviewers:
+      - "domain_specialist_for_rule"
+      - "tax_platform_engineer"
+      - "product_owner_for_scope_if_needed"
+    notes:
+      - "Schedule C instructions for 2025 identify a 70 cents per mile business standard mileage rate."
+      - "This prototype rule assumes the taxpayer is eligible to use the standard mileage method. Actual-expense method and first-year election rules require additional artifacts."
+      - "Generated work item only. Runtime XML patches require tax and engineering review."
+      - "Source refs were selected from deterministic relevance classification and need reviewer confirmation."

@@ -27,20 +27,36 @@
             <artifactId>factgraph_3</artifactId>
         </dependency>
 
-        <!-- For org.springframework.core.io.Resource used by XmlProcessor.
-             spring-core is small and dep-free relative to spring-boot, so
-             this stays a lightweight library. -->
+        <!-- FactTypeWithItem / FactEvaluationResult / EvaluatedFactInfo are
+             shared with backend, df-plan-service, and the submit/status pipeline. -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
+            <groupId>gov.irs.directfile</groupId>
+            <artifactId>data-models</artifactId>
         </dependency>
 
-        <!-- Lombok @Slf4j on FactGraphLoader; slf4j-api is the runtime target -->
+        <!-- FactGraphService is a @Service that injects ApplicationContext, uses
+             @Value and @PostConstruct. spring-context transitively brings in
+             spring-core (used by XmlProcessor) and spring-beans (for @Value),
+             plus jakarta.annotation-api for @PostConstruct. -->
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
         </dependency>
+
+        <!-- ObjectMapper used by FactGraphService.getGraph / getFact -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- StringUtils.isNotBlank in FactGraphService.factInfoFactory -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <!-- Lombok is inherited from the parent BOM's default <dependencies>.
+             slf4j-api is the runtime target of @Slf4j on FactGraphLoader / FactGraphService. -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

@@ -54,14 +54,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
+        <!-- jackson-core/databind are transitive via spring-boot-starter-web -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

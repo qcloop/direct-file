@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
@@ -47,19 +47,19 @@ class SendEmailV1HandlerIntegrationTest {
     @Autowired
     SendEmailResultRepository sendEmailResultRepository;
 
-    @MockBean
+    @MockitoBean
     SqsClient sqsClient;
 
-    @MockBean
+    @MockitoBean
     SqsClientConfiguration sqsClientConfiguration;
 
-    @MockBean
+    @MockitoBean
     CryptoMaterialsManager cryptoMaterialsManager;
 
-    @MockBean
+    @MockitoBean
     DataEncryptDecrypt dataEncryptDecrypt;
 
-    @MockBean
+    @MockitoBean
     SqsConnectionSetupService sqsConnectionSetupService;
 
     @RegisterExtension

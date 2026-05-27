@@ -83,7 +83,24 @@ Human check:
 - Domain owner confirms chunks classified as fact graph, validation, interview, evidence, PDF config, scenario, or explanation inputs.
 - Irrelevant chunks are retained in the corpus but excluded from generation.
 
-## 5. Concept And Topic Modeling
+## 5. Runtime Resource Target Mapping
+
+The `release-agent` and tax platform engineer classify checked-in runtime resources by source dependency and generation feasibility.
+
+Output:
+- `runtime-resources/direct-file-resource-map.yaml`
+- `RUNTIME_RESOURCE_DEPENDENCY_MAP.md`
+
+Automation:
+- Inventory `backend/src/main/resources` and `df-plan-service/src/main/resources`.
+- Mark each resource group as direct IRS-corpus dependent, indirectly tax-dependent, derived, platform-only, or non-tax infrastructure.
+
+Human check:
+- Engineering owner confirms which runtime files are generation targets.
+- Tax owner confirms source-dependent resource groups are covered by the authoritative corpus.
+- Product owner confirms unsupported-scope artifacts and blockers are not treated as pure tax-law derivations.
+
+## 6. Concept And Topic Modeling
 
 The `rule-modeling-agent` proposes tax topics, gateway facts, opened facts, and affected forms.
 
@@ -93,7 +110,7 @@ Output:
 Human check:
 - Domain owner approves topic boundaries and branch applicability.
 
-## 6. Rule Drafting
+## 7. Rule Drafting
 
 The `rule-modeling-agent` drafts rule models from reviewed source chunks and expert requirements.
 
@@ -104,24 +121,47 @@ Human check:
 - Tax expert approves interpretation.
 - Engineer approves type, fact path, and compiler/runtime feasibility.
 
-## 7. FactGraph Artifact Drafting
+## 8. FactGraph Artifact Drafting
 
 The `rule-modeling-agent` and `release-agent` draft fact graph XML, validation XML, and scenario tests from reviewed source chunks and approved rule models.
 
 Output:
 - `factgraph/<jurisdiction>/<tax-year>/*.yaml`
-- draft XML patches under an implementation work area
+- draft patches for `backend/src/main/resources/tax/*.xml`
+- draft patches for `df-plan-service/src/main/resources/tax-plan/*.xml`
+- regenerated draft `backend/src/main/resources/factgraphservice/xmlFactPaths`
 
 Automation:
 - Generate fact graph work items from rules with `source_refs`, fact paths, expected outputs, and scenario coverage.
 - Validate provenance with `tools/validate_artifact_provenance.py`.
+- Validate draft XML against `backend/src/main/resources/tax/FactDictionaryModule.rng`.
+- Regenerate fact path indexes from approved XML.
 
 Human check:
 - Tax expert approves source interpretation.
 - Engineer approves fact path design, data types, graph dependencies, and generated tests.
+- MeF/export engineer approves export and e-file validation changes.
 - No fact graph artifact can be approved without exact `source_refs`.
 
-## 8. Interview Authoring
+## 9. PDF Configuration Drafting
+
+The `document-understanding-agent` and `release-agent` draft PDF field-to-fact mappings for generated filing PDFs.
+
+Output:
+- draft patches for `backend/src/main/resources/pdf/<tax-year>/<form>/<language>/configuration.yml`
+- PDF field mapping review packets
+
+Automation:
+- Extract fillable PDF field names and page text from IRS form PDFs.
+- Match field labels, line numbers, and approved fact paths.
+- Use vision/OCR extraction as a sanity check when PDF metadata or text extraction is weak.
+
+Human check:
+- Forms/PDF engineer verifies field paths and generated output.
+- Tax specialist verifies line-to-fact semantics.
+- Bilingual content reviewer verifies non-English configurations.
+
+## 10. Interview Authoring
 
 The `procedure-interview-agent` drafts gateway and detail questions with `asks_when` and `skip_when` gates.
 
@@ -132,7 +172,7 @@ Human check:
 - Content designer approves wording.
 - Tax expert approves applicability.
 
-## 9. Evidence Mapping
+## 11. Evidence Mapping
 
 The `document-understanding-agent` maps documents and imported data to topic signals and candidate facts.
 
@@ -142,7 +182,7 @@ Output:
 Human check:
 - Tax expert confirms evidence is sufficient only as a signal unless explicitly allowed as a fact source.
 
-## 10. Conflict Rules
+## 12. Conflict Rules
 
 The `reviewer-agent` and `scenario-test-agent` draft contradictions between documents, profile, answers, and facts.
 
@@ -152,7 +192,7 @@ Output:
 Human check:
 - Tax expert and product owner approve severity and user-facing resolution.
 
-## 11. Scenario Generation
+## 13. Scenario Generation
 
 The `scenario-test-agent` drafts ordinary, boundary, negative, and adversarial scenarios.
 
@@ -163,13 +203,14 @@ Human check:
 - Tax expert approves expected outcomes.
 - Engineer wires scenarios into automated tests.
 
-## 12. Review And Release
+## 14. Review And Release
 
 The `reviewer-agent` checks citations, dependencies, missing tests, unsafe AI behavior, and contradictions. The `release-agent` packages approved artifacts.
 
 Output:
 - `reviews/<jurisdiction>/<tax-year>/*.md`
-- compiled backend artifacts in a later implementation
+- approved implementation patches for source-dependent runtime artifacts
+- regenerated derived indexes
 
 Human check:
 - Tax owner, compliance reviewer, product/content owner, and engineering owner approve before runtime use.
