@@ -165,8 +165,9 @@ class PublishSubmissionConfirmationsEventHandlerTest {
                 payload.get(TAX_RETURN_SUBMISSION_RECEIPT_INFORMATIONS_KEY)
                         .size()); // 252 because there were already 2 in the default json payload
 
-        when(taxReturnSubmissionRepository.findAllBySubmissionIds(anyList()))
-                .thenAnswer((Answer<List<TaxReturnSubmission>>) invocation -> {
+        when(taxReturnSubmissionRepository.findAllBySubmissionIds(anyList())).thenAnswer((Answer<
+                        List<TaxReturnSubmission>>)
+                invocation -> {
                     List<String> submissionIds = invocation.getArgument(0);
 
                     return submissionIds.stream()
@@ -215,8 +216,9 @@ class PublishSubmissionConfirmationsEventHandlerTest {
                 payload.get(SUBMISSION_IDS_KEY).size()); // 252 because there were already 2 in the default json payload
         payload.set("batchSize", new IntNode(150));
 
-        when(taxReturnSubmissionRepository.findAllBySubmissionIds(anyList()))
-                .thenAnswer((Answer<List<TaxReturnSubmission>>) invocation -> {
+        when(taxReturnSubmissionRepository.findAllBySubmissionIds(anyList())).thenAnswer((Answer<
+                        List<TaxReturnSubmission>>)
+                invocation -> {
                     List<String> submissionIds = invocation.getArgument(0);
 
                     return submissionIds.stream()

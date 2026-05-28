@@ -4,7 +4,6 @@ import com.amazon.sqs.javamessaging.ProviderConfiguration;
 import com.amazon.sqs.javamessaging.SQSConnection;
 import com.amazon.sqs.javamessaging.SQSConnectionFactory;
 import com.amazon.sqs.javamessaging.SQSSession;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.annotation.PreDestroy;
 import jakarta.jms.*;
 import lombok.SneakyThrows;
@@ -19,9 +18,6 @@ import gov.irs.directfile.emailservice.listeners.SendEmailMessageQueueListener;
 @Slf4j
 @Service
 @ConditionalOnProperty(value = "email-service.messageQueue.sqs-message-handling-enabled", havingValue = "true")
-@SuppressFBWarnings(
-        value = {"EI_EXPOSE_REP2"},
-        justification = "Initial SpotBugs Setup")
 @SuppressWarnings({"PMD.CloseResource", "PMD.UnusedPrivateMethod"})
 public class SqsConnectionSetupService {
     private final EmailServiceConfigurationProperties configProps;

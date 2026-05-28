@@ -32,29 +32,23 @@ public interface SubmissionEventRepository extends CrudRepository<SubmissionEven
             nativeQuery = true)
     int countFailedEvents(UUID submissionId);
 
-    @Query(
-            value =
-                    """
+    @Query(value = """
                 SELECT se.*
                 FROM submission_events se
                 JOIN taxreturn_submissions trs ON se.taxreturn_submission_id = trs.id
                 WHERE trs.taxreturn_id = :taxReturnId
                 ORDER BY se.created_at DESC LIMIT 1
-                """,
-            nativeQuery = true)
+                """, nativeQuery = true)
     Optional<SubmissionEvent> getLatestSubmissionEventByTaxReturnId(UUID taxReturnId);
 
-    @Query(
-            value =
-                    """
+    @Query(value = """
                 SELECT se.*
                 FROM submission_events se
                 JOIN taxreturn_submissions trs ON se.taxreturn_submission_id = trs.id
                 WHERE trs.taxreturn_id = :taxReturnId
                       AND se.event_type = 'accepted'
                 ORDER BY se.created_at DESC LIMIT 1
-                """,
-            nativeQuery = true)
+                """, nativeQuery = true)
     Optional<SubmissionEvent> getLatestAcceptedSubmissionEventForTaxReturnId(UUID taxReturnId);
 
     // Based on Spring Query Method Docs:

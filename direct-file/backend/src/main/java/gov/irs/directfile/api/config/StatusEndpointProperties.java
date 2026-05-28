@@ -12,11 +12,9 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "direct-file.status-endpoint")
 @Validated
 public class StatusEndpointProperties {
-    @NotBlank
-    @URL
+    @NotBlank @URL
     private String statusEndpointURI;
 
-    @NotBlank
-    @URL
+    @NotBlank @URL
     private String rejectionCodesEndpointURI;
 }

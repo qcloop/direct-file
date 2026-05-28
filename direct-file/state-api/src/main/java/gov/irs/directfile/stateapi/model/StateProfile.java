@@ -16,17 +16,13 @@ public class StateProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    private String accountId;
+    @NotBlank private String accountId;
 
-    @NotBlank
-    private String stateCode;
+    @NotBlank private String stateCode;
 
-    @NotBlank
-    private String taxSystemName;
+    @NotBlank private String taxSystemName;
 
-    @NotBlank
-    private String landingUrl;
+    @NotBlank private String landingUrl;
 
     private String defaultRedirectUrl;
 

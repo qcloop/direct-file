@@ -25,8 +25,7 @@ class StatusQueueListenerServiceTest {
 
     private StatusQueueListenerService statusQueueListenerService;
 
-    String messageJson =
-            """
+    String messageJson = """
                 {
                   "payload": {
                     "@type": "StatusChangePayloadV1",
@@ -68,9 +67,7 @@ class StatusQueueListenerServiceTest {
     @Test
     void onMessage_exceptionThrown() throws JMSException {
         SQSTextMessage mockMessage = mock(SQSTextMessage.class);
-        when(mockMessage.getText())
-                .thenReturn(
-                        """
+        when(mockMessage.getText()).thenReturn("""
                         {"some_key":"some_val_without_a_closing_string}\s
                         """);
 

@@ -43,6 +43,9 @@ public class PlanningTools {
             "ein", WRAPPER_PREFIX + "EinWrapper",
             "tin", WRAPPER_PREFIX + "TinWrapper");
 
+    /** Shared description for the {@code sessionId} tool parameter (returned by {@code create_session}). */
+    private static final String SESSION_ID_DESCRIPTION = "Planning session id from create_session.";
+
     /** Federal quarterly estimated-tax deadlines for TY2025 payments. */
     private static final List<Deadline> DEADLINES_2025 = List.of(
             new Deadline("Q1", LocalDate.of(2025, 4, 15)),
@@ -89,7 +92,7 @@ public class PlanningTools {
             description = "Read a single fact from a planning session's fact graph. Returns the "
                     + "current value if computable, or a 'not yet computable' note listing why.")
     public ReadResult getFact(
-            @ToolParam(description = "Planning session id from create_session.") String sessionId,
+            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @ToolParam(description = "Fact path, e.g. /seTax or /planning/safeHarborTarget.") String path) {
         return graph.readFact(sessionId, path);
     }
@@ -101,7 +104,7 @@ public class PlanningTools {
                     + "or 'typeCode' (full Scala class name). Returns whether the write was "
                     + "accepted by the fact graph's validation pass.")
     public PlanningGraphService.WriteResult setFact(
-            @ToolParam(description = "Planning session id from create_session.") String sessionId,
+            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @ToolParam(description = "Fact path, e.g. /planning/priorYearTotalTax.") String path,
             @ToolParam(
                             description = "Short type alias: dollar | int | boolean | string | day | enum | ein | tin. "
@@ -140,7 +143,7 @@ public class PlanningTools {
                     + "description, computed value, and the values of every fact it directly "
                     + "depends on. Useful for grounding 'why is my number X?' answers.")
     public PlanningGraphService.ExplainResult explain(
-            @ToolParam(description = "Planning session id from create_session.") String sessionId,
+            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @ToolParam(description = "Fact path to explain.") String path) {
         return graph.explain(sessionId, path);
     }
@@ -153,7 +156,7 @@ public class PlanningTools {
                     + "next deadline, and a derivation chain. If required facts are missing, "
                     + "returns a 'needs_facts' response so the agent can gather them.")
     public Map<String, Object> estimateQuarterlyPayment(
-            @ToolParam(description = "Planning session id from create_session.") String sessionId,
+            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @ToolParam(description = "ISO date (YYYY-MM-DD). Required because the fact graph has no clock.")
                     String asOfDate) {
 

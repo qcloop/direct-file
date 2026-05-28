@@ -24,8 +24,8 @@ import org.mockito.Mock;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.GetQueueUrlRequest;
 import software.amazon.awssdk.services.sqs.model.GetQueueUrlResponse;
@@ -75,8 +75,7 @@ class SendEmailMessageQueueListenerTest {
     private Logger listenerLogger;
     private ListAppender<ILoggingEvent> listAppender;
 
-    String messageJson =
-            """
+    String messageJson = """
                     {
                         "payload": {
                             "@type": "SendEmailPayloadV1",
@@ -251,8 +250,7 @@ class SendEmailMessageQueueListenerTest {
     @Test
     void onMessage_ReadsTreeCorrectly_MalformedMessageRaisesRuntimeExceptionButCaught() throws JMSException {
         SQSTextMessage mockMessage = mock(SQSTextMessage.class);
-        when(mockMessage.getText())
-                .thenReturn("""
+        when(mockMessage.getText()).thenReturn("""
                 {"some_key":"some_val_without_a_closing_string}\s
                 """);
 

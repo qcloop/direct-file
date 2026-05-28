@@ -23,5 +23,8 @@ public class FeatureFlagConfigurationProperties {
         @NotNull private final boolean enabled;
     }
 
-    public record Allowlist(@NotNull boolean enabled, @NotNull String hexKey, @NotNull String objectKey) {}
+    public record Allowlist(
+            @NotNull boolean enabled,
+            @NotNull String hexKey,
+            @NotNull String objectKey) {}
 }

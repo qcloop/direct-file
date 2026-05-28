@@ -327,8 +327,7 @@ public class StateApiControllerTest {
         ac.setAuthorizationCode(authorizationCode);
         ac.setTaxReturnUuid(UUID.randomUUID());
         ac.setTaxYear(2022);
-        String xml =
-                """
+        String xml = """
                 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
                         """;
         var exportedFacts = new HashMap<String, Object>();

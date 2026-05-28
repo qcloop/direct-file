@@ -6,8 +6,7 @@ import gov.irs.directfile.api.taxreturn.ApiErrorKeys;
 import gov.irs.directfile.api.taxreturn.TaxReturnApi.GenericResponseBadId;
 
 public class TaxReturnNotFoundResponseStatusException extends ApiResponseStatusException {
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
             {
                 "status":"NOT_FOUND",
                 "message":"404 NOT_FOUND \\"The user has no such tax return.\\"",

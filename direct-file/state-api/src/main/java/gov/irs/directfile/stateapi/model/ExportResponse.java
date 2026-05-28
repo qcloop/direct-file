@@ -20,16 +20,14 @@ public class ExportResponse {
     private String error;
 
     @JsonIgnore
-    public static final String docsExampleObjectSuccess =
-            """
+    public static final String docsExampleObjectSuccess = """
             {
                 "status": "success",
                 "taxReturn": "encoded-encrypted-data"
             }
             """;
 
-    public static final String docsExampleObjectError =
-            """
+    public static final String docsExampleObjectError = """
             {
                 "status": "error",
                 "error": "E_AUTHORIZATION_CODE_EXPIRED"

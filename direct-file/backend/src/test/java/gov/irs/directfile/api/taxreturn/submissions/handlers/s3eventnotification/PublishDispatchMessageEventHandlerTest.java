@@ -89,8 +89,9 @@ class PublishDispatchMessageEventHandlerTest {
 
         // Dynamically mock the return value of findAllBySubmissionIds to return a list of size equal to the size of the
         // list of submissionIds passed to it.
-        when(taxReturnSubmissionRepository.findAllBySubmissionIds(anyList()))
-                .thenAnswer((Answer<List<TaxReturnSubmission>>) invocation -> {
+        when(taxReturnSubmissionRepository.findAllBySubmissionIds(anyList())).thenAnswer((Answer<
+                        List<TaxReturnSubmission>>)
+                invocation -> {
                     List<String> submissionIds = invocation.getArgument(0);
 
                     return submissionIds.stream()

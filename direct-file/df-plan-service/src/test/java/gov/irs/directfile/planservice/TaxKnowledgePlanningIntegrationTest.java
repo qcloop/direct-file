@@ -81,14 +81,7 @@ class TaxKnowledgePlanningIntegrationTest {
         String sessionId = setFactSessionWithSelfEmploymentAnswer(false);
 
         Object result = tools.planQuestions(
-                sessionId,
-                null,
-                null,
-                null,
-                null,
-                Map.of("prior_year_topics", List.of("self_employment")),
-                null,
-                null);
+                sessionId, null, null, null, null, Map.of("prior_year_topics", List.of("self_employment")), null, null);
 
         TaxKnowledgeService.PlanResult plan = (TaxKnowledgeService.PlanResult) result;
 

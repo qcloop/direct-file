@@ -13,5 +13,8 @@ import org.springframework.validation.annotation.Validated;
 public class DataImportGatingConfigurationProperties {
     @NotNull private final Allowlist allowlist;
 
-    public record Allowlist(@NotNull boolean enabled, @NotNull String hexKey, @NotNull String objectKey) {}
+    public record Allowlist(
+            @NotNull boolean enabled,
+            @NotNull String hexKey,
+            @NotNull String objectKey) {}
 }

@@ -2,8 +2,8 @@ package gov.irs.directfile.api.util.base;
 
 import com.amazonaws.encryptionsdk.CryptoMaterialsManager;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import gov.irs.directfile.api.util.SecurityTestConfiguration;
 

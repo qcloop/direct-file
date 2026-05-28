@@ -23,12 +23,15 @@ public class FakePIIService implements PIIService {
         for (PIIAttribute attribute : attributes) {
             String attributeValue;
             switch (attribute) {
-                case PIIAttribute.EMAILADDRESS -> attributeValue =
-                        String.format("test-user+%s@directfile.test", userExternalId.toString());
+                case PIIAttribute.EMAILADDRESS -> {
+                    attributeValue = String.format("test-user+%s@directfile.test", userExternalId.toString());
+                }
                 case PIIAttribute.TIN -> {
                     attributeValue = TIN;
                 }
-                default -> attributeValue = PLACEHOLDER_ATTRIBUTE_VALUE;
+                default -> {
+                    attributeValue = PLACEHOLDER_ATTRIBUTE_VALUE;
+                }
             }
 
             responseMap.put(attribute, attributeValue);

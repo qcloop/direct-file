@@ -4,9 +4,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-@SuppressFBWarnings(
-        value = "NM_FIELD_NAMING_CONVENTION",
-        justification = "Initial Spotbugs Setup")
+@SuppressFBWarnings(value = "NM_FIELD_NAMING_CONVENTION", justification = "Initial Spotbugs Setup")
 @EqualsAndHashCode
 @ToString
 public class RejectedStatus {

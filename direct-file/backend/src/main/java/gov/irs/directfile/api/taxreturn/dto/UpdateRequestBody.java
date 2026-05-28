@@ -19,8 +19,7 @@ public class UpdateRequestBody {
     // Nullable boolean; only want to update database when true/false sent
     private Boolean surveyOptIn;
 
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
       {
          "facts": {
           "/filers/#363812c5-2b5d-46fd-a1f7-49f07bcf59d7/tin": {

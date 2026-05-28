@@ -133,10 +133,7 @@ public interface TaxReturnApi {
                             @Content(
                                     mediaType = "*/*",
                                     schema = @Schema(implementation = ResponseStatusException.class),
-                                    examples =
-                                            @ExampleObject(
-                                                    value =
-                                                            """
+                                    examples = @ExampleObject(value = """
                                                 {
                                                     "timestamp":"2024-04-10T19:38:53.343+00:00",
                                                     "status":400,
@@ -153,10 +150,7 @@ public interface TaxReturnApi {
                             @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = ResponseStatusException.class),
-                                    examples =
-                                            @ExampleObject(
-                                                    value =
-                                                            """
+                                    examples = @ExampleObject(value = """
                                                 {
                                                     "timestamp":"2024-04-10T19:31:14.739+00:00",
                                                     "status":409,
@@ -173,10 +167,7 @@ public interface TaxReturnApi {
                             @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = ResponseStatusException.class),
-                                    examples =
-                                            @ExampleObject(
-                                                    value =
-                                                            """
+                                    examples = @ExampleObject(value = """
                                                       {
                                                           "timestamp":"2024-04-10T16:24:57.808+00:00",
                                                           "status":500,
@@ -195,8 +186,7 @@ public interface TaxReturnApi {
                                         schema = @Schema(implementation = CreateRequestBody.class),
                                         examples = @ExampleObject(value = CreateRequestBody.docsExampleObject))
                             })
-                    @Valid
-                    @RequestBody
+                    @Valid @RequestBody
                     CreateRequestBody body,
             HttpServletRequest request);
 
@@ -222,10 +212,7 @@ public interface TaxReturnApi {
                             @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = ResponseStatusException.class),
-                                    examples =
-                                            @ExampleObject(
-                                                    value =
-                                                            """
+                                    examples = @ExampleObject(value = """
                                                 {
                                                     "timestamp":"2024-04-10T16:01:54.163+00:00",
                                                     "status":400,
@@ -263,10 +250,7 @@ public interface TaxReturnApi {
                             @Content(
                                     mediaType = "*/*",
                                     schema = @Schema(implementation = ResponseStatusException.class),
-                                    examples =
-                                            @ExampleObject(
-                                                    value =
-                                                            """
+                                    examples = @ExampleObject(value = """
                                                         {
                                                             "timestamp":"2024-04-10T15:55:18.614+00:00",
                                                             "status":409,
@@ -283,10 +267,7 @@ public interface TaxReturnApi {
                             @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = ResponseStatusException.class),
-                                    examples =
-                                            @ExampleObject(
-                                                    value =
-                                                            """
+                                    examples = @ExampleObject(value = """
                                                       {
                                                           "timestamp":"2024-04-10T16:24:57.808+00:00",
                                                           "status":500,
@@ -306,8 +287,7 @@ public interface TaxReturnApi {
                                         schema = @Schema(implementation = UpdateRequestBody.class),
                                         examples = @ExampleObject(value = UpdateRequestBody.docsExampleObject))
                             })
-                    @Valid
-                    @RequestBody
+                    @Valid @RequestBody
                     UpdateRequestBody body,
             HttpServletRequest request);
 
@@ -380,8 +360,7 @@ public interface TaxReturnApi {
                                         schema = @Schema(implementation = SubmitRequestBody.class),
                                         examples = @ExampleObject(value = SubmitRequestBody.docsExampleObject))
                             })
-                    @Valid
-                    @RequestBody
+                    @Valid @RequestBody
                     SubmitRequestBody body,
             HttpServletRequest request);
 
@@ -412,8 +391,7 @@ public interface TaxReturnApi {
                                         schema = @Schema(implementation = SignRequestBody.class),
                                         examples = @ExampleObject(value = SignRequestBody.docsExampleObject))
                             })
-                    @Valid
-                    @RequestBody
+                    @Valid @RequestBody
                     SignRequestBody body,
             HttpServletRequest request)
             throws Exception;

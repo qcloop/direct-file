@@ -22,8 +22,7 @@ public class ResponseBody {
     private String dataImportBehavior;
     private Boolean surveyOptIn;
 
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
     {
         "id": "f4b14d1f-fc8b-40e2-9317-deaf69d17f65",
         "createdAt": "2024-10-28 15:55:35.285",
@@ -226,8 +225,7 @@ public class ResponseBody {
          ]
     }""";
 
-    public static final String docsExampleList =
-            """
+    public static final String docsExampleList = """
     [
         {
             "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
@@ -253,8 +251,6 @@ public class ResponseBody {
                 }
             },
         },
-        """
-                    + docsExampleObject
-                    + """
+        """ + docsExampleObject + """
     ]""";
 }

@@ -16,8 +16,7 @@ public class ApiResponseStatusException extends ResponseStatusException {
 
     private ApiErrorKeys apiErrorKey;
 
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
             {
                 "status": "",
                 "message": "",

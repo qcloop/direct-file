@@ -430,8 +430,10 @@ public class TaxKnowledgeService {
         }
 
         boolean hasConfirmedAnswerForAny(List<String> paths) {
-            return paths.stream().map(facts::get).filter(Objects::nonNull).anyMatch(fact -> "confirmed"
-                    .equals(fact.status()));
+            return paths.stream()
+                    .map(facts::get)
+                    .filter(Objects::nonNull)
+                    .anyMatch(fact -> "confirmed".equals(fact.status()));
         }
     }
 

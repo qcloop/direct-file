@@ -18,8 +18,7 @@ public class StateRedirect {
 
     @NotNull private Long stateProfileId;
 
-    @NotBlank
-    private String redirectUrl;
+    @NotBlank private String redirectUrl;
 
     @NotNull private Instant createdAt;
 

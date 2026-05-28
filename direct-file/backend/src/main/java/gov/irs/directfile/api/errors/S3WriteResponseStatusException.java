@@ -6,8 +6,7 @@ import gov.irs.directfile.api.taxreturn.ApiErrorKeys;
 import gov.irs.directfile.api.taxreturn.TaxReturnApi.S3WriteError;
 
 public class S3WriteResponseStatusException extends ApiResponseStatusException {
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
         {
             "status":"BAD_REQUEST",
             "message":"400 BAD_REQUEST \\"Unable to write XML for tax return to S3.\\"",

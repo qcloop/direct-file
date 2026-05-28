@@ -20,20 +20,16 @@ public class BoilerplateConfigurationProperties {
     @AllArgsConstructor
     @Getter
     public static class NestedClass1 {
-        @NotBlank
-        private final String property1;
+        @NotBlank private final String property1;
     }
 
     @AllArgsConstructor
     @Getter
     public static class NestedClass2 {
-        @NotBlank
-        private final String property1;
+        @NotBlank private final String property1;
 
-        @NotBlank
-        private final String property2;
+        @NotBlank private final String property2;
 
-        @NotBlank
-        private final String property3;
+        @NotBlank private final String property3;
     }
 }

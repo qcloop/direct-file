@@ -59,14 +59,16 @@
         <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
         <maven-site-plugin.version>3.12.1</maven-site-plugin.version>
         <spotbugs-maven-plugin.version>4.9.8.3</spotbugs-maven-plugin.version>
-        <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
+        <!-- Spotless/Palantir 2.43.0/2.39.0 use javac internals that changed in JDK 25
+             (NoSuchMethodError in Log$DeferredDiagnosticHandler). Bumped to JDK-25-capable releases. -->
+        <spotless-maven-plugin.version>3.6.0</spotless-maven-plugin.version>
         <jaxb2-maven-plugin.version>3.2.0</jaxb2-maven-plugin.version>
         <maven-project-info-reports-plugin.version>3.5.0</maven-project-info-reports-plugin.version>
 
         <config-folder.path>${project.basedir}/../../config</config-folder.path>
 
         <!-- Spotless properties-->
-        <spotless-plugin.palantirVersion>2.39.0</spotless-plugin.palantirVersion>
+        <spotless-plugin.palantirVersion>2.91.0</spotless-plugin.palantirVersion>
         <spotless-plugin.file.xml-prefs>${config-folder.path}/spotless-xml.prefs</spotless-plugin.file.xml-prefs>
 
         <!-- SpotBugs properties-->

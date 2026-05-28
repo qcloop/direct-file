@@ -21,8 +21,7 @@ public class StatusResponseBody {
     private Date createdAt;
 
     @JsonIgnore
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
                     {
                         "status": "Accepted",
                         "translationKey": "status.accepted"

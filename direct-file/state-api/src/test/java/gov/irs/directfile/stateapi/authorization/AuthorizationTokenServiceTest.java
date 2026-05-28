@@ -70,9 +70,11 @@ public class AuthorizationTokenServiceTest {
         // NOTE: We aren't stubbing the encryptor's return value, so a NullPointerException will be thrown.
         // That's ok because we're not testing what the encryptor returns,
         // we're just testing that the encryptor is invoked
-        assertThrows(NullPointerException.class, () -> authorizationTokenService
-                .generateAndEncrypt(authorizationTokenClaims)
-                .block());
+        assertThrows(
+                NullPointerException.class,
+                () -> authorizationTokenService
+                        .generateAndEncrypt(authorizationTokenClaims)
+                        .block());
 
         // then
         verify(dataEncryptDecrypt).encrypt(any(), any());
@@ -90,9 +92,11 @@ public class AuthorizationTokenServiceTest {
         // NOTE: We aren't stubbing the encryptor's return value, so a NullPointerException will be thrown.
         // That's ok because we're not testing what the encryptor returns,
         // we're just testing that an encryption context is passed into the encryptor
-        assertThrows(NullPointerException.class, () -> authorizationTokenService
-                .generateAndEncrypt(authorizationTokenClaims)
-                .block());
+        assertThrows(
+                NullPointerException.class,
+                () -> authorizationTokenService
+                        .generateAndEncrypt(authorizationTokenClaims)
+                        .block());
         ArgumentCaptor<Map<String, String>> encryptionContextCaptor = ArgumentCaptor.captor();
 
         // then

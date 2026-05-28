@@ -220,6 +220,9 @@ services:
       - "${DF_LISTEN_ADDRESS:-127.0.0.1}:4566:4566" # LocalStack Gateway
       - "${DF_LISTEN_ADDRESS:-127.0.0.1}:4510-4559:4510-4559" # external services port range
     environment:
+      # Recent localstack images require a license/auth token. Set LOCALSTACK_AUTH_TOKEN
+      # in your shell or a .env file next to this compose file; it is passed through here.
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:-}
       - LOCALSTACK_HOST=localstack # where services are available from other containers
       - SERVICES=s3,sqs,sqs-query,kms,sns,iam,lambda,logs
       - DISABLE_EVENTS=1 # disable analytics

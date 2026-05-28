@@ -30,18 +30,15 @@ public class AuthorizationCode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    private UUID taxReturnUuid;
+    @NotBlank private UUID taxReturnUuid;
 
-    @NotBlank
-    private String authorizationCode;
+    @NotBlank private String authorizationCode;
 
     @NotNull private int taxYear;
 
     @NotNull private Timestamp expiresAt;
 
-    @NotBlank
-    private String stateCode;
+    @NotBlank private String stateCode;
 
     private String submissionId;
 

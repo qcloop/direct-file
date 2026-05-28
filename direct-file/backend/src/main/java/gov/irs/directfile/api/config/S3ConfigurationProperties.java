@@ -14,8 +14,7 @@ import org.springframework.validation.annotation.Validated;
 @AllArgsConstructor
 public class S3ConfigurationProperties {
 
-    @NotBlank
-    private final String region;
+    @NotBlank private final String region;
 
     @NotNull private final Credentials credentials;
 
@@ -24,35 +23,27 @@ public class S3ConfigurationProperties {
     @Getter
     @AllArgsConstructor
     public static class Credentials {
-        @NotBlank
-        private final String accessKey;
+        @NotBlank private final String accessKey;
 
-        @NotBlank
-        private final String secretKey;
+        @NotBlank private final String secretKey;
     }
 
     @Getter
     @AllArgsConstructor
     public static class S3 {
-        @NotBlank
-        private final String endpoint;
+        @NotBlank private final String endpoint;
 
-        @NotBlank
-        private final String assumeRoleArn;
+        @NotBlank private final String assumeRoleArn;
 
-        @NotNull @Min(value = 0)
-        private final int assumeRoleDurationSeconds;
+        @NotNull @Min(value = 0) private final int assumeRoleDurationSeconds;
 
-        @NotBlank
-        private final String assumeRoleSessionName;
+        @NotBlank private final String assumeRoleSessionName;
 
         private final String kmsWrappingKeyArn;
 
-        @NotBlank
-        private final String bucket;
+        @NotBlank private final String bucket;
 
-        @NotBlank
-        private final String operationsJobsBucket;
+        @NotBlank private final String operationsJobsBucket;
 
         private final String environmentPrefix;
     }

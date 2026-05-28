@@ -7,8 +7,7 @@ import gov.irs.directfile.api.taxreturn.ApiErrorKeys;
 import gov.irs.directfile.api.taxreturn.TaxReturnApi.SubmissionBlockingFacts;
 
 public class SubmissionBlockingFactsResponseStatusException extends ApiResponseStatusException {
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
         {
             "status":"BAD_REQUEST",
             "message":"400 BAD_REQUEST \\"Submission blocking facts are true for tax return.\\"",

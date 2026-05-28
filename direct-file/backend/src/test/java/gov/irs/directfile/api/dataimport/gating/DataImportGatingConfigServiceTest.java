@@ -47,8 +47,7 @@ public class DataImportGatingConfigServiceTest {
     @Test
     void getDataImportGating_withinAllowList_thenReturnsConfig() {
         // given
-        String dataImportGatingConfigString =
-                """
+        String dataImportGatingConfigString = """
 				{					
 					"percentages": [
 						{

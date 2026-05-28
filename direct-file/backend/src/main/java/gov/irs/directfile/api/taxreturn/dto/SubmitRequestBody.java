@@ -14,8 +14,7 @@ import gov.irs.directfile.models.FactTypeWithItem;
 public class SubmitRequestBody {
     @NotNull(message = "No facts provided") private Map<@NotEmpty String, @NotNull FactTypeWithItem> facts;
 
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
                     {
                        "facts": {
                          "/address": {

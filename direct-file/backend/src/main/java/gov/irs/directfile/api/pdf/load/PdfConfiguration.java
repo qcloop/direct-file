@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -27,9 +26,6 @@ import gov.irs.directfile.api.pdf.TableConfig;
 
 @Getter
 @AllArgsConstructor
-@SuppressFBWarnings(
-        value = {"MS_SHOULD_BE_FINAL"},
-        justification = "Initial Spotbugs setup")
 @SuppressWarnings(value = {"PMD.AssignmentInOperand", "PMD.AvoidReassigningLoopVariables"})
 public class PdfConfiguration {
     private String includeWhenFactPath;

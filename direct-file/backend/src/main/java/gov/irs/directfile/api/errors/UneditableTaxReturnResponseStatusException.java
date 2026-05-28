@@ -6,8 +6,7 @@ import gov.irs.directfile.api.taxreturn.ApiErrorKeys;
 import gov.irs.directfile.api.taxreturn.TaxReturnApi.SubmittedTaxReturn;
 
 public class UneditableTaxReturnResponseStatusException extends ApiResponseStatusException {
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
         {
             "status":"CONFLICT",
             "message":"409 CONFLICT \\"Tax return has already been submitted, and is not editable.\\"",
