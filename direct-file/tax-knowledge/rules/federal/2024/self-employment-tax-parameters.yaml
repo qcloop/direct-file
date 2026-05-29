@@ -1,0 +1,67 @@
+parameter_set_id: self_employment_tax_parameters_ty2024
+tax_year: 2024
+jurisdiction: federal
+topic_id: self_employment
+status: published
+source_ids:
+  - irs_instruction_1040_schedule_c_2024
+  - irs_instruction_1040_schedule_se_2024
+  - irs_form_1040_es_2024
+  - ssa_cola_announcement_2024
+description: >
+  Year/jurisdiction-scoped federal self-employment tax constants. The planning service loads
+  the set matching the planning tax year and injects each value into the session fact graph at
+  the given fact_path. Adding a future year is a new file here — no code change.
+
+  This set includes the FICA component rates (Rationals). The fact-graph engine supports
+  writable Rationals (WritableNode registers RationalNode); the RNG schema's WritableContent
+  was simply missing Rational and has been corrected. As a result the dictionary now carries no
+  self-employment numeric constants at all — only the calculation structure — and every value a
+  tax year fixes is data here, editable without touching code or recompiling.
+parameters:
+  - fact_path: /standardMileageRate
+    name: Business standard mileage rate
+    type: rational
+    value: "67/100"
+    unit: dollars_per_mile
+    source_id: irs_instruction_1040_schedule_c_2024
+    note: IRS business standard mileage rate for 2024 is 67 cents per mile.
+  - fact_path: /socialSecurityWageBase
+    name: Social Security wage base
+    type: dollar
+    value: "168600"
+    unit: dollars
+    source_id: ssa_cola_announcement_2024
+    note: SSA Social Security taxable maximum (wage base) for 2024 is $168,600.
+  - fact_path: /seFilingThreshold
+    name: Self-employment tax filing threshold
+    type: dollar
+    value: "400"
+    unit: dollars
+    source_id: irs_instruction_1040_schedule_se_2024
+    note: Net SE earnings at or above $400 trigger SE tax. Statutory; not indexed.
+  - fact_path: /highIncomeSafeHarborThreshold
+    name: High-income safe-harbor AGI threshold
+    type: dollar
+    value: "150000"
+    unit: dollars
+    source_id: irs_form_1040_es_2024
+    note: Prior-year AGI above $150,000 requires 110% (not 100%) safe-harbor coverage (IRC 6654).
+  - fact_path: /seSocialSecurityRate
+    name: Social Security portion of SE tax rate
+    type: rational
+    value: "124/1000"
+    source_id: irs_instruction_1040_schedule_se_2024
+    note: 12.4% Social Security component of self-employment tax.
+  - fact_path: /seMedicareRate
+    name: Medicare portion of SE tax rate
+    type: rational
+    value: "29/1000"
+    source_id: irs_instruction_1040_schedule_se_2024
+    note: 2.9% Medicare component of self-employment tax.
+  - fact_path: /seWageMultiplier
+    name: Net earnings multiplier
+    type: rational
+    value: "9235/10000"
+    source_id: irs_instruction_1040_schedule_se_2024
+    note: 92.35% net-earnings multiplier (removes the employer-equivalent half of FICA from the SE base).

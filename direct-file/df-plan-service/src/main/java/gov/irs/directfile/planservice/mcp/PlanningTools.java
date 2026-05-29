@@ -10,9 +10,13 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
+import gov.irs.directfile.planservice.citation.CitationService;
 import gov.irs.directfile.planservice.graph.PlanningGraphService;
 import gov.irs.directfile.planservice.graph.PlanningGraphService.ReadResult;
 import gov.irs.directfile.planservice.knowledge.TaxKnowledgeService;
+import gov.irs.directfile.planservice.knowledge.TaxKnowledgeService.Citation;
+import gov.irs.directfile.planservice.report.PlanReportService;
+import gov.irs.directfile.planservice.report.PlanReportService.PlanReport;
 
 /**
  * Spring AI MCP tools exposed by df-plan-service.
@@ -32,6 +36,7 @@ public class PlanningTools {
     private static final String WRAPPER_PREFIX = "gov.irs.factgraph.persisters.";
     private static final String DOLLAR_WRAPPER = WRAPPER_PREFIX + "DollarWrapper";
     private static final String INT_WRAPPER = WRAPPER_PREFIX + "IntWrapper";
+    private static final String RATIONAL_WRAPPER = WRAPPER_PREFIX + "RationalWrapper";
 
     private static final Map<String, String> TYPE_ALIASES = Map.of(
             "dollar", DOLLAR_WRAPPER,
@@ -46,12 +51,14 @@ public class PlanningTools {
     /** Shared description for the {@code sessionId} tool parameter (returned by {@code create_session}). */
     private static final String SESSION_ID_DESCRIPTION = "Planning session id from create_session.";
 
-    /** Federal quarterly estimated-tax deadlines for TY2025 payments. */
-    private static final List<Deadline> DEADLINES_2025 = List.of(
-            new Deadline("Q1", LocalDate.of(2025, 4, 15)),
-            new Deadline("Q2", LocalDate.of(2025, 6, 16)), // 6/15 is a Sunday
-            new Deadline("Q3", LocalDate.of(2025, 9, 15)),
-            new Deadline("Q4", LocalDate.of(2026, 1, 15)));
+    /** Key for the status field returned by the tool responses. */
+    private static final String STATUS_KEY = "status";
+
+    /** Key for the free-text note field returned by several tool responses. */
+    private static final String NOTE_KEY = "note";
+
+    /** Self-employment tax fact path, read by several tools. */
+    private static final String SE_TAX_PATH = "/seTax";
 
     private static final List<RequiredFact> REQUIRED_FACTS = List.of(
             new RequiredFact(
@@ -72,19 +79,38 @@ public class PlanningTools {
 
     private final PlanningGraphService graph;
     private final TaxKnowledgeService taxKnowledge;
+    private final PlanReportService reportService;
+    private final CitationService citationService;
 
-    public PlanningTools(PlanningGraphService graph, TaxKnowledgeService taxKnowledge) {
+    public PlanningTools(
+            PlanningGraphService graph,
+            TaxKnowledgeService taxKnowledge,
+            PlanReportService reportService,
+            CitationService citationService) {
         this.graph = graph;
         this.taxKnowledge = taxKnowledge;
+        this.reportService = reportService;
+        this.citationService = citationService;
     }
 
     @Tool(
             name = "create_session",
-            description = "Create a new in-memory planning session and return its id. "
-                    + "All subsequent tool calls require this id. Sessions are not persisted "
-                    + "and live only for the duration of the server process.")
-    public Map<String, Object> createSession() {
-        return Map.of("sessionId", graph.createSession());
+            description = "Create a new in-memory planning session for a tax year and return its id. "
+                    + "The session is seeded with that year's indexed tax constants (standard mileage "
+                    + "rate, Social Security wage base) from tax-knowledge; if a year has no published "
+                    + "constants the call fails rather than silently using another year's rates. All "
+                    + "subsequent tool calls require this id. Sessions are not persisted and live only "
+                    + "for the duration of the server process — if a later call reports an "
+                    + "unknown/expired session, call this again and re-enter the facts.")
+    public Map<String, Object> createSession(
+            @ToolParam(
+                            description = "Tax year to plan for, e.g. \"2025\". Defaults to the current calendar year.",
+                            required = false)
+                    String taxYear) {
+        int year = (taxYear == null || taxYear.isBlank())
+                ? java.time.Year.now().getValue()
+                : Integer.parseInt(taxYear.trim());
+        return Map.of("sessionId", graph.createSession(year), "taxYear", year);
     }
 
     @Tool(
@@ -101,8 +127,9 @@ public class PlanningTools {
             name = "set_fact",
             description = "Write a value to a writable fact in a planning session. Specify the "
                     + "type via 'type' (short alias: dollar/int/boolean/string/day/enum/ein/tin) "
-                    + "or 'typeCode' (full Scala class name). Returns whether the write was "
-                    + "accepted by the fact graph's validation pass.")
+                    + "or 'typeCode' (full Scala class name). Optionally pass 'source' to record "
+                    + "where the value came from as stated by the taxpayer. Returns whether the "
+                    + "write was accepted by the fact graph's validation pass.")
     public PlanningGraphService.WriteResult setFact(
             @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @ToolParam(description = "Fact path, e.g. /planning/priorYearTotalTax.") String path,
@@ -115,7 +142,17 @@ public class PlanningTools {
                             description = "Full Scala persister type code, used when 'type' is not one of the aliases.",
                             required = false)
                     String typeCode,
-            @ToolParam(description = "Value matching the declared type.") Object value) {
+            @ToolParam(
+                            description = "Value to write, as a string: e.g. \"608\" (dollar), "
+                                    + "\"2025-04-15\" (day), \"true\" (boolean).")
+                    String value,
+            @ToolParam(
+                            description = "Optional free-text provenance as stated by the taxpayer, e.g. "
+                                    + "\"2024 1099-NEC box 1, Uber\". Recorded for the export report and "
+                                    + "shown there as self-reported; it is not verified and never enters "
+                                    + "the tax math.",
+                            required = false)
+                    String source) {
 
         String resolvedTypeCode = typeCode;
         if (resolvedTypeCode == null || resolvedTypeCode.isBlank()) {
@@ -128,13 +165,157 @@ public class PlanningTools {
             }
         }
 
-        // Dollar values arrive as numbers; the persister wants them as strings.
+        // The MCP client sends the value as a string; convert it to the JSON shape each persister
+        // wrapper expects. DollarWrapper and the other string-backed wrappers read a string as-is;
+        // IntWrapper expects a JSON number and BooleanWrapper a JSON boolean.
         Object shaped = value;
-        if (DOLLAR_WRAPPER.equals(resolvedTypeCode) && value instanceof Number n) {
-            shaped = n.toString();
+        if (INT_WRAPPER.equals(resolvedTypeCode)) {
+            shaped = Long.parseLong(value.trim());
+        } else if ((WRAPPER_PREFIX + "BooleanWrapper").equals(resolvedTypeCode)) {
+            shaped = Boolean.parseBoolean(value.trim());
         }
 
-        return graph.writeFact(sessionId, path, resolvedTypeCode, shaped);
+        PlanningGraphService.WriteResult result = graph.writeFact(sessionId, path, resolvedTypeCode, shaped);
+        graph.setSourceNote(sessionId, path, source);
+        return result;
+    }
+
+    @Tool(
+            name = "calculate_se_tax",
+            description = "Compute self-employment tax (Schedule SE) for a planning session from gross "
+                    + "receipts and business expenses. Returns net profit, net earnings (92.35% of "
+                    + "profit), the Social Security portion (capped at the annual wage base and reduced "
+                    + "by any W-2 Social Security wages), the Medicare portion, total SE tax, and the "
+                    + "deductible half. Use this to build the projected current-year tax that "
+                    + "estimate_quarterly_payment needs.")
+    public Map<String, Object> calculateSeTax(
+            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @ToolParam(description = "Gross self-employment receipts (Schedule C line 1), as a string, e.g. \"24000\".")
+                    String grossReceipts,
+            @ToolParam(
+                            description =
+                                    "Business miles driven (standard-mileage method), as a whole number. Default 0.",
+                            required = false)
+                    String businessMiles,
+            @ToolParam(description = "Platform/commission fees withheld, as a string. Default 0.", required = false)
+                    String platformFees,
+            @ToolParam(description = "Supplies and other business expenses, as a string. Default 0.", required = false)
+                    String suppliesAndOther,
+            @ToolParam(
+                            description = "Social Security wages already reported on W-2s this year, as a string. "
+                                    + "Default 0.",
+                            required = false)
+                    String socialSecurityWagesFromW2) {
+
+        // Populate the Schedule C / SE inputs; the fact graph derives the rest. These are full-year
+        // actuals, so the annualization factor is 1/1 (no projection) — see project_net_profit for the
+        // year-to-date path.
+        graph.writeFact(sessionId, "/seGrossReceipts", DOLLAR_WRAPPER, dollarOrZero(grossReceipts));
+        graph.writeFact(sessionId, "/seVehicleBusinessMiles", INT_WRAPPER, longOrZero(businessMiles));
+        graph.writeFact(sessionId, "/sePlatformFees", DOLLAR_WRAPPER, dollarOrZero(platformFees));
+        graph.writeFact(sessionId, "/seSuppliesAndOther", DOLLAR_WRAPPER, dollarOrZero(suppliesAndOther));
+        graph.writeFact(
+                sessionId, "/seSocialSecurityWagesFromW2", DOLLAR_WRAPPER, dollarOrZero(socialSecurityWagesFromW2));
+        graph.writeFact(sessionId, "/seAnnualizationFactor", RATIONAL_WRAPPER, Map.of("n", 1, "d", 1));
+
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put(STATUS_KEY, "ok");
+        // Surface the tax year and the rate actually used, so a wrong-year session (e.g. planning
+        // 2026 on a 2025 session) is visible rather than silently using stale constants.
+        out.put("tax_year", graph.taxYearOf(sessionId));
+        out.put("standard_mileage_rate", graph.readDecimal(sessionId, "/standardMileageRate"));
+        out.put("net_profit", graph.readFact(sessionId, "/seNetProfit").value());
+        out.put(
+                "net_earnings_from_se",
+                graph.readFact(sessionId, "/seNetEarnings").value());
+        out.put(
+                "social_security_portion",
+                graph.readFact(sessionId, "/seSocialSecurityTax").value());
+        out.put("medicare_portion", graph.readFact(sessionId, "/seMedicareTax").value());
+        out.put("self_employment_tax", graph.readFact(sessionId, SE_TAX_PATH).value());
+        out.put(
+                "deductible_half",
+                graph.readFact(sessionId, "/deductibleHalfOfSETax").value());
+        out.put("explanation_tree", graph.explain(sessionId, SE_TAX_PATH));
+        return out;
+    }
+
+    @Tool(
+            name = "project_net_profit",
+            description = "Project full-year self-employment net profit (and SE tax) from year-to-date "
+                    + "raw numbers. Give the receipts, miles, fees, and supplies accumulated so far this "
+                    + "year plus the asOfDate; the tool annualizes them straight-line (× 12 ÷ months of "
+                    + "data) and runs the same Schedule C/SE math. Returns projected gross receipts, net "
+                    + "profit, net earnings, and SE tax with a derivation chain. Assumes income is even "
+                    + "across the year — for seasonal income or a known full-year figure, use "
+                    + "calculate_se_tax with full-year numbers instead.")
+    public Map<String, Object> projectNetProfit(
+            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @ToolParam(
+                            description = "ISO date (YYYY-MM-DD) the year-to-date figures run through. Required "
+                                    + "because the fact graph has no clock; it sets how many months to annualize from.")
+                    String asOfDate,
+            @ToolParam(description = "Year-to-date gross self-employment receipts, as a string, e.g. \"21000\".")
+                    String ytdGrossReceipts,
+            @ToolParam(
+                            description = "Year-to-date business miles driven, as a whole number. Default 0.",
+                            required = false)
+                    String ytdBusinessMiles,
+            @ToolParam(description = "Year-to-date platform/commission fees, as a string. Default 0.", required = false)
+                    String ytdPlatformFees,
+            @ToolParam(
+                            description = "Year-to-date supplies and other business expenses, as a string. Default 0.",
+                            required = false)
+                    String ytdSuppliesAndOther,
+            @ToolParam(
+                            description = "Social Security wages already reported on W-2s this year, as a string. "
+                                    + "Not annualized. Default 0.",
+                            required = false)
+                    String socialSecurityWagesFromW2) {
+
+        int taxYear = graph.taxYearOf(sessionId);
+        int monthsElapsed = monthsElapsedInTaxYear(taxYear, LocalDate.parse(asOfDate));
+
+        // Write the year-to-date figures into the same Schedule C inputs, then set the annualization
+        // factor so the graph projects them to a full year (12 / months of data).
+        graph.writeFact(sessionId, "/seGrossReceipts", DOLLAR_WRAPPER, dollarOrZero(ytdGrossReceipts));
+        graph.writeFact(sessionId, "/seVehicleBusinessMiles", INT_WRAPPER, longOrZero(ytdBusinessMiles));
+        graph.writeFact(sessionId, "/sePlatformFees", DOLLAR_WRAPPER, dollarOrZero(ytdPlatformFees));
+        graph.writeFact(sessionId, "/seSuppliesAndOther", DOLLAR_WRAPPER, dollarOrZero(ytdSuppliesAndOther));
+        graph.writeFact(
+                sessionId, "/seSocialSecurityWagesFromW2", DOLLAR_WRAPPER, dollarOrZero(socialSecurityWagesFromW2));
+        graph.writeFact(sessionId, "/seMonthsElapsed", INT_WRAPPER, (long) monthsElapsed);
+        graph.writeFact(sessionId, "/seAnnualizationFactor", RATIONAL_WRAPPER, Map.of("n", 12, "d", monthsElapsed));
+
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put(STATUS_KEY, "ok");
+        out.put("tax_year", taxYear);
+        out.put("standard_mileage_rate", graph.readDecimal(sessionId, "/standardMileageRate"));
+        out.put("months_elapsed", monthsElapsed);
+        out.put("annualization_factor", "12/" + monthsElapsed);
+        out.put("ytd_gross_receipts", dollarOrZero(ytdGrossReceipts));
+        out.put(
+                "projected_gross_receipts",
+                graph.readFact(sessionId, "/seEffectiveGrossReceipts").value());
+        out.put(
+                "projected_net_profit",
+                graph.readFact(sessionId, "/seNetProfit").value());
+        out.put(
+                "projected_net_earnings_from_se",
+                graph.readFact(sessionId, "/seNetEarnings").value());
+        out.put(
+                "projected_self_employment_tax",
+                graph.readFact(sessionId, SE_TAX_PATH).value());
+        out.put(
+                "deductible_half",
+                graph.readFact(sessionId, "/deductibleHalfOfSETax").value());
+        out.put(
+                NOTE_KEY,
+                "Projected figures annualize your year-to-date numbers assuming income is even across "
+                        + "the year (straight-line). Seasonal income will differ. This projects "
+                        + "self-employment tax only; it does not include income tax.");
+        out.put("explanation_tree", graph.explain(sessionId, "/seNetProfit"));
+        return out;
     }
 
     @Tool(
@@ -146,6 +327,80 @@ public class PlanningTools {
             @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @ToolParam(description = "Fact path to explain.") String path) {
         return graph.explain(sessionId, path);
+    }
+
+    @Tool(
+            name = "cite",
+            description = "Explain the legal basis for a fact: returns the authorities (IRC sections, "
+                    + "IRS forms/instructions/publications) behind the fact's value, each with a formal "
+                    + "citation, an official link, and a friendly plain-language explanation. Use to "
+                    + "answer 'why / on what basis is this number what it is?'. Authorities are derived "
+                    + "from the fact's actual computation, so a result cites every statutory constant it "
+                    + "depends on.")
+    public Map<String, Object> cite(
+            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @ToolParam(description = "Fact path to explain the basis for, e.g. /seTax or /planning/safeHarborTarget.")
+                    String path) {
+        int taxYear = graph.taxYearOf(sessionId);
+        ReadResult value = graph.readFact(sessionId, path);
+        List<Citation> found = citationService.citationsForFact(taxYear, path);
+
+        List<Map<String, Object>> authorities = new ArrayList<>();
+        for (Citation c : found) {
+            Map<String, Object> a = new LinkedHashMap<>();
+            a.put("source_id", c.sourceId());
+            a.put("authority", c.authority());
+            a.put("citation", c.citation());
+            a.put("title", c.title());
+            a.put("url", c.url());
+            a.put("plain_language", c.plainLanguage());
+            authorities.add(a);
+        }
+
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put(STATUS_KEY, "ok");
+        out.put("path", path);
+        out.put("value", value.value());
+        out.put("authorities", authorities);
+        if (authorities.isEmpty()) {
+            out.put(
+                    NOTE_KEY,
+                    "No statutory authority is attached to this value — it is either a raw input you "
+                            + "provided or pure arithmetic with no tax-law constant behind it.");
+        }
+        return out;
+    }
+
+    @Tool(
+            name = "export_plan",
+            description = "Generate a self-contained, printable planning summary for the session and "
+                    + "return it as Markdown sealed with a SHA-256 content hash. The summary lists the "
+                    + "taxpayer's self-reported inputs, the year's statutory parameters with their IRS "
+                    + "sources, and each computed result with its one-level derivation. By default it also "
+                    + "cites the legal authority behind each result and appends a plain-language 'Sources' "
+                    + "section; pass includeCitations=false to omit citations. The service stores nothing — "
+                    + "this artifact is the taxpayer's own record to save or print; hand the Markdown to the "
+                    + "user verbatim. Use after the relevant figures have been computed.")
+    public Map<String, Object> exportPlan(
+            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @ToolParam(
+                            description = "Include legal citations and a plain-language Sources section. "
+                                    + "Defaults to true.",
+                            required = false)
+                    Boolean includeCitations) {
+        PlanReport report = reportService.generate(sessionId, includeCitations == null || includeCitations);
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put(STATUS_KEY, "ok");
+        out.put("tax_year", report.taxYear());
+        out.put("generated_at", report.generatedAt());
+        out.put("hash_algorithm", "SHA-256");
+        out.put("sha256", report.sha256());
+        out.put("report_markdown", report.markdown());
+        out.put(
+                NOTE_KEY,
+                "This report is not stored by the service. Give the report_markdown to the taxpayer to "
+                        + "keep; the sha256 lets them later confirm the document was not altered.");
+        return out;
     }
 
     @Tool(
@@ -172,21 +427,23 @@ public class PlanningTools {
         }
         if (!missing.isEmpty()) {
             Map<String, Object> out = new LinkedHashMap<>();
-            out.put("status", "needs_facts");
+            out.put(STATUS_KEY, "needs_facts");
             out.put("missing_facts", missing);
             out.put("hint", "Ask the user for these values, write each via set_fact, then call this tool again.");
             return out;
         }
 
-        // 2. Resolve the next deadline and compute remaining quarters.
-        Deadline next = DEADLINES_2025.stream()
+        // 2. Resolve the next deadline and remaining quarters for the session's tax year
+        // (asOf only determines which of that year's deadlines are still ahead).
+        List<Deadline> deadlines = deadlinesForTaxYear(graph.taxYearOf(sessionId));
+        Deadline next = deadlines.stream()
                 .filter(d -> !d.due.isBefore(asOf))
                 .findFirst()
-                .orElse(DEADLINES_2025.get(DEADLINES_2025.size() - 1));
+                .orElse(deadlines.get(deadlines.size() - 1));
         long remainingQuarters =
-                DEADLINES_2025.stream().filter(d -> !d.due.isBefore(asOf)).count();
+                deadlines.stream().filter(d -> !d.due.isBefore(asOf)).count();
         if (remainingQuarters == 0) {
-            remainingQuarters = 1; // past last deadline — recommend Q4 catch-up payment
+            remainingQuarters = 1; // past the final (Jan 15) deadline — recommend a catch-up payment
         }
 
         graph.writeFact(sessionId, "/planning/remainingQuarters", INT_WRAPPER, remainingQuarters);
@@ -196,8 +453,10 @@ public class PlanningTools {
         ReadResult safeHarbor = graph.readFact(sessionId, "/planning/safeHarborTarget");
         ReadResult ytdApplied = graph.readFact(sessionId, "/planning/ytdPaymentsApplied");
         ReadResult remainingDue = graph.readFact(sessionId, "/planning/remainingPaymentDue");
-        ReadResult seTax = graph.readFact(sessionId, "/seTax");
+        ReadResult seTax = graph.readFact(sessionId, SE_TAX_PATH);
         ReadResult highIncomeRule = graph.readFact(sessionId, "/planning/highIncomeSafeHarborApplies");
+        ReadResult projectedTax = graph.readFact(sessionId, "/planning/projectedCurrentYearTax");
+        ReadResult balanceDueAtFiling = graph.readFact(sessionId, "/planning/projectedBalanceDueAtFiling");
 
         Map<String, Object> derivation = new LinkedHashMap<>();
         derivation.put("self_employment_tax", seTax.value());
@@ -212,10 +471,20 @@ public class PlanningTools {
         derivation.put("remaining_quarters", remainingQuarters);
 
         Map<String, Object> out = new LinkedHashMap<>();
-        out.put("status", "ok");
+        out.put(STATUS_KEY, "ok");
         out.put("recommended_payment", suggested.value());
         out.put("next_deadline", next.due.toString());
         out.put("quarter", next.quarter);
+        // Keep the two questions distinct: the safe-harbor recommendation ("least to prepay to
+        // avoid the penalty") is not the same as what's actually owed for the year.
+        out.put("projected_total_tax", projectedTax.value());
+        out.put("projected_balance_due_at_filing", balanceDueAtFiling.value());
+        out.put(
+                NOTE_KEY,
+                "recommended_payment is the safe-harbor minimum that avoids the IRC §6654 "
+                        + "underpayment penalty; it does NOT settle the year's tax. "
+                        + "projected_balance_due_at_filing is what would still be owed at filing if no "
+                        + "further payments are made beyond those already counted (negative = refund).");
         out.put("derivation", derivation);
         out.put("explanation_tree", graph.explain(sessionId, "/planning/nextQuarterlyPaymentSuggested"));
         out.put("payment_url", "https://www.irs.gov/payments/direct-pay");
@@ -273,7 +542,7 @@ public class PlanningTools {
     private static Map<String, Object> confirmed(Object value) {
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("value", value);
-        out.put("status", "confirmed");
+        out.put(STATUS_KEY, "confirmed");
         return out;
     }
 
@@ -298,6 +567,57 @@ public class PlanningTools {
             }
         }
         return states;
+    }
+
+    /**
+     * Federal individual estimated-tax deadlines (IRC §6654) for {@code taxYear}: the Apr 15 / Jun 15 /
+     * Sep 15 installments in that year and the Jan 15 installment in the next. Derived from the tax year
+     * (which the session is created with) rather than hard-coded, and pushed to the next Monday when the
+     * 15th lands on a weekend (federal-holiday shifts, e.g. Emancipation Day, are not modeled — treat
+     * these as planning dates, not authoritative filing dates).
+     */
+    private static List<Deadline> deadlinesForTaxYear(int taxYear) {
+        return List.of(
+                new Deadline("Q1", weekdayOnOrAfter(LocalDate.of(taxYear, 4, 15))),
+                new Deadline("Q2", weekdayOnOrAfter(LocalDate.of(taxYear, 6, 15))),
+                new Deadline("Q3", weekdayOnOrAfter(LocalDate.of(taxYear, 9, 15))),
+                new Deadline("Q4", weekdayOnOrAfter(LocalDate.of(taxYear + 1, 1, 15))));
+    }
+
+    /**
+     * Months of {@code taxYear} elapsed as of {@code asOf} (1–12), used as the annualization basis.
+     * The date must fall <em>within</em> the session's tax year. A date outside it is rejected rather
+     * than clamped: clamping a later-year date to 12 months would silently turn the projection into a
+     * no-op (factor 12/12 = 1) and return a full-year-sized number to a year-to-date user — a wrong
+     * headline figure with no failure signal. For full-year actuals, use {@code calculate_se_tax}.
+     */
+    private static int monthsElapsedInTaxYear(int taxYear, LocalDate asOf) {
+        if (asOf.getYear() != taxYear) {
+            throw new IllegalArgumentException("asOfDate " + asOf + " is not within tax year " + taxYear
+                    + ". project_net_profit annualizes year-to-date figures inside the planning year, so the "
+                    + "date must fall in " + taxYear + ". Create the session for the year you are planning, or "
+                    + "use calculate_se_tax if you already have full-year figures.");
+        }
+        return asOf.getMonthValue();
+    }
+
+    /** Push a date to the following Monday if it falls on a weekend. */
+    private static LocalDate weekdayOnOrAfter(LocalDate d) {
+        return switch (d.getDayOfWeek()) {
+            case SATURDAY -> d.plusDays(2);
+            case SUNDAY -> d.plusDays(1);
+            default -> d;
+        };
+    }
+
+    /** Dollar inputs are written as strings (DollarWrapper reads a string); blank means $0. */
+    private static String dollarOrZero(String v) {
+        return (v == null || v.isBlank()) ? "0" : v.trim();
+    }
+
+    /** Int inputs (e.g. miles) are written as a JSON number; blank means 0. */
+    private static long longOrZero(String v) {
+        return (v == null || v.isBlank()) ? 0L : Long.parseLong(v.trim());
     }
 
     private record Deadline(String quarter, LocalDate due) {}

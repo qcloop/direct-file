@@ -55,8 +55,12 @@
 
         <!-- maven plugin versions-->
         <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
         <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
+        <!-- maven-pmd-plugin 3.28.0 bundles PMD 7.17.0, whose ASM can't parse JDK 26 class
+             files (StackOverflowError in ParseLock#doParse). PMD 7.21.0 added Java 26 support
+             (pmd/pmd#5871); override the plugin's PMD modules to that version. -->
+        <pmd.version>7.21.0</pmd.version>
         <maven-site-plugin.version>3.12.1</maven-site-plugin.version>
         <spotbugs-maven-plugin.version>4.9.8.3</spotbugs-maven-plugin.version>
         <!-- Spotless/Palantir 2.43.0/2.39.0 use javac internals that changed in JDK 25
@@ -519,6 +523,31 @@
                         <ruleset>${maven-pmd-plugin.ruleset}</ruleset>
                     </rulesets>
                 </configuration>
+                <!-- Override the PMD version bundled with the plugin so analysis works on JDK 26
+                     (see pmd.version above). All four modules the plugin pulls are pinned together
+                     to keep PMD's internals on a single version. -->
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sourceforge.pmd</groupId>
+                        <artifactId>pmd-core</artifactId>
+                        <version>${pmd.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.sourceforge.pmd</groupId>
+                        <artifactId>pmd-java</artifactId>
+                        <version>${pmd.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.sourceforge.pmd</groupId>
+                        <artifactId>pmd-javascript</artifactId>
+                        <version>${pmd.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.sourceforge.pmd</groupId>
+                        <artifactId>pmd-jsp</artifactId>
+                        <version>${pmd.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <goals>

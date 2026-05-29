@@ -996,6 +996,9 @@
           <ref name="EinContent" />
           <ref name="IntContent" />
           <ref name="MultiEnumContent" />
+          <!-- Rational is a registered WritableNode in the fact-graph engine
+               (WritableNode.defaultNodes); the schema had simply omitted it. -->
+          <ref name="RationalContent" />
         </choice>
         <optional>
           <oneOrMore>

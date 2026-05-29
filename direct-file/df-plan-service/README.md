@@ -72,8 +72,12 @@ on `PlanningTools` (camelCase, not snake_case).
 | `create_session`              | Allocate a new in-memory planning session              |
 | `get_fact`                    | Read a fact from a session's graph                     |
 | `set_fact`                    | Write a value to a writable fact                       |
+| `calculate_se_tax`            | Schedule C/SE tax from full-year figures               |
+| `project_net_profit`          | Project full-year net profit + SE tax from YTD figures |
 | `explain`                     | One-level derivation explanation for a fact            |
+| `cite`                        | Legal authority behind a fact + plain-language explanation |
 | `estimate_quarterly_payment`  | IRC §6654 safe-harbor quarterly recommendation         |
+| `export_plan`                 | Sealed, printable summary the taxpayer keeps (nothing stored) |
 | `plan_questions`              | Plan next interview questions from tax-knowledge YAML  |
 
 ## Build prerequisites
@@ -181,6 +185,25 @@ scaffold):
 - This MVP keeps planning sessions in memory only — nothing is persisted
   that would qualify as FTI under §6103. Once a session writes facts into
   a filed return (out of scope here), full FedRAMP-High obligations attach.
+- The durable record is **taxpayer-held, not server-held**. `export_plan`
+  renders the session as a self-contained, SHA-256-sealed Markdown summary
+  that the agent hands back to the taxpayer to save or print. The service
+  retains nothing, so this avoids a server-side FTI audit store while still
+  giving the taxpayer a reproducible, tamper-evident record. The hash is
+  tamper-evidence (content unchanged), not a signature (who produced it).
+  The report labels inputs **self-reported and unverified**: it traces the
+  arithmetic from the figures given, it does not confirm them against a
+  1099 or bank record — source-document verification is a separate concern
+  delegated elsewhere, deliberately not built into this planner.
+- **Citations are derived, not hand-mapped.** Each year-parameter carries a
+  `source_id`; the citation registry (`tax-knowledge/sources/federal/citations.yaml`)
+  resolves each id to a formal citation (e.g. `26 U.S.C. § 6654`), an official
+  URL, and a friendly plain-language explanation. A computed result cites every
+  statutory constant in its dependency closure, so `export_plan` (citations on by
+  default) and the `cite` tool attribute figures to authorities straight from the
+  computation graph — no per-fact citation table to maintain. Adding a new tax
+  year's parameter with a new `source_id` requires a matching registry entry
+  (enforced by `CitationRegistryTest`).
 
 ## Known limitations (MVP)
 

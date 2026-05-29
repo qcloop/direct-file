@@ -35,7 +35,7 @@ class QuarterlyEstimateIntegrationTest {
 
     @Test
     void quarterlyEstimateFlow() {
-        String sid = (String) tools.createSession().get("sessionId");
+        String sid = (String) tools.createSession("2025").get("sessionId");
 
         // 1) Without any facts populated, the tool should ask for what's missing.
         Map<String, Object> before = tools.estimateQuarterlyPayment(sid, "2025-08-20");
@@ -62,7 +62,35 @@ class QuarterlyEstimateIntegrationTest {
         assertThat(recommended).isEqualByComparingTo("800");
     }
 
+    /**
+     * Exercises the high-income (110%) safe-harbor leg, which the gig-worker scenario above
+     * never reaches (its AGI is below the threshold, so the 100% identity branch wins). With
+     * prior-year AGI over the $150K threshold, the injected {@code highIncomeSafeHarborRate}
+     * (110/100, from estimated-tax-parameters.yaml) must multiply prior-year tax — proving the
+     * rate is wired through from tax-knowledge and not a dictionary literal.
+     */
+    @Test
+    void highIncomeSafeHarborMultipliesPriorYearTaxBy110Percent() {
+        String sid = graph.createSession(2025);
+
+        writeDollar(sid, "/planning/priorYearTotalTax", 20000);
+        writeDollar(sid, "/planning/priorYearAGI", 200000); // over the $150K high-income threshold
+        writeDollar(sid, "/planning/projectedCurrentYearTax", 30000); // 90% leg = $27,000, so it loses
+
+        // High-income tier engaged.
+        assertThat(graph.readFact(sid, "/planning/highIncomeSafeHarborApplies").value())
+                .isEqualTo(true);
+        // Prior-year leg = 110% x $20,000 = $22,000 (would be $20,000 if the rate weren't applied).
+        assertThat((BigDecimal) graph.readFact(sid, "/planning/priorYearSafeHarborTarget")
+                        .value())
+                .isEqualByComparingTo("22000");
+        // Overall target = lesser of ($22,000, 90% x $30,000 = $27,000) = $22,000.
+        assertThat((BigDecimal)
+                        graph.readFact(sid, "/planning/safeHarborTarget").value())
+                .isEqualByComparingTo("22000");
+    }
+
     private void writeDollar(String sid, String path, int dollars) {
-        tools.setFact(sid, path, "dollar", null, dollars);
+        tools.setFact(sid, path, "dollar", null, Integer.toString(dollars), null);
     }
 }

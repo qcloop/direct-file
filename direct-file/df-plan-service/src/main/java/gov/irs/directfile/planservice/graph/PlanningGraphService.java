@@ -1,11 +1,17 @@
 package gov.irs.directfile.planservice.graph;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +34,7 @@ import gov.irs.directfile.api.loaders.processor.FactGraphLoader;
 import gov.irs.directfile.api.loaders.processor.XmlProcessor;
 import gov.irs.directfile.models.FactTypeWithItem;
 import gov.irs.directfile.planservice.config.PlanServiceProperties;
+import gov.irs.directfile.planservice.knowledge.TaxKnowledgeService;
 
 /**
  * Loads the combined fact dictionary (production tax/ XMLs + planning tax-plan/ XMLs)
@@ -43,9 +50,14 @@ import gov.irs.directfile.planservice.config.PlanServiceProperties;
 public class PlanningGraphService {
     private static final Logger log = LoggerFactory.getLogger(PlanningGraphService.class);
 
+    private static final String DOLLAR_WRAPPER = "gov.irs.factgraph.persisters.DollarWrapper";
+    private static final String INT_WRAPPER = "gov.irs.factgraph.persisters.IntWrapper";
+    private static final String RATIONAL_WRAPPER = "gov.irs.factgraph.persisters.RationalWrapper";
+
     private final ApplicationContext applicationContext;
     private final ObjectMapper objectMapper;
     private final PlanServiceProperties properties;
+    private final TaxKnowledgeService taxKnowledge;
 
     private FactDictionary dictionary;
     private TaxDictionaryDigest digest;
@@ -53,10 +65,14 @@ public class PlanningGraphService {
     private final Map<String, SessionState> sessions = new ConcurrentHashMap<>();
 
     public PlanningGraphService(
-            ApplicationContext applicationContext, ObjectMapper objectMapper, PlanServiceProperties properties) {
+            ApplicationContext applicationContext,
+            ObjectMapper objectMapper,
+            PlanServiceProperties properties,
+            TaxKnowledgeService taxKnowledge) {
         this.applicationContext = applicationContext;
         this.objectMapper = objectMapper;
         this.properties = properties;
+        this.taxKnowledge = taxKnowledge;
     }
 
     @PostConstruct
@@ -81,19 +97,76 @@ public class PlanningGraphService {
                 properties.factXmlPatterns().size());
     }
 
-    public String createSession() {
+    public String createSession(int taxYear) {
+        // Resolve the year's tax parameters first — this throws if the year has no published
+        // parameters, so we never create a session that silently uses another year's values.
+        List<TaxKnowledgeService.TaxParameter> params = taxKnowledge.taxParametersForYear(taxYear);
         String id = java.util.UUID.randomUUID().toString();
-        sessions.put(id, new SessionState(new LinkedHashMap<>()));
+        sessions.put(id, new SessionState(taxYear, new LinkedHashMap<>(), new LinkedHashMap<>()));
+        // Inject the year-indexed constants so SE-tax and safe-harbor math use the right year's values.
+        // The fact-graph value type drives the persister wrapper and how the string is shaped:
+        // int -> a JSON number; rational -> the "n/d" string; dollar (default) -> the string as-is.
+        for (TaxKnowledgeService.TaxParameter p : params) {
+            String typeCode;
+            Object value;
+            switch (p.type() == null ? "dollar" : p.type().toLowerCase()) {
+                case "int" -> {
+                    typeCode = INT_WRAPPER;
+                    value = Long.parseLong(p.value().trim());
+                }
+                case "rational" -> {
+                    typeCode = RATIONAL_WRAPPER;
+                    // The Rational persister serializes as {"n":<numerator>,"d":<denominator>};
+                    // parameters are authored in the readable "n/d" form, so split here.
+                    String[] nd = p.value().trim().split("/", 2);
+                    if (nd.length != 2) {
+                        throw new IllegalArgumentException(
+                                "Rational parameter " + p.factPath() + " must be 'n/d', got: " + p.value());
+                    }
+                    value = Map.of("n", Integer.parseInt(nd[0].trim()), "d", Integer.parseInt(nd[1].trim()));
+                }
+                default -> {
+                    typeCode = DOLLAR_WRAPPER;
+                    value = p.value();
+                }
+            }
+            writeFact(id, p.factPath(), typeCode, value);
+        }
         return id;
+    }
+
+    public int taxYearOf(String sessionId) {
+        return require(sessionId).taxYear();
     }
 
     public Graph graphFor(String sessionId) {
         SessionState state = require(sessionId);
-        try {
-            String json = objectMapper.writeValueAsString(state.facts);
-            return new Graph(dictionary, InMemoryPersister.apply(json));
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to materialize graph for session " + sessionId, e);
+        // Serialize under the session lock: building the graph iterates the facts map, and a
+        // concurrent writeFact mutating it would corrupt serialization. Holding the lock here (and in
+        // writeFact) is what prevents the transient "failed to build graph" faults under concurrent
+        // tool calls on the same session.
+        synchronized (state) {
+            try {
+                String json = objectMapper.writeValueAsString(state.facts);
+                return new Graph(dictionary, InMemoryPersister.apply(json));
+            } catch (Exception e) {
+                // Log the underlying cause (and fact paths, not values) so build failures are
+                // diagnosable; the cause was previously swallowed behind the generic message.
+                log.error(
+                        "Failed to build fact graph for session {} (fact paths: {})",
+                        sessionId,
+                        state.facts.keySet(),
+                        e);
+                // Distinct from an expired/unknown session (which require() reports): the session
+                // exists, but its current facts could not be assembled into a graph — usually the
+                // most recent write was malformed for its declared type.
+                throw new IllegalStateException(
+                        "Internal error building the fact graph for session " + sessionId
+                                + " — the session still exists (this is not an expiry). The most recent fact write"
+                                + " may be malformed for its type; re-check the last set_fact, or recreate the"
+                                + " session if this persists.",
+                        e);
+            }
         }
     }
 
@@ -104,12 +177,15 @@ public class PlanningGraphService {
      */
     public WriteResult writeFact(String sessionId, String path, String typeCode, Object rawValue) {
         SessionState state = require(sessionId);
-        state.facts.put(path, new FactTypeWithItem(typeCode, objectMapper.valueToTree(rawValue)));
-
-        Graph g = graphFor(sessionId);
-        var saveResult = g.save();
-        boolean ok = (boolean) saveResult._1();
-        return new WriteResult(ok, ok ? List.of() : List.of("Save reported limit violation for " + path));
+        // The put and the subsequent graph build/save must be atomic w.r.t. other writers on this
+        // session; graphFor re-acquires the same (reentrant) lock.
+        synchronized (state) {
+            state.facts.put(path, new FactTypeWithItem(typeCode, objectMapper.valueToTree(rawValue)));
+            Graph g = graphFor(sessionId);
+            var saveResult = g.save();
+            boolean ok = (boolean) saveResult._1();
+            return new WriteResult(ok, ok ? List.of() : List.of("Save reported limit violation for " + path));
+        }
     }
 
     public ReadResult readFact(String sessionId, String path) {
@@ -129,11 +205,68 @@ public class PlanningGraphService {
         }
     }
 
+    /**
+     * Read a fact and coerce it to a plain {@link BigDecimal}, whatever its underlying type. Dollars
+     * and ints convert directly; a {@code Rational} (which {@link #readFact} returns as the engine's
+     * own type, rendering as "n/d") is divided out so numeric consumers — tool JSON payloads, tests —
+     * get a clean number instead of an engine object. Returns {@code null} if the fact is not
+     * computable. Note: the report deliberately still shows rationals as "n/d" via {@code readFact}.
+     */
+    public BigDecimal readDecimal(String sessionId, String path) {
+        return toDecimal(readFact(sessionId, path).value());
+    }
+
+    private static BigDecimal toDecimal(Object v) {
+        if (v == null) {
+            return null;
+        }
+        if (v instanceof BigDecimal bd) {
+            return bd;
+        }
+        if (v instanceof Number n) {
+            return new BigDecimal(n.toString());
+        }
+        String s = v.toString().trim();
+        int slash = s.indexOf('/');
+        if (slash > 0) {
+            BigDecimal num = new BigDecimal(s.substring(0, slash).trim());
+            BigDecimal den = new BigDecimal(s.substring(slash + 1).trim());
+            BigDecimal quotient = num.divide(den, 10, RoundingMode.HALF_UP).stripTrailingZeros();
+            return new BigDecimal(quotient.toPlainString());
+        }
+        return new BigDecimal(s);
+    }
+
     public Map<String, Object> sessionFacts(String sessionId) {
         SessionState state = require(sessionId);
         Map<String, Object> out = new LinkedHashMap<>();
-        state.facts.forEach((path, fact) -> out.put(path, scalarizePersistedItem(fact)));
+        synchronized (state) {
+            state.facts.forEach((path, fact) -> out.put(path, scalarizePersistedItem(fact)));
+        }
         return out;
+    }
+
+    /**
+     * Record a taxpayer-stated provenance note for a fact (e.g. "2024 1099-NEC, Uber"). This is
+     * metadata only — it is never written into the fact graph and never verified; it is surfaced
+     * in the export report as self-reported provenance. Blank notes are ignored.
+     */
+    public void setSourceNote(String sessionId, String path, String note) {
+        if (note == null || note.isBlank()) {
+            return;
+        }
+        SessionState state = require(sessionId);
+        synchronized (state) {
+            state.sourceNotes().put(path, note.trim());
+        }
+    }
+
+    /** Taxpayer-stated provenance notes by fact path (see {@link #setSourceNote}). */
+    public Map<String, String> sourceNotes(String sessionId) {
+        SessionState state = require(sessionId);
+        synchronized (state) {
+            return new LinkedHashMap<>(state.sourceNotes());
+        }
     }
 
     /**
@@ -164,6 +297,40 @@ public class PlanningGraphService {
                     dv.complete()));
         }
         return new ExplainResult(path, fact.name(), fact.description(), value.value(), value.complete(), deps);
+    }
+
+    /**
+     * Transitive set of fact paths that {@code path} depends on (directly or indirectly), walking
+     * {@code Dependency} nodes through the dictionary. Used to attribute a computed result to the
+     * authorities behind the parameters in its computation. Excludes {@code path} itself and bottoms
+     * out at writable facts (inputs and injected parameters), which have no derivation to recurse into.
+     */
+    public Set<String> dependencyClosure(String path) {
+        Set<String> visited = new LinkedHashSet<>();
+        TaxFact start = digest.getFacts().get(path);
+        if (start == null) {
+            return visited;
+        }
+        Deque<String> stack = new ArrayDeque<>();
+        collectDirectDependencies(start, stack);
+        while (!stack.isEmpty()) {
+            String p = stack.pop();
+            if (!visited.add(p)) {
+                continue;
+            }
+            TaxFact f = digest.getFacts().get(p);
+            if (f != null) {
+                collectDirectDependencies(f, stack);
+            }
+        }
+        return visited;
+    }
+
+    private void collectDirectDependencies(TaxFact fact, Deque<String> out) {
+        List<String> direct = new ArrayList<>();
+        collectDependencyPaths(fact.derived(), direct);
+        collectDependencyPaths(fact.placeholder(), direct);
+        out.addAll(direct);
     }
 
     private void collectDependencyPaths(TaxCompNode node, List<String> out) {
@@ -225,12 +392,15 @@ public class PlanningGraphService {
     private SessionState require(String id) {
         SessionState s = sessions.get(id);
         if (s == null) {
-            throw new IllegalArgumentException("Unknown planning session: " + id);
+            throw new IllegalArgumentException("Unknown or expired planning session: " + id
+                    + ". Sessions are held in memory and are lost when the service restarts; "
+                    + "call create_session to start a new one, then re-enter the facts.");
         }
         return s;
     }
 
-    private record SessionState(LinkedHashMap<String, FactTypeWithItem> facts) {}
+    private record SessionState(
+            int taxYear, LinkedHashMap<String, FactTypeWithItem> facts, LinkedHashMap<String, String> sourceNotes) {}
 
     public record WriteResult(boolean ok, List<String> violations) {}
 

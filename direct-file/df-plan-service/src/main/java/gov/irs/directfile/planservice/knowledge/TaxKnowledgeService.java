@@ -38,7 +38,9 @@ public class TaxKnowledgeService {
     private final PlanServiceProperties properties;
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
+    private Path root;
     private KnowledgeBundle bundle = new KnowledgeBundle(List.of(), List.of(), List.of());
+    private Map<String, Citation> citations = Map.of();
 
     public TaxKnowledgeService(PlanServiceProperties properties) {
         this.properties = properties;
@@ -46,7 +48,7 @@ public class TaxKnowledgeService {
 
     @PostConstruct
     void load() throws IOException {
-        Path root = resolveRoot(properties.taxKnowledgeRoot());
+        this.root = resolveRoot(properties.taxKnowledgeRoot());
         if (!Files.exists(root)) {
             log.warn("Tax knowledge root {} does not exist; question planning artifacts are disabled", root);
             return;
@@ -56,13 +58,16 @@ public class TaxKnowledgeService {
         List<EvidenceMap> evidenceMaps = loadEvidenceFiles(root.resolve("evidence"));
         List<ConflictRule> conflictRules = loadConflictFiles(root.resolve("conflicts"));
         this.bundle = new KnowledgeBundle(questions, evidenceMaps, conflictRules);
+        this.citations = loadCitations(root);
 
         log.info(
-                "Tax knowledge artifacts loaded from {}: {} questions, {} evidence maps, {} conflict rules",
+                "Tax knowledge artifacts loaded from {}: {} questions, {} evidence maps, {} conflict rules, "
+                        + "{} citations",
                 root,
                 questions.size(),
                 evidenceMaps.size(),
-                conflictRules.size());
+                conflictRules.size(),
+                citations.size());
     }
 
     public PlanResult plan(PlanRequest request) {
@@ -145,6 +150,125 @@ public class TaxKnowledgeService {
                 .orElse(configured)
                 .normalize();
     }
+
+    /**
+     * Year/jurisdiction-scoped tax parameters for {@code taxYear}, merged from every
+     * {@code *-tax-parameters.yaml} under tax-knowledge {@code rules/federal/<year>/}. The loader
+     * is topic-agnostic: each topic contributes its own parameter file (self-employment today,
+     * standard deduction / brackets / credits later) and all are merged by fact_path. Throws if the
+     * year has no parameter files — callers must not silently fall back to another year's values.
+     */
+    public List<TaxParameter> taxParametersForYear(int taxYear) {
+        Path base = root != null ? root : resolveRoot(properties.taxKnowledgeRoot());
+        Path dir = base.resolve("rules").resolve("federal").resolve(Integer.toString(taxYear));
+        // User-facing messages reference the logical location, never the absolute filesystem path
+        // (which leaks the host's directory layout to the agent / taxpayer).
+        String location = "rules/federal/" + taxYear + "/";
+        List<Path> files;
+        try (Stream<Path> walk = Files.exists(dir) ? Files.walk(dir) : Stream.empty()) {
+            files = walk.filter(Files::isRegularFile)
+                    .filter(p -> p.getFileName().toString().endsWith("-tax-parameters.yaml"))
+                    .sorted()
+                    .toList();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to scan tax parameters for " + taxYear + " under " + location, e);
+        }
+        if (files.isEmpty()) {
+            throw new IllegalArgumentException("No published tax parameters for tax year " + taxYear
+                    + " in the tax-knowledge base (expected a <topic>-tax-parameters.yaml under " + location
+                    + "). The planning year's parameters may not be published yet.");
+        }
+        List<TaxParameter> out = new ArrayList<>();
+        for (Path file : files) {
+            try {
+                Map<String, Object> doc = yamlMapper.readValue(file.toFile(), MAP_TYPE);
+                for (Map<String, Object> p : maps(doc.get("parameters"))) {
+                    out.add(new TaxParameter(
+                            asString(p.get("fact_path")),
+                            asString(p.get("type")),
+                            asString(p.get("value")),
+                            asString(p.get("name")),
+                            asString(p.get("source_id")),
+                            asString(p.get("note"))));
+                }
+            } catch (IOException e) {
+                throw new IllegalStateException(
+                        "Failed to read tax parameters for " + taxYear + " from " + file.getFileName(), e);
+            }
+        }
+        if (out.isEmpty()) {
+            throw new IllegalStateException(
+                    "Tax parameter files for " + taxYear + " under " + location + " list no parameters.");
+        }
+        return out;
+    }
+
+    /**
+     * One year-indexed tax parameter from a {@code *-tax-parameters.yaml} file. {@code factPath},
+     * {@code type}, and {@code value} drive injection into the session graph; {@code name},
+     * {@code sourceId}, and {@code note} carry the human-readable provenance surfaced in the
+     * taxpayer-held export so each statutory constant can be traced back to its IRS source.
+     */
+    public record TaxParameter(String factPath, String type, String value, String name, String sourceId, String note) {}
+
+    /**
+     * Resolve a {@code source_id} (as carried by parameters and rules) to its formal legal citation
+     * and friendly plain-language explanation. Returns {@code null} if the id is not in the registry.
+     */
+    public Citation citation(String sourceId) {
+        return sourceId == null ? null : citations.get(sourceId);
+    }
+
+    /** The full citation registry, keyed by {@code source_id}. */
+    public Map<String, Citation> citations() {
+        return java.util.Collections.unmodifiableMap(citations);
+    }
+
+    private Map<String, Citation> loadCitations(Path knowledgeRoot) {
+        Path file = knowledgeRoot.resolve("sources").resolve("federal").resolve("citations.yaml");
+        if (!Files.exists(file)) {
+            log.warn("Citation registry {} not found; authority citations will be unavailable", file);
+            return Map.of();
+        }
+        try {
+            Map<String, Object> doc = yamlMapper.readValue(file.toFile(), MAP_TYPE);
+            if (!(doc.get("citations") instanceof Map<?, ?> raw)) {
+                return Map.of();
+            }
+            Map<String, Citation> out = new LinkedHashMap<>();
+            for (Map.Entry<?, ?> entry : raw.entrySet()) {
+                if (!(entry.getValue() instanceof Map<?, ?> fields)) {
+                    continue;
+                }
+                String id = String.valueOf(entry.getKey());
+                out.put(
+                        id,
+                        new Citation(
+                                id,
+                                asString(fields.get("authority")),
+                                asString(fields.get("citation")),
+                                asString(fields.get("title")),
+                                asString(fields.get("url")),
+                                collapse(asString(fields.get("plain_language")))));
+            }
+            return out;
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to read citation registry " + file, e);
+        }
+    }
+
+    /** Collapse folded-scalar whitespace (newlines and runs of spaces) into single spaces. */
+    private static String collapse(String s) {
+        return s == null ? null : s.strip().replaceAll("\\s+", " ");
+    }
+
+    /**
+     * A resolved citation for a {@code source_id}: the {@code authority} kind (statute, form,
+     * instruction, publication, agency_announcement), the formal {@code citation} string and
+     * {@code title}, an official {@code url}, and a friendly {@code plainLanguage} explanation.
+     */
+    public record Citation(
+            String sourceId, String authority, String citation, String title, String url, String plainLanguage) {}
 
     private List<Question> loadQuestionFiles(Path root) throws IOException {
         List<Question> out = new ArrayList<>();

@@ -94,8 +94,9 @@ class TaxKnowledgePlanningIntegrationTest {
     }
 
     private String setFactSessionWithSelfEmploymentAnswer(boolean hasSelfEmployment) {
-        String sessionId = graph.createSession();
-        tools.setFact(sessionId, "/hasSelfEmploymentIncome", "boolean", null, hasSelfEmployment);
+        String sessionId = graph.createSession(2025);
+        tools.setFact(
+                sessionId, "/hasSelfEmploymentIncome", "boolean", null, Boolean.toString(hasSelfEmployment), null);
         return sessionId;
     }
 }

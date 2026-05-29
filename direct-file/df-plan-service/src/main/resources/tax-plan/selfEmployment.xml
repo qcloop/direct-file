@@ -3,62 +3,81 @@
   <Facts>
 
     <!-- ============================================================
-         TY2024 CONSTANTS for self-employment + estimated tax
+         SELF-EMPLOYMENT TAX RATES — year-indexed (FICA rates)
+
+         These are Rationals. The fact-graph engine supports writable Rationals
+         (WritableNode.defaultNodes registers RationalNode); the RNG schema's
+         WritableContent was just missing it (now added). So the rates are injected
+         per planning tax year from tax-knowledge like the dollar constants — the
+         dictionary now carries NO self-employment numeric constants, only structure.
          ============================================================ -->
     <Fact path="/seSocialSecurityRate">
-      <Description>Social Security portion of SE tax (12.4%)</Description>
-      <TaxYear>2024</TaxYear>
-      <Derived>
-        <Rational>124/1000</Rational>
-      </Derived>
+      <Name>Social Security portion of SE tax rate</Name>
+      <Description>Social Security rate component of SE tax (e.g. 12.4%); injected per planning tax year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
     </Fact>
 
     <Fact path="/seMedicareRate">
-      <Description>Medicare portion of SE tax (2.9%)</Description>
-      <TaxYear>2024</TaxYear>
-      <Derived>
-        <Rational>29/1000</Rational>
-      </Derived>
+      <Name>Medicare portion of SE tax rate</Name>
+      <Description>Medicare rate component of SE tax (e.g. 2.9%); injected per planning tax year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
     </Fact>
 
     <Fact path="/seWageMultiplier">
-      <Description>Net earnings multiplier (92.35%) — removes employer-equivalent FICA from the SE base.</Description>
-      <TaxYear>2024</TaxYear>
-      <Derived>
-        <Rational>9235/10000</Rational>
-      </Derived>
+      <Name>Net earnings multiplier</Name>
+      <Description>Net-earnings multiplier (e.g. 92.35%) removing employer-equivalent FICA; injected per planning tax
+        year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
     </Fact>
 
+    <!-- Year-indexed constants: NOT hardcoded to a tax year. The planning service injects
+         the value matching the session's tax year from tax-knowledge
+         (rules/federal/<year>/self-employment-tax-parameters.yaml) at session creation. -->
     <Fact path="/socialSecurityWageBase">
-      <Description>Social Security wage base, TY2024.</Description>
-      <TaxYear>2024</TaxYear>
-      <Derived>
-        <Dollar>168600</Dollar>
-      </Derived>
+      <Name>Social Security wage base</Name>
+      <Description>Year-indexed Social Security taxable maximum; injected per planning tax year.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
     </Fact>
 
     <Fact path="/standardMileageRate">
-      <Description>Business standard mileage rate, TY2024 ($0.67/mi).</Description>
-      <TaxYear>2024</TaxYear>
-      <Derived>
-        <Dollar>0.67</Dollar>
-      </Derived>
+      <Name>Business standard mileage rate</Name>
+      <Description>Year-indexed business standard mileage rate (dollars per mile); injected per planning tax year.
+        A
+        Rational, not a Dollar: the rate can carry a half-cent (e.g. 72.5¢ = 725/1000), which a
+        cents-precision Dollar
+        would silently round.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
     </Fact>
 
+    <!-- Year-indexed Dollar constants: injected per planning tax year from tax-knowledge
+         (rules/federal/<year>/self-employment-tax-parameters.yaml), like the wage base and
+         mileage rate above. The FICA component rates below stay structural because the
+         fact-graph type system does not allow Rational facts to be writable. -->
     <Fact path="/seFilingThreshold">
-      <Description>Net SE earnings at or above this trigger SE tax ($400).</Description>
-      <TaxYear>2024</TaxYear>
-      <Derived>
-        <Dollar>400</Dollar>
-      </Derived>
+      <Name>Self-employment tax filing threshold</Name>
+      <Description>Net SE earnings at or above this trigger SE tax; injected per planning tax year.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
     </Fact>
 
     <Fact path="/highIncomeSafeHarborThreshold">
-      <Description>Prior-year AGI above this requires 110% (not 100%) safe-harbor coverage.</Description>
-      <TaxYear>2024</TaxYear>
-      <Derived>
-        <Dollar>150000</Dollar>
-      </Derived>
+      <Name>High-income safe-harbor AGI threshold</Name>
+      <Description>Prior-year AGI above this requires 110% (not 100%) safe-harbor coverage; injected per planning tax
+        year.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
     </Fact>
 
 
@@ -73,14 +92,59 @@
          Collection wrapper and re-roll the sums).
          ============================================================ -->
 
+    <!-- ============================================================
+         ANNUALIZATION (projected net profit from year-to-date)
+
+         The Schedule C inputs below (receipts, miles, fees, supplies) may be
+         either full-year actuals or year-to-date figures. The annualization
+         factor scales them to a projected full year: 12 ÷ months of data, so
+         1/1 = full-year actuals (no projection) and e.g. 12/7 = annualize from
+         seven months. The factor is supplied by the agent (the fact graph has
+         no clock); the projection multiply itself is in-graph so it shows up in
+         explain / cite / the export. Straight-line: assumes income is even
+         across the year — seasonal income will differ.
+         ============================================================ -->
+    <Fact path="/seMonthsElapsed">
+      <Name>Months of year-to-date data</Name>
+      <Description>How many months of this year the entered figures cover (1–12). Documents the
+        basis for the projection;
+        12 means the figures are full-year.</Description>
+      <Writable>
+        <Int />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seAnnualizationFactor">
+      <Name>Annualization factor (1 = full-year actuals)</Name>
+      <Description>Multiplier applied to the entered Schedule C figures to project a full year
+        (12 ÷ months of data). 1/1
+        leaves full-year actuals unchanged.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
     <Fact path="/seGrossReceipts">
       <Name>Gross receipts (Schedule C Line 1)</Name>
       <Description>Total gross income from self-employment across all platforms
         (1099-NEC + business portion of 1099-K +
-        cash).</Description>
+        cash). May be full-year or year-to-date; annualized by the factor above.</Description>
       <Writable>
         <Dollar />
       </Writable>
+    </Fact>
+
+    <Fact path="/seEffectiveGrossReceipts">
+      <Name>Projected gross receipts</Name>
+      <Description>Entered gross receipts scaled to a full year by the annualization factor.</Description>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/seGrossReceipts" />
+            <Dependency path="/seAnnualizationFactor" />
+          </Multiply>
+        </Round>
+      </Derived>
     </Fact>
 
     <Fact path="/seVehicleBusinessMiles">
@@ -93,11 +157,20 @@
 
     <Fact path="/seVehicleDeduction">
       <Name>Vehicle deduction (standard mileage method)</Name>
+      <Description>Business miles × standard mileage rate, annualized by the factor (projects
+        year-to-date miles to a
+        full year along with the rest).</Description>
       <Derived>
         <Round>
           <Multiply>
             <Dependency path="/seVehicleBusinessMiles" />
             <Dependency path="/standardMileageRate" />
+            <Dependency path="/seAnnualizationFactor" />
+            <!-- miles (Int) × rate (Rational) × factor (Rational) is a Rational; Round only accepts a
+                 Dollar. Multiplying by a $1 unit coerces the exact rational dollars-value to a Dollar
+                 (Rational × Dollar -> Dollar) without changing the amount, so the half-cent rate (e.g.
+                 72.5¢) is preserved through the multiply and only rounded once, at the end. -->
+            <Dollar>1</Dollar>
           </Multiply>
         </Round>
       </Derived>
@@ -113,32 +186,65 @@
 
     <Fact path="/seSuppliesAndOther">
       <Name>Supplies and other expenses</Name>
-      <Description>Catch-all for supplies, phone business portion, insurance, etc.</Description>
+      <Description>Catch-all for supplies, phone business portion, insurance, etc.
+        May be full-year or year-to-date;
+        annualized by the factor above.</Description>
       <Writable>
         <Dollar />
       </Writable>
     </Fact>
 
+    <Fact path="/seEffectivePlatformFees">
+      <Name>Projected platform / commission fees</Name>
+      <Description>Entered platform fees scaled to a full year by the annualization factor.</Description>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/sePlatformFees" />
+            <Dependency path="/seAnnualizationFactor" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seEffectiveSuppliesAndOther">
+      <Name>Projected supplies and other expenses</Name>
+      <Description>Entered supplies/other scaled to a full year by the annualization factor.</Description>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/seSuppliesAndOther" />
+            <Dependency path="/seAnnualizationFactor" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
     <Fact path="/seTotalExpenses">
+      <Name>Total business expenses</Name>
+      <Description>Projected full-year expenses: annualized vehicle deduction, platform fees,
+        and supplies.</Description>
       <Derived>
         <Add>
           <Dependency path="/seVehicleDeduction" />
-          <Dependency path="/sePlatformFees" />
-          <Dependency path="/seSuppliesAndOther" />
+          <Dependency path="/seEffectivePlatformFees" />
+          <Dependency path="/seEffectiveSuppliesAndOther" />
         </Add>
       </Derived>
     </Fact>
 
     <Fact path="/seNetProfit">
       <Name>Net profit (Schedule C Line 31)</Name>
-      <Description>Gross receipts minus total expenses. Negative values are losses;
-        for the planning MVP we clip at zero
-        for SE-tax purposes.</Description>
+      <Description>Projected gross receipts minus projected total expenses. Negative values are
+        losses; for the planning
+        MVP we clip at zero for SE-tax purposes. With a 1/1 annualization
+        factor these are full-year actuals; otherwise
+        they are annualized from year-to-date.</Description>
       <Derived>
         <GreaterOf>
           <Subtract>
             <Minuend>
-              <Dependency path="/seGrossReceipts" />
+              <Dependency path="/seEffectiveGrossReceipts" />
             </Minuend>
             <Subtrahends>
               <Dependency path="/seTotalExpenses" />
@@ -168,6 +274,7 @@
     </Fact>
 
     <Fact path="/seTaxRequired">
+      <Name>SE tax applies (net earnings ≥ filing threshold)</Name>
       <Description>True if net SE earnings are at or above the $400 SE-filing threshold.</Description>
       <Derived>
         <Not>
@@ -194,6 +301,7 @@
     </Fact>
 
     <Fact path="/ssWageBaseRemaining">
+      <Name>Social Security wage base remaining</Name>
       <Description>SS wage base minus W-2 SS wages already paid.</Description>
       <Derived>
         <GreaterOf>
@@ -211,6 +319,7 @@
     </Fact>
 
     <Fact path="/seSocialSecurityTax">
+      <Name>Social Security portion of SE tax</Name>
       <Derived>
         <Multiply>
           <LesserOf>
@@ -223,6 +332,7 @@
     </Fact>
 
     <Fact path="/seMedicareTax">
+      <Name>Medicare portion of SE tax</Name>
       <Description>Medicare portion of SE tax. Excludes the Additional Medicare
         0.9% surtax that applies above $200K
         (single) / $250K (MFJ) — that's
@@ -309,6 +419,7 @@
     </Fact>
 
     <Fact path="/planning/highIncomeSafeHarborApplies">
+      <Name>High-income safe-harbor tier applies</Name>
       <Description>If prior-year AGI exceeded the threshold, safe harbor requires
         110% of prior-year tax. Otherwise 100%
         suffices.</Description>
@@ -326,7 +437,29 @@
       </Derived>
     </Fact>
 
+    <!-- IRC §6654 safe-harbor percentages — year-indexed (injected from tax-knowledge
+         estimated-tax-parameters.yaml). The 100% base case is the identity branch below
+         (no multiplier), so only the high-income 110% leg carries a rate here. -->
+    <Fact path="/planning/highIncomeSafeHarborRate">
+      <Name>High-income prior-year safe-harbor rate</Name>
+      <Description>Prior-year tax multiplier when AGI exceeds the high-income threshold (e.g. 110%); injected per
+        planning tax year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/currentYearSafeHarborRate">
+      <Name>Current-year safe-harbor rate</Name>
+      <Description>Multiplier on projected current-year tax for the safe-harbor alternative (e.g. 90%); injected per
+        planning tax year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
     <Fact path="/planning/priorYearSafeHarborTarget">
+      <Name>Prior-year safe-harbor target</Name>
       <Description>100% or 110% of prior-year tax, depending on AGI tier.</Description>
       <Derived>
         <Round>
@@ -338,7 +471,7 @@
               <Then>
                 <Multiply>
                   <Dependency path="/planning/priorYearTotalTax" />
-                  <Rational>110/100</Rational>
+                  <Dependency path="/planning/highIncomeSafeHarborRate" />
                 </Multiply>
               </Then>
             </Case>
@@ -368,12 +501,13 @@
     </Fact>
 
     <Fact path="/planning/currentYearSafeHarborTarget">
+      <Name>Current-year safe-harbor target</Name>
       <Description>90% of projected current-year tax — the alternative safe-harbor leg.</Description>
       <Derived>
         <Round>
           <Multiply>
             <Dependency path="/planning/projectedCurrentYearTax" />
-            <Rational>90/100</Rational>
+            <Dependency path="/planning/currentYearSafeHarborRate" />
           </Multiply>
         </Round>
       </Derived>
@@ -408,6 +542,7 @@
     </Fact>
 
     <Fact path="/planning/ytdPaymentsApplied">
+      <Name>Payments already applied YTD (withholding + estimated)</Name>
       <Derived>
         <Add>
           <Dependency path="/planning/ytdWithholding" />
@@ -430,6 +565,29 @@
           </Subtract>
           <Dollar>0</Dollar>
         </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/projectedBalanceDueAtFiling">
+      <Name>Projected balance due at filing</Name>
+      <Description>Projected total federal tax for the year minus payments already made
+        (withholding + estimated
+        payments). This is what you would still owe when you file
+        if you made no further payments. It is distinct from
+        the safe-harbor target, which is
+        only the minimum prepayment that avoids the IRC §6654 underpayment penalty —
+        paying
+        the safe-harbor amount can still leave a balance owed at filing. A negative value means
+        a projected refund.</Description>
+      <Derived>
+        <Subtract>
+          <Minuend>
+            <Dependency path="/planning/projectedCurrentYearTax" />
+          </Minuend>
+          <Subtrahends>
+            <Dependency path="/planning/ytdPaymentsApplied" />
+          </Subtrahends>
+        </Subtract>
       </Derived>
     </Fact>
 

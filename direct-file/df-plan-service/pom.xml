@@ -97,4 +97,26 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- The AWS SDK (kms -> apache-client -> httpclient) drags in commons-logging,
+                 which conflicts with Spring's spring-jcl and prints a diagnostic to stdout on
+                 startup. That corrupts the stdio MCP transport (stdout must carry only JSON-RPC
+                 frames), so keep commons-logging out of the repackaged fat jar; spring-jcl
+                 provides the commons-logging API at runtime. -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>commons-logging</groupId>
+                            <artifactId>commons-logging</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

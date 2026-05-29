@@ -1,0 +1,70 @@
+parameter_set_id: self_employment_tax_parameters_ty2026
+tax_year: 2026
+jurisdiction: federal
+status: draft
+source_ids:
+  - irs_instruction_1040_schedule_c_2026
+  - irs_instruction_1040_schedule_se_2026
+  - irs_form_1040_es_2026
+  - ssa_cola_announcement_2026
+description: >
+  Federal self-employment tax constants for tax year 2026. STATUS IS DRAFT: the statutory values
+  here (FICA component rates, the $400 SE filing threshold, the $150,000 high-income safe-harbor
+  AGI threshold) are year-invariant and confident, but the two year-indexed figures —
+  standardMileageRate and socialSecurityWageBase — are PROVISIONAL and must be confirmed against
+  the official 2026 IRS and SSA announcements before this set is promoted to published. The values
+  below let 2026 planning sessions run, but treat the mileage rate and wage base as estimates until
+  verified. See the per-parameter notes.
+parameters:
+  - fact_path: /standardMileageRate
+    name: Business standard mileage rate
+    type: rational
+    value: "725/1000"
+    unit: dollars_per_mile
+    source_id: irs_instruction_1040_schedule_c_2026
+    note: >
+      PROVISIONAL 2026 business standard mileage rate (72.5 cents/mile = 725/1000 dollars/mile).
+      Modeled as a Rational so the half-cent is exact (a Dollar would round it to 0.72). Confirm
+      against the official IRS 2026 announcement before publishing; do not treat as authoritative yet.
+  - fact_path: /socialSecurityWageBase
+    name: Social Security wage base
+    type: dollar
+    value: "184500"
+    unit: dollars
+    source_id: ssa_cola_announcement_2026
+    note: >
+      PROVISIONAL 2026 Social Security taxable maximum. Confirm against the SSA Contribution and
+      Benefit Base announcement (released October 2025) before publishing; do not treat as
+      authoritative yet.
+  - fact_path: /seFilingThreshold
+    name: Self-employment tax filing threshold
+    type: dollar
+    value: "400"
+    unit: dollars
+    source_id: irs_instruction_1040_schedule_se_2026
+    note: Net SE earnings at or above $400 trigger SE tax. Statutory; not indexed.
+  - fact_path: /highIncomeSafeHarborThreshold
+    name: High-income safe-harbor AGI threshold
+    type: dollar
+    value: "150000"
+    unit: dollars
+    source_id: irs_form_1040_es_2026
+    note: Prior-year AGI above $150,000 requires 110% (not 100%) safe-harbor coverage (IRC 6654). Statutory.
+  - fact_path: /seSocialSecurityRate
+    name: Social Security portion of SE tax rate
+    type: rational
+    value: "124/1000"
+    source_id: irs_instruction_1040_schedule_se_2026
+    note: 12.4% Social Security component of self-employment tax. Statutory rate.
+  - fact_path: /seMedicareRate
+    name: Medicare portion of SE tax rate
+    type: rational
+    value: "29/1000"
+    source_id: irs_instruction_1040_schedule_se_2026
+    note: 2.9% Medicare component of self-employment tax. Statutory rate.
+  - fact_path: /seWageMultiplier
+    name: Net earnings multiplier
+    type: rational
+    value: "9235/10000"
+    source_id: irs_instruction_1040_schedule_se_2026
+    note: 92.35% net-earnings multiplier (removes the employer-equivalent half of FICA from the SE base). Statutory.
