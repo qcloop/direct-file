@@ -26,32 +26,39 @@
         <byte-buddy.version>1.17.7</byte-buddy.version>
 
         <!-- dependency management versions-->
-        <amazon-sqs-java-messaging-lib.version>2.1.1</amazon-sqs-java-messaging-lib.version>
-        <aws-encryption-sdk.version>3.0.1</aws-encryption-sdk.version>
+        <amazon-sqs-java-messaging-lib.version>2.1.4</amazon-sqs-java-messaging-lib.version>
+        <aws-encryption-sdk.version>3.0.2</aws-encryption-sdk.version>
         <!-- https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/java.html#java-installation -->
         <aws-sdk.version>2.30.19</aws-sdk.version>
         <!-- https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/setup-project-maven.html#sdk-as-dependency -->
         <jaxb-api.version>2.3.1</jaxb-api.version>
+        <!-- Spring Boot 4 removed dependency management for Testcontainers, so its BOM is
+             imported explicitly below. Pinned to the 1.x line because Testcontainers 2.0
+             dropped the standalone org.testcontainers:junit-jupiter artifact that state-api
+             references. -->
+        <testcontainers.version>1.21.3</testcontainers.version>
         <spring-ai.version>1.0.0</spring-ai.version>
-        <logstash.version>7.4</logstash.version>
-        <modelmapper.version>3.1.0</modelmapper.version>
+        <logstash.version>9.0</logstash.version>
+        <modelmapper.version>3.2.6</modelmapper.version>
         <modelmapper-module-record.version>1.0.0</modelmapper-module-record.version>
         <spotbugs.version>4.9.8</spotbugs.version>
-        <springdoc.version>2.1.0</springdoc.version>
+        <!-- springdoc 3.x is the Spring Boot 4 / Spring Framework 7 compatible line
+             (2.x targets Boot 3). -->
+        <springdoc.version>3.0.3</springdoc.version>
 
-        <pdfbox.version>3.0.3</pdfbox.version>
+        <pdfbox.version>3.0.7</pdfbox.version>
         <amazon-s3-encryption-client-java.version>3.1.3</amazon-s3-encryption-client-java.version>
         <aws.java.sdk.version>2.20.131</aws.java.sdk.version>
-        <bouncycastle.bcpkix.version>1.78.1</bouncycastle.bcpkix.version>
-        <commons-compress.version>1.26.0</commons-compress.version>
-        <commons-io.version>2.15.1</commons-io.version>
-        <commons-text.version>1.12.0</commons-text.version>
-        <guava-version>33.0.0-jre</guava-version>
-        <wiremock.version>3.9.1</wiremock.version>
-        <openfeature.version>1.14.1</openfeature.version>
+        <bouncycastle.bcpkix.version>1.84</bouncycastle.bcpkix.version>
+        <commons-compress.version>1.28.0</commons-compress.version>
+        <commons-io.version>2.22.0</commons-io.version>
+        <commons-text.version>1.15.0</commons-text.version>
+        <guava-version>33.6.0-jre</guava-version>
+        <wiremock.version>3.13.2</wiremock.version>
+        <openfeature.version>1.20.2</openfeature.version>
         <!-- Boot 3.3 transitively managed okhttp3; Boot 3.4 removed that
              management entry, so state-api needs an explicit pin here. -->
-        <okhttp3.version>4.12.0</okhttp3.version>
+        <okhttp3.version>5.3.2</okhttp3.version>
 
         <!-- maven plugin versions-->
         <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
@@ -113,6 +120,13 @@
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-bom</artifactId>
                 <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -228,17 +242,17 @@
             <dependency>
                 <groupId>org.xmlunit</groupId>
                 <artifactId>xmlunit-core</artifactId>
-                <version>2.10.0</version>
+                <version>2.12.0</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.ws</groupId>
                 <artifactId>jaxws-rt</artifactId>
-                <version>4.0.1</version>
+                <version>4.0.4</version>
             </dependency>
             <dependency>
                 <groupId>io.lettuce</groupId>
                 <artifactId>lettuce-core</artifactId>
-                <version>6.5.1.RELEASE</version>
+                <version>7.6.0.RELEASE</version>
             </dependency>
             <!-- end of security pins -->
 
@@ -286,7 +300,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.40</version>
+            <version>1.18.46</version>
             <optional>true</optional>
         </dependency>
     </dependencies>
@@ -303,7 +317,7 @@
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
-                                <version>1.18.40</version>
+                                <version>1.18.46</version>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>

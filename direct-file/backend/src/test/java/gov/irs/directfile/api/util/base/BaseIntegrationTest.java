@@ -3,7 +3,7 @@ package gov.irs.directfile.api.util.base;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.test.web.servlet.MockMvc;
 
 import gov.irs.directfile.api.taxreturn.TaxReturnRepository;

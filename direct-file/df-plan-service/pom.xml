@@ -46,7 +46,7 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -73,7 +73,7 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- jackson-core/databind arrive transitively via spring-boot-starter-web;
+        <!-- jackson-core/databind arrive transitively via spring-boot-starter-webmvc;
              only jackson-dataformat-yaml needs an explicit declaration. -->
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -83,6 +83,18 @@
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Spring Framework 7 (Boot 4) dropped spring-jcl; spring-core now pulls the real
+             Apache commons-logging, which does its own log discovery and can write directly
+             to stdout — fatal for the stdio MCP transport (stdout must be JSON-RPC only).
+             Exclude that artifact from the fat jar (see spring-boot-maven-plugin below) and
+             provide the commons-logging API via jcl-over-slf4j instead, so JCL output is
+             funnelled through SLF4J/Logback and obeys the stdio file-only logging config. -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
             <scope>runtime</scope>
         </dependency>
 
@@ -100,11 +112,12 @@
 
     <build>
         <plugins>
-            <!-- The AWS SDK (kms -> apache-client -> httpclient) drags in commons-logging,
-                 which conflicts with Spring's spring-jcl and prints a diagnostic to stdout on
-                 startup. That corrupts the stdio MCP transport (stdout must carry only JSON-RPC
-                 frames), so keep commons-logging out of the repackaged fat jar; spring-jcl
-                 provides the commons-logging API at runtime. -->
+            <!-- Keep the real Apache commons-logging out of the repackaged fat jar: it does its
+                 own log discovery and prints diagnostics straight to stdout on startup, which
+                 corrupts the stdio MCP transport (stdout must carry only JSON-RPC frames). The
+                 commons-logging API is supplied instead by jcl-over-slf4j (declared above), which
+                 routes through SLF4J/Logback and so respects the stdio file-only logging config.
+                 (Spring Framework 7 removed spring-jcl, which used to fill this role.) -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
