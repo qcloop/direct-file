@@ -76,6 +76,20 @@ class PlanReportTest {
         assertThat(md).contains("based on:");
         assertThat(md).contains("## Sources & plain-language");
         assertThat(md).contains("In plain terms:");
+
+        // 2025 is finalized, so no provisional banner.
+        assertThat(md).doesNotContain("Provisional values");
+    }
+
+    @Test
+    void flagsProvisionalParametersInTheReportForADraftYear() {
+        String sid = (String) tools.createSession("2026").get("sessionId");
+        tools.calculateSeTax(sid, "40000", "10000", "0", "0", "0");
+        String md = reportService.generate(sid).markdown();
+
+        // 2026's draft constants surface as a banner and are marked in the parameter table.
+        assertThat(md).contains("Provisional values for 2026");
+        assertThat(md).contains("⚠ provisional");
     }
 
     @Test

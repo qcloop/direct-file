@@ -110,7 +110,22 @@ public class PlanningTools {
         int year = (taxYear == null || taxYear.isBlank())
                 ? java.time.Year.now().getValue()
                 : Integer.parseInt(taxYear.trim());
-        return Map.of("sessionId", graph.createSession(year), "taxYear", year);
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("sessionId", graph.createSession(year));
+        out.put("taxYear", year);
+        addProvisionalWarning(out, year);
+        return out;
+    }
+
+    /**
+     * Attach a {@code provisional_warning} to a tool response when the session's tax year carries
+     * provisional (draft, unverified) constants, so the agent never presents those numbers as final.
+     */
+    private void addProvisionalWarning(Map<String, Object> out, int taxYear) {
+        String warning = taxKnowledge.provisionalWarning(taxYear);
+        if (warning != null) {
+            out.put("provisional_warning", warning);
+        }
     }
 
     @Tool(
@@ -237,6 +252,7 @@ public class PlanningTools {
                 "deductible_half",
                 graph.readFact(sessionId, "/deductibleHalfOfSETax").value());
         out.put("explanation_tree", graph.explain(sessionId, SE_TAX_PATH));
+        addProvisionalWarning(out, graph.taxYearOf(sessionId));
         return out;
     }
 
@@ -315,6 +331,7 @@ public class PlanningTools {
                         + "the year (straight-line). Seasonal income will differ. This projects "
                         + "self-employment tax only; it does not include income tax.");
         out.put("explanation_tree", graph.explain(sessionId, "/seNetProfit"));
+        addProvisionalWarning(out, taxYear);
         return out;
     }
 
@@ -488,6 +505,7 @@ public class PlanningTools {
         out.put("derivation", derivation);
         out.put("explanation_tree", graph.explain(sessionId, "/planning/nextQuarterlyPaymentSuggested"));
         out.put("payment_url", "https://www.irs.gov/payments/direct-pay");
+        addProvisionalWarning(out, graph.taxYearOf(sessionId));
         return out;
     }
 

@@ -204,6 +204,12 @@ scaffold):
   computation graph — no per-fact citation table to maintain. Adding a new tax
   year's parameter with a new `source_id` requires a matching registry entry
   (enforced by `CitationRegistryTest`).
+- **Provisional parameters are flagged, not trusted silently.** A parameter may be
+  marked `provisional: true` (a value published as a draft pending the official
+  IRS/SSA announcement — e.g. the 2026 mileage rate and wage base). Such a year is
+  still usable, but every tool response carries a `provisional_warning` naming the
+  unverified values, and the export shows a banner plus a `⚠ provisional` marker on
+  those rows — so a draft constant is never presented as a final figure.
 
 ## Known limitations (MVP)
 

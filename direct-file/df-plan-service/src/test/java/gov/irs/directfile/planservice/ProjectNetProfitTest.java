@@ -66,6 +66,40 @@ class ProjectNetProfitTest {
     }
 
     @Test
+    void halfCentMileageRateIsExactNotRoundedToCents() {
+        // The 2026 rate is 72.5¢/mile. Modeled as a Rational it is exact: 10,000 mi × $0.725 = $7,250.
+        // A cents-precision Dollar would have stored 0.72 and given $7,200 — silently understating the
+        // deduction (the user-reported gap). calculate_se_tax writes a 1/1 factor, so no annualization.
+        String s2026 = graph.createSession(2026);
+        tools.calculateSeTax(s2026, "50000", "10000", "0", "0", "0");
+
+        assertThat((BigDecimal) graph.readFact(s2026, "/seVehicleDeduction").value())
+                .isEqualByComparingTo("7250");
+    }
+
+    @Test
+    void flagsProvisionalConstantsForADraftYearButNotAFinalizedOne() {
+        // 2026's mileage rate and wage base are provisional (draft); the tool must say so, naming them.
+        String s2026 = (String) tools.createSession("2026").get("sessionId");
+        Map<String, Object> out2026 = tools.projectNetProfit(s2026, "2026-07-01", "21000", "7000", "0", "0", "0");
+        assertThat((String) out2026.get("provisional_warning"))
+                .contains("2026")
+                .contains("mileage")
+                .contains("Social Security wage base");
+
+        // 2025 is finalized — no warning.
+        String s2025 = (String) tools.createSession("2025").get("sessionId");
+        Map<String, Object> out2025 = tools.projectNetProfit(s2025, "2025-07-01", "21000", "7000", "0", "0", "0");
+        assertThat(out2025).doesNotContainKey("provisional_warning");
+    }
+
+    @Test
+    void createSessionWarnsOnlyForADraftYear() {
+        assertThat(tools.createSession("2026")).containsKey("provisional_warning");
+        assertThat(tools.createSession("2025")).doesNotContainKey("provisional_warning");
+    }
+
+    @Test
     void refusesToProjectFromBeforeTheTaxYearStarted() {
         String sid = (String) tools.createSession("2025").get("sessionId");
 

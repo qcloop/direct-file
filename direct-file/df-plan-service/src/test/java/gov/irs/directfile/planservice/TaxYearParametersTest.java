@@ -28,10 +28,9 @@ class TaxYearParametersTest {
         String s2024 = graph.createSession(2024);
         String s2025 = graph.createSession(2025);
 
-        assertThat((BigDecimal) graph.readFact(s2024, "/standardMileageRate").value())
-                .isEqualByComparingTo("0.67");
-        assertThat((BigDecimal) graph.readFact(s2025, "/standardMileageRate").value())
-                .isEqualByComparingTo("0.70");
+        // standardMileageRate is a Rational (exact, can carry a half-cent), read as a decimal.
+        assertThat(graph.readDecimal(s2024, "/standardMileageRate")).isEqualByComparingTo("0.67");
+        assertThat(graph.readDecimal(s2025, "/standardMileageRate")).isEqualByComparingTo("0.70");
         assertThat((BigDecimal) graph.readFact(s2024, "/socialSecurityWageBase").value())
                 .isEqualByComparingTo("168600");
         assertThat((BigDecimal) graph.readFact(s2025, "/socialSecurityWageBase").value())
@@ -64,8 +63,7 @@ class TaxYearParametersTest {
         // 2026 session is created and the constants are injected.
         String s2026 = graph.createSession(2026);
 
-        assertThat((BigDecimal) graph.readFact(s2026, "/standardMileageRate").value())
-                .isEqualByComparingTo("0.725");
+        assertThat(graph.readDecimal(s2026, "/standardMileageRate")).isEqualByComparingTo("0.725");
         assertThat(graph.readFact(s2026, "/socialSecurityWageBase").complete()).isTrue();
         assertThat((BigDecimal) graph.readFact(s2026, "/seFilingThreshold").value())
                 .isEqualByComparingTo("400");

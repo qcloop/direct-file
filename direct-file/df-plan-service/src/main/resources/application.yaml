@@ -41,4 +41,5 @@ direct-file:
 
 logging:
   level:
-    gov.irs.directfile.planservice: INFO
+    gov.irs.directfile.planservice: TRACE
+    org.springframework.web: TRACE

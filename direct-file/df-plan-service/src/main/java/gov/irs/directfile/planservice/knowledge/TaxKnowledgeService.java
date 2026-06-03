@@ -189,7 +189,8 @@ public class TaxKnowledgeService {
                             asString(p.get("value")),
                             asString(p.get("name")),
                             asString(p.get("source_id")),
-                            asString(p.get("note"))));
+                            asString(p.get("note")),
+                            Boolean.TRUE.equals(p.get("provisional"))));
                 }
             } catch (IOException e) {
                 throw new IllegalStateException(
@@ -209,7 +210,44 @@ public class TaxKnowledgeService {
      * {@code sourceId}, and {@code note} carry the human-readable provenance surfaced in the
      * taxpayer-held export so each statutory constant can be traced back to its IRS source.
      */
-    public record TaxParameter(String factPath, String type, String value, String name, String sourceId, String note) {}
+    public record TaxParameter(
+            String factPath,
+            String type,
+            String value,
+            String name,
+            String sourceId,
+            String note,
+            boolean provisional) {}
+
+    /**
+     * Display names of parameters for {@code taxYear} explicitly marked {@code provisional: true}
+     * (i.e. values published as drafts pending official confirmation). Empty when the year is fully
+     * finalized. Used to keep the planner from presenting unverified constants as authoritative.
+     */
+    public List<String> provisionalParameterNames(int taxYear) {
+        List<String> names = new ArrayList<>();
+        for (TaxParameter p : taxParametersForYear(taxYear)) {
+            if (p.provisional()) {
+                names.add(p.name() == null || p.name().isBlank() ? p.factPath() : p.name());
+            }
+        }
+        return names;
+    }
+
+    /**
+     * A taxpayer-facing warning naming the year's provisional constants, or {@code null} if the year
+     * is fully finalized. Surfaced in tool responses and the export so an unverified value is never
+     * presented as authoritative.
+     */
+    public String provisionalWarning(int taxYear) {
+        List<String> names = provisionalParameterNames(taxYear);
+        if (names.isEmpty()) {
+            return null;
+        }
+        return "Tax year " + taxYear + " uses provisional, unverified constants pending official "
+                + "confirmation: " + String.join(", ", names) + ". Treat these results as estimates, not "
+                + "final figures, until the values are confirmed against the official IRS/SSA announcements.";
+    }
 
     /**
      * Resolve a {@code source_id} (as carried by parameters and rules) to its formal legal citation

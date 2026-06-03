@@ -139,6 +139,22 @@ public class PlanReportService {
                 .append("> This document is generated on demand and **is not stored by the service**; keep\n")
                 .append("> your own copy.\n\n");
 
+        // Loudly flag any provisional (draft, unverified) constants so a year whose parameters are
+        // not yet finalized (e.g. before the IRS/SSA publish the new rates) is never read as final.
+        List<String> provisional = new ArrayList<>();
+        for (TaxParameter p : params) {
+            if (p.provisional()) {
+                provisional.add(orPath(p.name(), p.factPath()));
+            }
+        }
+        if (!provisional.isEmpty()) {
+            sb.append("> ⚠ **Provisional values for ")
+                    .append(taxYear)
+                    .append(".** These constants are drafts pending official confirmation and may change: ")
+                    .append(String.join(", ", provisional))
+                    .append(". Any figure that depends on them is an estimate, not a final amount.\n\n");
+        }
+
         sb.append("## Your inputs (self-reported, unverified)\n\n");
         if (inputPaths.isEmpty()) {
             sb.append("_No inputs were entered in this session._\n\n");
@@ -176,14 +192,15 @@ public class PlanReportService {
             } else {
                 authorityCell = blankToDash(p.sourceId());
             }
+            String valueCell = p.provisional() ? formatParamValue(p) + " ⚠ provisional" : formatParamValue(p);
             sb.append("| ")
                     .append(orPath(p.name(), p.factPath()))
                     .append(CELL)
-                    .append(formatParamValue(p))
+                    .append(valueCell)
                     .append(CELL)
                     .append(authorityCell)
                     .append(CELL)
-                    .append(blankToDash(p.note()))
+                    .append(blankToDash(collapseWhitespace(p.note())))
                     .append(" |\n");
         }
         sb.append("\n");
@@ -300,6 +317,11 @@ public class PlanReportService {
 
     private static String blankToDash(String s) {
         return (s == null || s.isBlank()) ? "—" : s;
+    }
+
+    /** Collapse newlines/runs of whitespace to single spaces so folded-scalar notes stay on one table row. */
+    private static String collapseWhitespace(String s) {
+        return s == null ? null : s.strip().replaceAll("\\s+", " ");
     }
 
     /** Dollars/decimals render as currency; whole-number inputs (e.g. miles) as plain integers. */

@@ -26,12 +26,12 @@
     <rule ref="category/java/bestpractices.xml/AvoidReassigningParameters" />
     <rule ref="category/java/bestpractices.xml/AvoidUsingHardCodedIP" />
     <rule ref="category/java/bestpractices.xml/CheckResultSet" />
-    <rule ref="category/java/bestpractices.xml/DefaultLabelNotLastInSwitchStmt" />
+    <rule ref="category/java/bestpractices.xml/DefaultLabelNotLastInSwitch" />
     <rule ref="category/java/bestpractices.xml/LiteralsFirstInComparisons" />
     <rule ref="category/java/bestpractices.xml/MissingOverride" />
     <rule ref="category/java/bestpractices.xml/PreserveStackTrace" />
     <rule ref="category/java/bestpractices.xml/PrimitiveWrapperInstantiation" />
-    <rule ref="category/java/bestpractices.xml/SwitchStmtsShouldHaveDefault" />
+    <rule ref="category/java/bestpractices.xml/NonExhaustiveSwitch" />
     <rule ref="category/java/bestpractices.xml/UnusedFormalParameter" />
     <rule ref="category/java/bestpractices.xml/UnusedLocalVariable" />
     <rule ref="category/java/bestpractices.xml/UnusedPrivateField" />
@@ -75,11 +75,9 @@
     <!-- Error Prone Rules: https://pmd.github.io/pmd/pmd_rules_java_errorprone.html -->
     <rule ref="category/java/errorprone.xml/AssignmentInOperand" />
     <rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop" />
-    <rule ref="category/java/errorprone.xml/AvoidCatchingThrowable" />
     <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor" />
     <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals" />
     <rule ref="category/java/errorprone.xml/AvoidInstanceofChecksInCatchClause" />
-    <rule ref="category/java/errorprone.xml/AvoidLosingExceptionInformation" />
     <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators" />
     <rule ref="category/java/errorprone.xml/AvoidUsingOctalValues" />
     <rule ref="category/java/errorprone.xml/BrokenNullCheck" />
@@ -102,7 +100,6 @@
     <rule ref="category/java/errorprone.xml/UnnecessaryConversionTemporary" />
     <rule ref="category/java/errorprone.xml/UnusedNullCheckInEquals" />
     <rule ref="category/java/errorprone.xml/UseEqualsToCompareStrings" />
-    <rule ref="category/java/errorprone.xml/UselessOperationOnImmutable" />
 
     <!-- Multi-Threading Rules: https://pmd.github.io/pmd/pmd_rules_java_multithreading.html -->
     <rule ref="category/java/multithreading.xml/AvoidSynchronizedAtMethodLevel" />

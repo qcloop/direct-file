@@ -21,6 +21,7 @@ parameters:
     type: rational
     value: "725/1000"
     unit: dollars_per_mile
+    provisional: true
     source_id: irs_instruction_1040_schedule_c_2026
     note: >
       PROVISIONAL 2026 business standard mileage rate (72.5 cents/mile = 725/1000 dollars/mile).
@@ -31,6 +32,7 @@ parameters:
     type: dollar
     value: "184500"
     unit: dollars
+    provisional: true
     source_id: ssa_cola_announcement_2026
     note: >
       PROVISIONAL 2026 Social Security taxable maximum. Confirm against the SSA Contribution and
