@@ -18,7 +18,7 @@ src/main/java/gov/irs/directfile/planservice/
   mcp/PlanningTools.java                    # @Tool-annotated methods exposed via MCP
 
 src/main/resources/
-  application.yaml                          # HTTP+SSE transport (default profile)
+  application.yaml                          # Streamable HTTP transport (default profile)
   application-stdio.yaml                    # STDIO transport (profile=stdio)
   tax-plan/selfEmployment.xml               # planning fact module
 
@@ -27,9 +27,9 @@ src/test/java/.../TaxKnowledgePlanningIntegrationTest.java
 ```
 
 The MCP plumbing — JSON-RPC framing, capabilities negotiation, tool discovery,
-JSON Schema generation from method signatures, SSE/STDIO transports — is
-provided by `spring-ai-starter-mcp-server-webmvc` (HTTP+SSE) and
-`spring-ai-starter-mcp-server` (core + STDIO). Tools are plain
+JSON Schema generation from method signatures, Streamable HTTP / STDIO transports —
+is provided by `spring-ai-starter-mcp-server-webflux` (reactive Streamable HTTP,
+which transitively carries the core mcp-server + STDIO support). Tools are plain
 `@Tool`-annotated Java methods on the `PlanningTools` Spring bean.
 
 The planning fact module declaratively encodes:
@@ -111,16 +111,19 @@ cd ../df-plan-service && ../backend/mvnw test
 
 ## Running
 
-### HTTP+SSE transport (default — network-accessible)
+### Streamable HTTP transport (default — network-accessible)
 
 ```bash
 ../backend/mvnw spring-boot:run
 ```
 
-The service listens on port 8090 and publishes two MCP endpoints:
+The service runs on reactive WebFlux/Netty, listens on port 8090, and publishes a
+single MCP endpoint (Streamable HTTP, MCP spec 2025-03-26+):
 
-- `GET  /mcp/sse`     — server-sent-events stream (long-lived; LLM gateway opens this first)
-- `POST /mcp/message` — JSON-RPC requests from the connected client
+- `POST /mcp` — JSON-RPC requests; the response is either a JSON body or, for
+  streamed results, a `text/event-stream`
+- `GET  /mcp` — opens the server→client SSE stream for an established session
+  (session id carried in the `Mcp-Session-Id` header from `initialize`)
 
 ### STDIO transport (subprocess of a desktop MCP host)
 
@@ -150,17 +153,24 @@ config:
 
 ### Sanity-checking the HTTP endpoint
 
-The Spring AI MCP server speaks the MCP protocol over SSE, so a raw `curl`
-no longer exchanges full request/response pairs the way the previous
-JSON-RPC endpoint did. To exercise tools from the command line, use the
-official `mcp` CLI (or any MCP client SDK) pointed at the SSE endpoint:
+Streamable HTTP exchanges JSON-RPC over plain `POST /mcp`, so a raw `curl` can
+drive the handshake. `initialize` returns an `Mcp-Session-Id` header that
+subsequent requests must echo back:
 
 ```bash
-# With the modelcontextprotocol/inspector or any MCP client:
-#   transport: http+sse
-#   url:       http://localhost:8090
-#   sse path:  /mcp/sse
-#   msg path:  /mcp/message
+# 1) initialize (note the Mcp-Session-Id response header)
+curl -i -X POST http://localhost:8090/mcp \
+  -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"curl","version":"1"}}}'
+
+# 2) reuse the session id for notifications/initialized, then tools/list, tools/call …
+curl -X POST http://localhost:8090/mcp \
+  -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
+  -H 'Mcp-Session-Id: <id-from-step-1>' \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}'
+
+# Or point the modelcontextprotocol/inspector (transport: streamable-http) at
+#   http://localhost:8090/mcp
 ```
 
 End-to-end smoke testing is covered by the integration tests

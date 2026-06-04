@@ -46,7 +46,7 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webmvc</artifactId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -58,14 +58,16 @@
         </dependency>
 
         <!--
-            Spring AI MCP server. The webmvc-sse starter transitively pulls in the
-            core mcp-server starter (which carries STDIO support), so we only need
-            this one declaration. STDIO is enabled at runtime via
+            Spring AI MCP server (reactive/WebFlux). This starter serves the Streamable
+            HTTP transport (single /mcp endpoint, spec 2025-03-26+) when
+            `spring.ai.mcp.server.protocol=STREAMABLE`, and transitively pulls in the
+            core mcp-server starter (which carries STDIO support), so we only need this
+            one declaration. STDIO is enabled at runtime via
             `spring.ai.mcp.server.stdio=true` in application-stdio.yaml.
         -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+            <artifactId>spring-ai-starter-mcp-server-webflux</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -73,7 +75,7 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- jackson-core/databind arrive transitively via spring-boot-starter-webmvc;
+        <!-- jackson-core/databind arrive transitively via spring-boot-starter-webflux;
              only jackson-dataformat-yaml needs an explicit declaration. -->
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>

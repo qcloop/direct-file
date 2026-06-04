@@ -9,14 +9,18 @@ spring:
         # Identity advertised in the MCP initialize handshake.
         name: df-plan-service
         version: 0.0.1
-        # SYNC dispatches tool calls on the request thread. ASYNC switches to
-        # Reactor scheduling (only useful if individual tools become non-blocking).
+        # SYNC keeps the blocking tool implementations (fact-graph calls) as-is; the
+        # WebFlux transport dispatches them off the event loop. ASYNC is only useful
+        # if individual tools become non-blocking.
         type: SYNC
-        # WebMVC + SSE: the starter publishes /mcp/sse (event stream) and
-        # /mcp/message (POST for client requests). An LLM gateway connects over
-        # SSE and posts JSON-RPC framed tool calls.
-        sse-endpoint: /mcp/sse
-        sse-message-endpoint: /mcp/message
+        # Streamable HTTP transport (MCP spec 2025-03-26+), served by the WebFlux
+        # starter: a single endpoint handles POST (JSON-RPC requests) and GET (SSE
+        # stream for server->client messages), replacing the older HTTP+SSE two-endpoint
+        # transport. An LLM gateway connects to this one URL.
+        enabled: true
+        protocol: STREAMABLE
+        streamable-http:
+          mcp-endpoint: /mcp
         capabilities:
           tool: true
           resource: false
