@@ -180,11 +180,25 @@ public class PlanningGraphService {
         // The put and the subsequent graph build/save must be atomic w.r.t. other writers on this
         // session; graphFor re-acquires the same (reentrant) lock.
         synchronized (state) {
-            state.facts.put(path, new FactTypeWithItem(typeCode, objectMapper.valueToTree(rawValue)));
-            Graph g = graphFor(sessionId);
-            var saveResult = g.save();
-            boolean ok = (boolean) saveResult._1();
-            return new WriteResult(ok, ok ? List.of() : List.of("Save reported limit violation for " + path));
+            // Snapshot the prior mapping so a write that the graph can't assemble (e.g. an invalid
+            // persister typeCode, which makes the fact-graph's upickle abort) can be rolled back.
+            // Without this, the bad entry lingers in state.facts and every later graphFor() for this
+            // session fails too — one malformed set_fact would poison the whole session.
+            FactTypeWithItem previous =
+                    state.facts.put(path, new FactTypeWithItem(typeCode, objectMapper.valueToTree(rawValue)));
+            try {
+                Graph g = graphFor(sessionId);
+                var saveResult = g.save();
+                boolean ok = (boolean) saveResult._1();
+                return new WriteResult(ok, ok ? List.of() : List.of("Save reported limit violation for " + path));
+            } catch (RuntimeException e) {
+                if (previous == null) {
+                    state.facts.remove(path);
+                } else {
+                    state.facts.put(path, previous);
+                }
+                throw e;
+            }
         }
     }
 

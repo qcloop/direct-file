@@ -180,6 +180,18 @@ public class PlanningTools {
             }
         }
 
+        // Every real fact-graph persister lives under gov.irs.factgraph.persisters. A client-supplied
+        // typeCode outside that package (e.g. an LLM-invented "us.gov.irs.df.plan.FilingStatusPersister")
+        // would otherwise reach the graph and trigger an opaque upickle "invalid tag" abort that also
+        // poisons the session. Reject it here with a message the caller can act on. Enums — including
+        // filing status — use the EnumWrapper persister, reachable via type="enum".
+        if (!resolvedTypeCode.startsWith(WRAPPER_PREFIX)) {
+            throw new IllegalArgumentException("Unknown persister typeCode '" + resolvedTypeCode
+                    + "'. Fact-graph persisters live under " + WRAPPER_PREFIX
+                    + "; prefer the 'type' alias instead (one of " + TYPE_ALIASES.keySet()
+                    + ") — e.g. type=\"enum\" for a filing-status fact.");
+        }
+
         // The MCP client sends the value as a string; convert it to the JSON shape each persister
         // wrapper expects. DollarWrapper and the other string-backed wrappers read a string as-is;
         // IntWrapper expects a JSON number and BooleanWrapper a JSON boolean.
