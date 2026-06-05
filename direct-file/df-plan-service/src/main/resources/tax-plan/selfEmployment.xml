@@ -388,6 +388,133 @@
 
 
     <!-- ============================================================
+         ADDITIONAL MEDICARE TAX — Form 8959 (IRC §1401(b)(2) / §3101(b)(2))
+
+         A 0.9% surtax on Medicare wages + self-employment income above a
+         filing-status threshold ($200K single / $250K MFJ / $125K MFS). The
+         threshold and the 0.9% rate are injected per planning tax year /
+         filing status from tax-knowledge. Form 8959 applies ONE combined
+         threshold: W-2 Medicare wages are counted first, reducing the
+         threshold left for SE income.
+         ============================================================ -->
+    <Fact path="/additionalMedicareThreshold">
+      <Name>Additional Medicare Tax threshold</Name>
+      <Description>Filing-status threshold above which the 0.9% Additional Medicare Tax applies; injected per
+        planning
+        tax year and filing status.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/additionalMedicareRate">
+      <Name>Additional Medicare Tax rate</Name>
+      <Description>The 0.9% Additional Medicare Tax rate (9/1000); injected per planning tax year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <!-- Medicare wages already reported on W-2s (box 5), written by the agent. Counted first
+         against the combined threshold, so they reduce the threshold remaining for SE income. -->
+    <Fact path="/medicareWagesFromW2">
+      <Name>Medicare wages already reported on W-2s (box 5)</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/additionalMedicareThresholdRemaining">
+      <Name>Threshold remaining for SE income after W-2 Medicare wages</Name>
+      <Description>Form 8959: the filing-status threshold reduced by W-2 Medicare wages, not below zero.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/additionalMedicareThreshold" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/medicareWagesFromW2" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/wagesSubjectToAdditionalMedicare">
+      <Name>W-2 Medicare wages over the threshold (Form 8959 Part I)</Name>
+      <Description>W-2 Medicare wages above the filing-status threshold, not below zero.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/medicareWagesFromW2" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/additionalMedicareThreshold" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seIncomeSubjectToAdditionalMedicare">
+      <Name>SE earnings over the remaining threshold (Form 8959 Part II)</Name>
+      <Description>Net SE earnings above the threshold remaining after W-2 Medicare wages, not below zero.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/seNetEarnings" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/additionalMedicareThresholdRemaining" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/additionalMedicareTaxOnWages">
+      <Name>Additional Medicare Tax on wages (Form 8959 Line 7)</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/wagesSubjectToAdditionalMedicare" />
+            <Dependency path="/additionalMedicareRate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/additionalMedicareTaxOnSE">
+      <Name>Additional Medicare Tax on self-employment income (Form 8959 Line 13)</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/seIncomeSubjectToAdditionalMedicare" />
+            <Dependency path="/additionalMedicareRate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/additionalMedicareTax">
+      <Name>Additional Medicare Tax (Form 8959 Line 18)</Name>
+      <Description>Total 0.9% Additional Medicare Tax: the wage portion plus the self-employment portion.</Description>
+      <Derived>
+        <Add>
+          <Dependency path="/additionalMedicareTaxOnWages" />
+          <Dependency path="/additionalMedicareTaxOnSE" />
+        </Add>
+      </Derived>
+    </Fact>
+
+
+    <!-- ============================================================
          QUARTERLY ESTIMATED TAX (Form 1040-ES)
 
          The agent gathers prior-year tax / AGI / YTD payments, then

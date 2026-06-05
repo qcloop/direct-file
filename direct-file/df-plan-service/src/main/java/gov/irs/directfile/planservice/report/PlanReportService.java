@@ -66,6 +66,7 @@ public class PlanReportService {
             new ResultLine("/seMedicareTax", "Medicare portion of SE tax"),
             new ResultLine("/seTax", null),
             new ResultLine("/deductibleHalfOfSETax", null),
+            new ResultLine("/additionalMedicareTax", "Additional Medicare Tax (Form 8959)"),
             new ResultLine("/planning/safeHarborTarget", null),
             new ResultLine("/planning/remainingPaymentDue", null),
             new ResultLine("/planning/projectedBalanceDueAtFiling", null),

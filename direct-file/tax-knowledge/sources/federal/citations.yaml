@@ -32,6 +32,17 @@ citations:
       rates — 12.4% for Social Security and 2.9% for Medicare — together known as
       self-employment tax.
 
+  irc_1401b2:
+    authority: statute
+    citation: "26 U.S.C. § 1401(b)(2)"
+    title: "Additional Medicare Tax on self-employment income"
+    url: "https://www.law.cornell.edu/uscode/text/26/1401"
+    plain_language: >
+      An extra 0.9% Medicare tax for higher earners. Once your combined wages and
+      self-employment income pass a line set by your filing status ($200,000 single,
+      $250,000 married filing jointly, $125,000 married filing separately), this adds
+      0.9% on the amount above the line. There's no employer half — you pay it yourself.
+
   irs_form_1040_es_2024:
     authority: form
     citation: "IRS Form 1040-ES (2024), Estimated Tax for Individuals"
@@ -91,6 +102,26 @@ citations:
       The step-by-step for figuring self-employment tax: multiply your net profit by
       92.35% to get net earnings, then apply the Social Security and Medicare rates.
       Earn less than $400 and you generally skip this tax.
+
+  irs_form_8959_2024:
+    authority: form
+    citation: "IRS Form 8959 (2024), Additional Medicare Tax"
+    title: "Additional Medicare Tax"
+    url: "https://www.irs.gov/forms-pubs/about-form-8959"
+    plain_language: >
+      The form that figures the extra 0.9% Medicare tax for higher earners. It adds up
+      your W-2 Medicare wages and self-employment income, subtracts the threshold for
+      your filing status, and charges 0.9% on what's above it.
+
+  irs_form_8959_2025:
+    authority: form
+    citation: "IRS Form 8959 (2025), Additional Medicare Tax"
+    title: "Additional Medicare Tax"
+    url: "https://www.irs.gov/forms-pubs/about-form-8959"
+    plain_language: >
+      The form that figures the extra 0.9% Medicare tax for higher earners. It adds up
+      your W-2 Medicare wages and self-employment income, subtracts the threshold for
+      your filing status, and charges 0.9% on what's above it.
 
   ssa_cola_announcement_2024:
     authority: agency_announcement
@@ -171,3 +202,13 @@ citations:
       Each year the Social Security Administration sets the most income that can be
       taxed for Social Security. Earnings above that cap aren't charged the Social
       Security part of the tax (Medicare has no cap).
+
+  irs_form_8959_2026:
+    authority: form
+    citation: "IRS Form 8959 (2026), Additional Medicare Tax"
+    title: "Additional Medicare Tax"
+    url: "https://www.irs.gov/forms-pubs/about-form-8959"
+    plain_language: >
+      The form that figures the extra 0.9% Medicare tax for higher earners. It adds up
+      your W-2 Medicare wages and self-employment income, subtracts the threshold for
+      your filing status, and charges 0.9% on what's above it.

@@ -35,7 +35,7 @@ class QuarterlyEstimateIntegrationTest {
 
     @Test
     void quarterlyEstimateFlow() {
-        String sid = (String) tools.createSession("2025").get("sessionId");
+        String sid = (String) tools.createSession("2025", null).get("sessionId");
 
         // 1) Without any facts populated, the tool should ask for what's missing.
         Map<String, Object> before = tools.estimateQuarterlyPayment(sid, "2025-08-20");

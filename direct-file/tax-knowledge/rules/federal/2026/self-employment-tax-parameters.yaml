@@ -7,6 +7,8 @@ source_ids:
   - irs_instruction_1040_schedule_se_2026
   - irs_form_1040_es_2026
   - ssa_cola_announcement_2026
+  - irs_form_8959_2026
+  - irc_1401b2
 description: >
   Federal self-employment tax constants for tax year 2026. STATUS IS DRAFT: the statutory values
   here (FICA component rates, the $400 SE filing threshold, the $150,000 high-income safe-harbor
@@ -70,3 +72,37 @@ parameters:
     value: "9235/10000"
     source_id: irs_instruction_1040_schedule_se_2026
     note: 92.35% net-earnings multiplier (removes the employer-equivalent half of FICA from the SE base). Statutory.
+  # Additional Medicare Tax (Form 8959). Rate is statutory (0.9%); thresholds are by filing status
+  # and are NOT inflation-indexed (unchanged since 2013), so they carry over to 2026 unchanged. The
+  # /additionalMedicareThreshold rows are status-scoped: only the one matching the session's filing
+  # status is injected.
+  - fact_path: /additionalMedicareRate
+    name: Additional Medicare Tax rate
+    type: rational
+    value: "9/1000"
+    source_id: irc_1401b2
+    note: 0.9% Additional Medicare Tax on Medicare wages + SE income above the filing-status threshold (Form 8959).
+  - fact_path: /additionalMedicareThreshold
+    name: Additional Medicare Tax threshold (single)
+    type: dollar
+    value: "200000"
+    unit: dollars
+    filing_status: single
+    source_id: irs_form_8959_2026
+    note: Single / head of household / qualifying surviving spouse — 0.9% surtax applies above $200,000.
+  - fact_path: /additionalMedicareThreshold
+    name: Additional Medicare Tax threshold (married filing jointly)
+    type: dollar
+    value: "250000"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_form_8959_2026
+    note: Married filing jointly — threshold is $250,000.
+  - fact_path: /additionalMedicareThreshold
+    name: Additional Medicare Tax threshold (married filing separately)
+    type: dollar
+    value: "125000"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_form_8959_2026
+    note: Married filing separately — threshold is $125,000.

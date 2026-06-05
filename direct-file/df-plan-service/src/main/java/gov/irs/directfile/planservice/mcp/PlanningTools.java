@@ -57,6 +57,12 @@ public class PlanningTools {
     /** Key for the free-text note field returned by several tool responses. */
     private static final String NOTE_KEY = "note";
 
+    /** Key for the tax-year field echoed back in tool responses. */
+    private static final String TAX_YEAR_KEY = "tax_year";
+
+    /** Key for the derivation/explanation tree returned by the calculation tools. */
+    private static final String EXPLANATION_TREE_KEY = "explanation_tree";
+
     /** Self-employment tax fact path, read by several tools. */
     private static final String SE_TAX_PATH = "/seTax";
 
@@ -106,13 +112,22 @@ public class PlanningTools {
             @ToolParam(
                             description = "Tax year to plan for, e.g. \"2025\". Defaults to the current calendar year.",
                             required = false)
-                    String taxYear) {
+                    String taxYear,
+            @ToolParam(
+                            description = "Filing status: single | mfj | mfs. Defaults to single. Drives"
+                                    + " filing-status thresholds such as the Additional Medicare Tax line."
+                                    + " Head-of-household and qualifying surviving spouse use the 'single'"
+                                    + " thresholds for these provisions.",
+                            required = false)
+                    String filingStatus) {
         int year = (taxYear == null || taxYear.isBlank())
                 ? java.time.Year.now().getValue()
                 : Integer.parseInt(taxYear.trim());
         Map<String, Object> out = new LinkedHashMap<>();
-        out.put("sessionId", graph.createSession(year));
+        String sessionId = graph.createSession(year, filingStatus);
+        out.put("sessionId", sessionId);
         out.put("taxYear", year);
+        out.put("filing_status", graph.filingStatusOf(sessionId));
         addProvisionalWarning(out, year);
         return out;
     }
@@ -249,7 +264,7 @@ public class PlanningTools {
         out.put(STATUS_KEY, "ok");
         // Surface the tax year and the rate actually used, so a wrong-year session (e.g. planning
         // 2026 on a 2025 session) is visible rather than silently using stale constants.
-        out.put("tax_year", graph.taxYearOf(sessionId));
+        out.put(TAX_YEAR_KEY, graph.taxYearOf(sessionId));
         out.put("standard_mileage_rate", graph.readDecimal(sessionId, "/standardMileageRate"));
         out.put("net_profit", graph.readFact(sessionId, "/seNetProfit").value());
         out.put(
@@ -263,7 +278,67 @@ public class PlanningTools {
         out.put(
                 "deductible_half",
                 graph.readFact(sessionId, "/deductibleHalfOfSETax").value());
-        out.put("explanation_tree", graph.explain(sessionId, SE_TAX_PATH));
+        out.put(EXPLANATION_TREE_KEY, graph.explain(sessionId, SE_TAX_PATH));
+        addProvisionalWarning(out, graph.taxYearOf(sessionId));
+        return out;
+    }
+
+    @Tool(
+            name = "calculate_additional_medicare",
+            description = "Compute the 0.9% Additional Medicare Tax (Form 8959) for a planning session. "
+                    + "Run calculate_se_tax or project_net_profit first so the session has self-employment "
+                    + "net earnings; this tool then adds W-2 Medicare wages (box 5) and applies the session's "
+                    + "filing-status threshold ($200K single / $250K MFJ / $125K MFS, set at create_session). "
+                    + "The surtax hits combined Medicare wages + SE income above the threshold — wages are "
+                    + "counted first, reducing the threshold left for SE income. Returns the wage portion, "
+                    + "the self-employment portion, and the total (Form 8959 Line 18).")
+    public Map<String, Object> calculateAdditionalMedicare(
+            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @ToolParam(
+                            description = "Medicare wages already reported on W-2 box 5 (wages subject to "
+                                    + "Medicare), as a string. Default 0 for a purely self-employed taxpayer.",
+                            required = false)
+                    String medicareWagesFromW2) {
+        graph.writeFact(sessionId, "/medicareWagesFromW2", DOLLAR_WRAPPER, dollarOrZero(medicareWagesFromW2));
+
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put(STATUS_KEY, "ok");
+        out.put(TAX_YEAR_KEY, graph.taxYearOf(sessionId));
+        out.put("filing_status", graph.filingStatusOf(sessionId));
+        out.put(
+                "additional_medicare_threshold",
+                graph.readFact(sessionId, "/additionalMedicareThreshold").value());
+        out.put(
+                "medicare_wages_from_w2",
+                graph.readFact(sessionId, "/medicareWagesFromW2").value());
+
+        // The SE portion needs net earnings from a prior calculate_se_tax / project_net_profit call.
+        // If they aren't populated yet, surface a note rather than silently returning a null SE portion.
+        ReadResult netEarnings = graph.readFact(sessionId, "/seNetEarnings");
+        if (!netEarnings.complete()) {
+            out.put(
+                    NOTE_KEY,
+                    "Self-employment net earnings aren't set yet — run calculate_se_tax or project_net_profit"
+                            + " first for the SE portion. The wage portion (if any) is still computed.");
+        }
+        out.put("net_earnings_from_se", netEarnings.value());
+        out.put(
+                "se_income_over_threshold",
+                graph.readFact(sessionId, "/seIncomeSubjectToAdditionalMedicare")
+                        .value());
+        out.put(
+                "additional_medicare_tax_on_se",
+                graph.readFact(sessionId, "/additionalMedicareTaxOnSE").value());
+        out.put(
+                "wages_over_threshold",
+                graph.readFact(sessionId, "/wagesSubjectToAdditionalMedicare").value());
+        out.put(
+                "additional_medicare_tax_on_wages",
+                graph.readFact(sessionId, "/additionalMedicareTaxOnWages").value());
+        out.put(
+                "additional_medicare_tax",
+                graph.readFact(sessionId, "/additionalMedicareTax").value());
+        out.put(EXPLANATION_TREE_KEY, graph.explain(sessionId, "/additionalMedicareTax"));
         addProvisionalWarning(out, graph.taxYearOf(sessionId));
         return out;
     }
@@ -317,7 +392,7 @@ public class PlanningTools {
 
         Map<String, Object> out = new LinkedHashMap<>();
         out.put(STATUS_KEY, "ok");
-        out.put("tax_year", taxYear);
+        out.put(TAX_YEAR_KEY, taxYear);
         out.put("standard_mileage_rate", graph.readDecimal(sessionId, "/standardMileageRate"));
         out.put("months_elapsed", monthsElapsed);
         out.put("annualization_factor", "12/" + monthsElapsed);
@@ -342,7 +417,7 @@ public class PlanningTools {
                 "Projected figures annualize your year-to-date numbers assuming income is even across "
                         + "the year (straight-line). Seasonal income will differ. This projects "
                         + "self-employment tax only; it does not include income tax.");
-        out.put("explanation_tree", graph.explain(sessionId, "/seNetProfit"));
+        out.put(EXPLANATION_TREE_KEY, graph.explain(sessionId, "/seNetProfit"));
         addProvisionalWarning(out, taxYear);
         return out;
     }
@@ -420,7 +495,7 @@ public class PlanningTools {
         PlanReport report = reportService.generate(sessionId, includeCitations == null || includeCitations);
         Map<String, Object> out = new LinkedHashMap<>();
         out.put(STATUS_KEY, "ok");
-        out.put("tax_year", report.taxYear());
+        out.put(TAX_YEAR_KEY, report.taxYear());
         out.put("generated_at", report.generatedAt());
         out.put("hash_algorithm", "SHA-256");
         out.put("sha256", report.sha256());
@@ -515,7 +590,7 @@ public class PlanningTools {
                         + "projected_balance_due_at_filing is what would still be owed at filing if no "
                         + "further payments are made beyond those already counted (negative = refund).");
         out.put("derivation", derivation);
-        out.put("explanation_tree", graph.explain(sessionId, "/planning/nextQuarterlyPaymentSuggested"));
+        out.put(EXPLANATION_TREE_KEY, graph.explain(sessionId, "/planning/nextQuarterlyPaymentSuggested"));
         out.put("payment_url", "https://www.irs.gov/payments/direct-pay");
         addProvisionalWarning(out, graph.taxYearOf(sessionId));
         return out;

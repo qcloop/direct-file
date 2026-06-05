@@ -32,7 +32,7 @@ class PlanReportTest {
 
     /** A gig-worker session whose SE-tax and quarterly figures are all computed before export. */
     private String seededSession() {
-        String sid = (String) tools.createSession("2025").get("sessionId");
+        String sid = (String) tools.createSession("2025", null).get("sessionId");
         tools.calculateSeTax(sid, "40000", "10000", "3000", "1000", "0");
         tools.setFact(sid, "/planning/priorYearTotalTax", "dollar", null, "3800", "2024 Form 1040, line 24");
         tools.setFact(sid, "/planning/priorYearAGI", "dollar", null, "58000", null);
@@ -83,7 +83,7 @@ class PlanReportTest {
 
     @Test
     void flagsProvisionalParametersInTheReportForADraftYear() {
-        String sid = (String) tools.createSession("2026").get("sessionId");
+        String sid = (String) tools.createSession("2026", null).get("sessionId");
         tools.calculateSeTax(sid, "40000", "10000", "0", "0", "0");
         String md = reportService.generate(sid).markdown();
 

@@ -97,16 +97,39 @@ public class PlanningGraphService {
                 properties.factXmlPatterns().size());
     }
 
+    /** Filing statuses recognized for status-scoped parameters (e.g. filing-status thresholds). */
+    private static final Set<String> FILING_STATUSES = Set.of("single", "mfj", "mfs");
+
+    /** Create a session for the given year, defaulting to the {@code single} filing status. */
     public String createSession(int taxYear) {
+        return createSession(taxYear, "single");
+    }
+
+    public String createSession(int taxYear, String filingStatus) {
+        String status = filingStatus == null || filingStatus.isBlank()
+                ? "single"
+                : filingStatus.trim().toLowerCase();
+        if (!FILING_STATUSES.contains(status)) {
+            throw new IllegalArgumentException("Unknown filing status '" + filingStatus + "'. Use one of "
+                    + FILING_STATUSES + " (head-of-household / qualifying surviving spouse share the 'single'"
+                    + " thresholds for these provisions).");
+        }
         // Resolve the year's tax parameters first — this throws if the year has no published
         // parameters, so we never create a session that silently uses another year's values.
         List<TaxKnowledgeService.TaxParameter> params = taxKnowledge.taxParametersForYear(taxYear);
         String id = java.util.UUID.randomUUID().toString();
-        sessions.put(id, new SessionState(taxYear, new LinkedHashMap<>(), new LinkedHashMap<>()));
+        sessions.put(id, new SessionState(taxYear, status, new LinkedHashMap<>(), new LinkedHashMap<>()));
         // Inject the year-indexed constants so SE-tax and safe-harbor math use the right year's values.
         // The fact-graph value type drives the persister wrapper and how the string is shaped:
         // int -> a JSON number; rational -> the "n/d" string; dollar (default) -> the string as-is.
         for (TaxKnowledgeService.TaxParameter p : params) {
+            // Status-scoped parameters (e.g. the Additional Medicare threshold) are injected only into
+            // a session whose filing status matches; status-agnostic parameters (filingStatus == null)
+            // always inject.
+            if (p.filingStatus() != null
+                    && !status.equalsIgnoreCase(p.filingStatus().trim())) {
+                continue;
+            }
             String typeCode;
             Object value;
             switch (p.type() == null ? "dollar" : p.type().toLowerCase()) {
@@ -137,6 +160,10 @@ public class PlanningGraphService {
 
     public int taxYearOf(String sessionId) {
         return require(sessionId).taxYear();
+    }
+
+    public String filingStatusOf(String sessionId) {
+        return require(sessionId).filingStatus();
     }
 
     public Graph graphFor(String sessionId) {
@@ -414,7 +441,10 @@ public class PlanningGraphService {
     }
 
     private record SessionState(
-            int taxYear, LinkedHashMap<String, FactTypeWithItem> facts, LinkedHashMap<String, String> sourceNotes) {}
+            int taxYear,
+            String filingStatus,
+            LinkedHashMap<String, FactTypeWithItem> facts,
+            LinkedHashMap<String, String> sourceNotes) {}
 
     public record WriteResult(boolean ok, List<String> violations) {}
 

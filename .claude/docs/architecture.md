@@ -87,10 +87,13 @@ Key types:
   rebuilt into a `Graph(dictionary, InMemoryPersister.apply(json))` on demand under a session lock.
 - `knowledge/TaxKnowledgeService` — loads the `tax-knowledge/` YAML (questions, evidence maps,
   conflict rules, citations, year-indexed parameters). Uses its **own** Jackson 2 YAML mapper.
-- `mcp/PlanningTools` — the `@Tool`-annotated methods exposed over MCP: `create_session`,
-  `get_fact`, `set_fact`, `explain`, `cite`, `calculate_se_tax`, `project_net_profit`,
-  `estimate_quarterly_payment`, `plan_questions`, `export_plan`. Tools are plain Java methods;
-  Spring AI generates the JSON Schema from the signatures.
+- `mcp/PlanningTools` — the `@Tool`-annotated methods exposed over MCP: `create_session`
+  (takes a `filing_status`: single/mfj/mfs, driving filing-status thresholds), `get_fact`,
+  `set_fact`, `explain`, `cite`, `calculate_se_tax`, `calculate_additional_medicare` (Form 8959
+  0.9% surtax), `project_net_profit`, `estimate_quarterly_payment`, `plan_questions`,
+  `export_plan`. Tools are plain Java methods; Spring AI generates the JSON Schema from the
+  signatures. Filing-status-dependent constants are status-scoped `*-tax-parameters.yaml` rows
+  (a `filing_status` field) injected only for the session's status.
 - `config/McpServerConfig` — registers the tools with the Spring AI MCP server
   (`MethodToolCallbackProvider`). Transport-agnostic.
 - `config/JacksonConfig` — the explicit Jackson 2 `ObjectMapper` bean (CLAUDE.md invariant 3).

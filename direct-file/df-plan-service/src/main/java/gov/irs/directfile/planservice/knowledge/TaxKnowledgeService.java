@@ -190,7 +190,8 @@ public class TaxKnowledgeService {
                             asString(p.get("name")),
                             asString(p.get("source_id")),
                             asString(p.get("note")),
-                            Boolean.TRUE.equals(p.get("provisional"))));
+                            Boolean.TRUE.equals(p.get("provisional")),
+                            asString(p.get("filing_status"))));
                 }
             } catch (IOException e) {
                 throw new IllegalStateException(
@@ -209,6 +210,11 @@ public class TaxKnowledgeService {
      * {@code type}, and {@code value} drive injection into the session graph; {@code name},
      * {@code sourceId}, and {@code note} carry the human-readable provenance surfaced in the
      * taxpayer-held export so each statutory constant can be traced back to its IRS source.
+     *
+     * <p>{@code filingStatus} (nullable) scopes a parameter to one filing status — e.g. the
+     * Additional Medicare Tax threshold is $200k single / $250k MFJ / $125k MFS. A null value
+     * means the parameter applies to every status (the common case); a non-null value is injected
+     * only into sessions created with the matching status.
      */
     public record TaxParameter(
             String factPath,
@@ -217,7 +223,8 @@ public class TaxKnowledgeService {
             String name,
             String sourceId,
             String note,
-            boolean provisional) {}
+            boolean provisional,
+            String filingStatus) {}
 
     /**
      * Display names of parameters for {@code taxYear} explicitly marked {@code provisional: true}
