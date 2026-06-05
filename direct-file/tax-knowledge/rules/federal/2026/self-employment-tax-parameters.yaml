@@ -9,6 +9,8 @@ source_ids:
   - ssa_cola_announcement_2026
   - irs_form_8959_2026
   - irc_1401b2
+  - irs_form_8995_2026
+  - irc_199a
 description: >
   Federal self-employment tax constants for tax year 2026. STATUS IS DRAFT: the statutory values
   here (FICA component rates, the $400 SE filing threshold, the $150,000 high-income safe-harbor
@@ -106,3 +108,39 @@ parameters:
     filing_status: mfs
     source_id: irs_form_8959_2026
     note: Married filing separately — threshold is $125,000.
+  # QBI deduction (Form 8995 / IRC 199A). Rate is statutory (20%). The taxable-income threshold is
+  # inflation-indexed (Rev. Proc. 2025-32) and PROVISIONAL until confirmed against the final 2026
+  # Form 8995. MFJ is double the single amount; MFS uses the single amount. Status-scoped rows.
+  - fact_path: /qbiRate
+    name: QBI deduction rate
+    type: rational
+    value: "1/5"
+    source_id: irc_199a
+    note: 20% qualified business income deduction under IRC 199A. Statutory.
+  - fact_path: /qbiThreshold
+    name: QBI taxable-income threshold (single)
+    type: dollar
+    value: "201750"
+    unit: dollars
+    filing_status: single
+    provisional: true
+    source_id: irs_form_8995_2026
+    note: Single / HoH / QSS — at or below $201,750 taxable income uses the simple Form 8995 method (TY2026, provisional).
+  - fact_path: /qbiThreshold
+    name: QBI taxable-income threshold (married filing jointly)
+    type: dollar
+    value: "403500"
+    unit: dollars
+    filing_status: mfj
+    provisional: true
+    source_id: irs_form_8995_2026
+    note: Married filing jointly — threshold is $403,500 (TY2026, provisional).
+  - fact_path: /qbiThreshold
+    name: QBI taxable-income threshold (married filing separately)
+    type: dollar
+    value: "201750"
+    unit: dollars
+    filing_status: mfs
+    provisional: true
+    source_id: irs_form_8995_2026
+    note: Married filing separately — uses the single amount, $201,750 (TY2026, provisional).

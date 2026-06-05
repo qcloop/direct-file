@@ -43,6 +43,17 @@ citations:
       $250,000 married filing jointly, $125,000 married filing separately), this adds
       0.9% on the amount above the line. There's no employer half — you pay it yourself.
 
+  irc_199a:
+    authority: statute
+    citation: "26 U.S.C. § 199A"
+    title: "Qualified business income deduction"
+    url: "https://www.law.cornell.edu/uscode/text/26/199A"
+    plain_language: >
+      A deduction that lets most self-employed people and small-business owners knock
+      20% off their qualifying business profit before income tax. If your total taxable
+      income is under a yearly limit, the math is simple (Form 8995); above that limit,
+      extra rules about wages and property can shrink or remove it (Form 8995-A).
+
   irs_form_1040_es_2024:
     authority: form
     citation: "IRS Form 1040-ES (2024), Estimated Tax for Individuals"
@@ -122,6 +133,26 @@ citations:
       The form that figures the extra 0.9% Medicare tax for higher earners. It adds up
       your W-2 Medicare wages and self-employment income, subtracts the threshold for
       your filing status, and charges 0.9% on what's above it.
+
+  irs_form_8995_2024:
+    authority: form
+    citation: "IRS Form 8995 (2024), Qualified Business Income Deduction Simplified Computation"
+    title: "Qualified Business Income Deduction Simplified Computation"
+    url: "https://www.irs.gov/forms-pubs/about-form-8995"
+    plain_language: >
+      The short form for the 20% qualified-business-income deduction, used when your
+      taxable income is under the year's limit. It takes 20% of your business profit and
+      caps it at 20% of your taxable income (excluding capital gains).
+
+  irs_form_8995_2025:
+    authority: form
+    citation: "IRS Form 8995 (2025), Qualified Business Income Deduction Simplified Computation"
+    title: "Qualified Business Income Deduction Simplified Computation"
+    url: "https://www.irs.gov/forms-pubs/about-form-8995"
+    plain_language: >
+      The short form for the 20% qualified-business-income deduction, used when your
+      taxable income is under the year's limit. It takes 20% of your business profit and
+      caps it at 20% of your taxable income (excluding capital gains).
 
   ssa_cola_announcement_2024:
     authority: agency_announcement
@@ -212,3 +243,13 @@ citations:
       The form that figures the extra 0.9% Medicare tax for higher earners. It adds up
       your W-2 Medicare wages and self-employment income, subtracts the threshold for
       your filing status, and charges 0.9% on what's above it.
+
+  irs_form_8995_2026:
+    authority: form
+    citation: "IRS Form 8995 (2026), Qualified Business Income Deduction Simplified Computation"
+    title: "Qualified Business Income Deduction Simplified Computation"
+    url: "https://www.irs.gov/forms-pubs/about-form-8995"
+    plain_language: >
+      The short form for the 20% qualified-business-income deduction, used when your
+      taxable income is under the year's limit. It takes 20% of your business profit and
+      caps it at 20% of your taxable income (excluding capital gains).

@@ -10,6 +10,8 @@ source_ids:
   - ssa_cola_announcement_2024
   - irs_form_8959_2024
   - irc_1401b2
+  - irs_form_8995_2024
+  - irc_199a
 description: >
   Year/jurisdiction-scoped federal self-employment tax constants. The planning service loads
   the set matching the planning tax year and injects each value into the session fact graph at
@@ -100,3 +102,36 @@ parameters:
     filing_status: mfs
     source_id: irs_form_8959_2024
     note: Married filing separately — threshold is $125,000.
+  # QBI deduction (Form 8995 / IRC 199A). Rate is statutory (20%); the taxable-income threshold is
+  # inflation-indexed and filing-status-dependent (MFJ is double the single amount; MFS uses the
+  # single amount). Threshold rows are status-scoped.
+  - fact_path: /qbiRate
+    name: QBI deduction rate
+    type: rational
+    value: "1/5"
+    source_id: irc_199a
+    note: 20% qualified business income deduction under IRC 199A.
+  - fact_path: /qbiThreshold
+    name: QBI taxable-income threshold (single)
+    type: dollar
+    value: "191950"
+    unit: dollars
+    filing_status: single
+    source_id: irs_form_8995_2024
+    note: Single / HoH / QSS — taxable income at or below $191,950 uses the simple Form 8995 method (TY2024).
+  - fact_path: /qbiThreshold
+    name: QBI taxable-income threshold (married filing jointly)
+    type: dollar
+    value: "383900"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_form_8995_2024
+    note: Married filing jointly — threshold is $383,900 (TY2024).
+  - fact_path: /qbiThreshold
+    name: QBI taxable-income threshold (married filing separately)
+    type: dollar
+    value: "191950"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_form_8995_2024
+    note: Married filing separately — uses the single amount, $191,950 (TY2024).

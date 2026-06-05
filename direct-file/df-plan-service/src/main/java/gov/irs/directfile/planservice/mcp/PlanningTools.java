@@ -66,6 +66,9 @@ public class PlanningTools {
     /** Self-employment tax fact path, read by several tools. */
     private static final String SE_TAX_PATH = "/seTax";
 
+    /** Schedule C net-profit fact path, read by several tools. */
+    private static final String SE_NET_PROFIT_PATH = "/seNetProfit";
+
     private static final List<RequiredFact> REQUIRED_FACTS = List.of(
             new RequiredFact(
                     "/planning/priorYearTotalTax",
@@ -266,7 +269,7 @@ public class PlanningTools {
         // 2026 on a 2025 session) is visible rather than silently using stale constants.
         out.put(TAX_YEAR_KEY, graph.taxYearOf(sessionId));
         out.put("standard_mileage_rate", graph.readDecimal(sessionId, "/standardMileageRate"));
-        out.put("net_profit", graph.readFact(sessionId, "/seNetProfit").value());
+        out.put("net_profit", graph.readFact(sessionId, SE_NET_PROFIT_PATH).value());
         out.put(
                 "net_earnings_from_se",
                 graph.readFact(sessionId, "/seNetEarnings").value());
@@ -344,6 +347,67 @@ public class PlanningTools {
     }
 
     @Tool(
+            name = "estimate_qbi_deduction",
+            description = "Estimate the 20% Qualified Business Income (QBI) deduction (Form 8995, IRC 199A) "
+                    + "for a planning session. Run calculate_se_tax or project_net_profit first so the session "
+                    + "has self-employment net profit; for a sole proprietor, QBI is that net profit minus the "
+                    + "deductible half of SE tax. The deduction is the lesser of 20% of QBI and 20% of (taxable "
+                    + "income minus net capital gains). This is the SIMPLE Form 8995 method, valid when taxable "
+                    + "income is at or below the filing-status threshold; above it, Form 8995-A wage/property "
+                    + "limits apply and the result is only an upper bound (flagged in the response).")
+    public Map<String, Object> estimateQbiDeduction(
+            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @ToolParam(
+                            description = "Taxable income before the QBI deduction (Form 1040 taxable income "
+                                    + "computed without this deduction), as a string. Caps the deduction at 20% of it.")
+                    String taxableIncomeBeforeQbi,
+            @ToolParam(
+                            description = "Net capital gains, including qualified dividends, as a string. "
+                                    + "Excluded from the income cap. Default 0.",
+                            required = false)
+                    String netCapitalGains) {
+        graph.writeFact(
+                sessionId,
+                "/planning/taxableIncomeBeforeQBIDeduction",
+                DOLLAR_WRAPPER,
+                dollarOrZero(taxableIncomeBeforeQbi));
+        graph.writeFact(sessionId, "/planning/netCapitalGains", DOLLAR_WRAPPER, dollarOrZero(netCapitalGains));
+
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put(STATUS_KEY, "ok");
+        out.put(TAX_YEAR_KEY, graph.taxYearOf(sessionId));
+        out.put("filing_status", graph.filingStatusOf(sessionId));
+
+        ReadResult netProfit = graph.readFact(sessionId, SE_NET_PROFIT_PATH);
+        if (!netProfit.complete()) {
+            out.put(
+                    NOTE_KEY,
+                    "Self-employment net profit isn't set yet — run calculate_se_tax or project_net_profit"
+                            + " first so QBI can be computed from it.");
+        }
+        out.put(
+                "qualified_business_income",
+                graph.readFact(sessionId, "/qualifiedBusinessIncome").value());
+        out.put("qbi_component", graph.readFact(sessionId, "/qbiComponent").value());
+        out.put("qbi_income_limit", graph.readFact(sessionId, "/qbiIncomeLimit").value());
+        out.put("qbi_deduction", graph.readFact(sessionId, "/qbiDeduction").value());
+        out.put("qbi_threshold", graph.readFact(sessionId, "/qbiThreshold").value());
+
+        ReadResult above = graph.readFact(sessionId, "/qbiAboveThreshold");
+        out.put("above_threshold", above.value());
+        if (Boolean.TRUE.equals(above.value())) {
+            out.put(
+                    "above_threshold_warning",
+                    "Taxable income is above the filing-status threshold for the simple method, so Form 8995-A"
+                            + " (specified-service-business, W-2-wage, and qualified-property limits) governs. The"
+                            + " qbi_deduction shown is an UPPER BOUND and may be reduced or eliminated.");
+        }
+        out.put(EXPLANATION_TREE_KEY, graph.explain(sessionId, "/qbiDeduction"));
+        addProvisionalWarning(out, graph.taxYearOf(sessionId));
+        return out;
+    }
+
+    @Tool(
             name = "project_net_profit",
             description = "Project full-year self-employment net profit (and SE tax) from year-to-date "
                     + "raw numbers. Give the receipts, miles, fees, and supplies accumulated so far this "
@@ -402,7 +466,7 @@ public class PlanningTools {
                 graph.readFact(sessionId, "/seEffectiveGrossReceipts").value());
         out.put(
                 "projected_net_profit",
-                graph.readFact(sessionId, "/seNetProfit").value());
+                graph.readFact(sessionId, SE_NET_PROFIT_PATH).value());
         out.put(
                 "projected_net_earnings_from_se",
                 graph.readFact(sessionId, "/seNetEarnings").value());
@@ -417,7 +481,7 @@ public class PlanningTools {
                 "Projected figures annualize your year-to-date numbers assuming income is even across "
                         + "the year (straight-line). Seasonal income will differ. This projects "
                         + "self-employment tax only; it does not include income tax.");
-        out.put(EXPLANATION_TREE_KEY, graph.explain(sessionId, "/seNetProfit"));
+        out.put(EXPLANATION_TREE_KEY, graph.explain(sessionId, SE_NET_PROFIT_PATH));
         addProvisionalWarning(out, taxYear);
         return out;
     }

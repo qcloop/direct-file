@@ -515,6 +515,147 @@
 
 
     <!-- ============================================================
+         QUALIFIED BUSINESS INCOME (QBI) DEDUCTION — Form 8995 (IRC §199A)
+
+         The 20% pass-through deduction. This models the SIMPLE method
+         (Form 8995), valid when taxable income is at or below the
+         filing-status threshold ($197,300 single / $394,600 MFJ for 2025).
+         Above the threshold the SSTB / W-2-wage / UBIA limits on Form
+         8995-A apply and this number is only an upper bound — the
+         estimate_qbi_deduction tool flags that via /qbiAboveThreshold.
+
+         For a sole proprietor, QBI = Schedule C net profit minus the
+         deductible half of SE tax. (A fuller model would also subtract the
+         self-employed health-insurance and retirement-plan deductions; those
+         aren't in this MVP, so QBI here is a slight overestimate when they
+         apply.) The deduction is the lesser of 20% of QBI and 20% of
+         (taxable income − net capital gains); the taxable-income figure is
+         agent-supplied, like the projected current-year tax.
+         ============================================================ -->
+    <Fact path="/qbiRate">
+      <Name>QBI deduction rate</Name>
+      <Description>The 20% qualified-business-income deduction rate (1/5); injected per planning tax year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/qbiThreshold">
+      <Name>QBI taxable-income threshold</Name>
+      <Description>Taxable income at or below this uses the simple Form 8995 method; above it, Form 8995-A limits
+        apply.
+        Filing-status-dependent; injected per planning tax year and filing status.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/qualifiedBusinessIncome">
+      <Name>Qualified business income (sole proprietor)</Name>
+      <Description>Schedule C net profit minus the deductible half of SE tax, not below zero.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/seNetProfit" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/deductibleHalfOfSETax" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/qbiComponent">
+      <Name>QBI component (20% of QBI, Form 8995 Line 5)</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/qualifiedBusinessIncome" />
+            <Dependency path="/qbiRate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <!-- Agent-supplied: taxable income before the QBI deduction (Form 8995 Line 11) and net capital
+         gains incl. qualified dividends (Line 12). The graph does not model the full 1040, so these
+         come from the agent, like /planning/projectedCurrentYearTax. -->
+    <Fact path="/planning/taxableIncomeBeforeQBIDeduction">
+      <Name>Taxable income before the QBI deduction (Form 8995 Line 11)</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/netCapitalGains">
+      <Name>Net capital gains incl. qualified dividends (Form 8995 Line 12)</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/qbiIncomeLimitBase">
+      <Name>Taxable income net of capital gains (Form 8995 Line 13)</Name>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/planning/taxableIncomeBeforeQBIDeduction" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/planning/netCapitalGains" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/qbiIncomeLimit">
+      <Name>Income limit on the QBI deduction (20% of Line 13, Form 8995 Line 14)</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/qbiIncomeLimitBase" />
+            <Dependency path="/qbiRate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/qbiDeduction">
+      <Name>QBI deduction (Form 8995 Line 15)</Name>
+      <Description>Lesser of 20% of QBI and 20% of taxable income net of capital gains.</Description>
+      <Derived>
+        <LesserOf>
+          <Dependency path="/qbiComponent" />
+          <Dependency path="/qbiIncomeLimit" />
+        </LesserOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/qbiAboveThreshold">
+      <Name>Taxable income above the QBI simple-method threshold</Name>
+      <Description>True when taxable income exceeds the filing-status threshold, so Form 8995-A (SSTB / W-2
+        wage / UBIA
+        limits) governs and the simple-method deduction is only an upper bound.</Description>
+      <Derived>
+        <GreaterThan>
+          <Left>
+            <Dependency path="/planning/taxableIncomeBeforeQBIDeduction" />
+          </Left>
+          <Right>
+            <Dependency path="/qbiThreshold" />
+          </Right>
+        </GreaterThan>
+      </Derived>
+    </Fact>
+
+
+    <!-- ============================================================
          QUARTERLY ESTIMATED TAX (Form 1040-ES)
 
          The agent gathers prior-year tax / AGI / YTD payments, then

@@ -90,9 +90,9 @@ Key types:
 - `mcp/PlanningTools` — the `@Tool`-annotated methods exposed over MCP: `create_session`
   (takes a `filing_status`: single/mfj/mfs, driving filing-status thresholds), `get_fact`,
   `set_fact`, `explain`, `cite`, `calculate_se_tax`, `calculate_additional_medicare` (Form 8959
-  0.9% surtax), `project_net_profit`, `estimate_quarterly_payment`, `plan_questions`,
-  `export_plan`. Tools are plain Java methods; Spring AI generates the JSON Schema from the
-  signatures. Filing-status-dependent constants are status-scoped `*-tax-parameters.yaml` rows
+  0.9% surtax), `estimate_qbi_deduction` (Form 8995 / §199A 20% deduction, simple method),
+  `project_net_profit`, `estimate_quarterly_payment`, `plan_questions`, `export_plan`. Tools are
+  plain Java methods; Spring AI generates the JSON Schema from the signatures. Filing-status-dependent constants are status-scoped `*-tax-parameters.yaml` rows
   (a `filing_status` field) injected only for the session's status.
 - `config/McpServerConfig` — registers the tools with the Spring AI MCP server
   (`MethodToolCallbackProvider`). Transport-agnostic.
