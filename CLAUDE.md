@@ -12,6 +12,8 @@ relative to the repo root (e.g. `direct-file/df-plan-service/...`).
 Supplemental detail (read these before non-trivial work):
 - @.claude/docs/architecture.md — end-to-end design, service topology, the fact graph, the planning service, shared libs.
 - @.claude/docs/operations.md — toolchain, build order, running services, profiles/ports, Docker, MCP transports.
+- @.claude/docs/decisions.md — why non-obvious engineering choices were made (decision log).
+- @.claude/docs/tech-debt.md — known gaps, limitations, and follow-ups.
 
 ---
 

@@ -21,6 +21,10 @@ code lives one directory down, under `direct-file/`.
   services and MCP transports, profiles/ports, Docker, buildability caveats.
 - **Per-service `README.md`** (e.g. [direct-file/df-plan-service/README.md](direct-file/df-plan-service/README.md))
   — the local source of truth for that service, including its MCP tool inventory.
+- **[.claude/docs/decisions.md](.claude/docs/decisions.md)** — why non-obvious choices were made
+  (the rationale that would otherwise be lost in chat threads).
+- **[.claude/docs/tech-debt.md](.claude/docs/tech-debt.md)** — known gaps, limitations, and
+  follow-ups, versioned in-repo so they're visible to every agent.
 
 ## Non-negotiable invariants (the short list; details in CLAUDE.md)
 
