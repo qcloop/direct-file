@@ -9,7 +9,6 @@ import java.util.Map;
 import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
 import gov.irs.directfile.planservice.citation.CitationService;
@@ -163,17 +162,19 @@ public class PlanningTools {
         }
     }
 
-    @Tool(
+    @McpTool(
             name = "get_fact",
             description = "Read a single fact from a planning session's fact graph. Returns the "
-                    + "current value if computable, or a 'not yet computable' note listing why.")
+                    + "current value if computable, or a 'not yet computable' note listing why.",
+            generateOutputSchema = true)
     public ReadResult getFact(
-            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
-            @ToolParam(description = "Fact path, e.g. /seTax or /planning/safeHarborTarget.") String path) {
+            @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @McpToolParam(description = "Fact path, e.g. /seTax or /planning/safeHarborTarget.") String path) {
         return graph.readFact(sessionId, path);
     }
 
-    @Tool(
+    @McpTool(
+            generateOutputSchema = true,
             name = "set_fact",
             description = "Write a value to a writable fact in a planning session. Specify the "
                     + "type via 'type' (short alias: dollar/int/boolean/string/day/enum/ein/tin) "
@@ -181,22 +182,22 @@ public class PlanningTools {
                     + "where the value came from as stated by the taxpayer. Returns whether the "
                     + "write was accepted by the fact graph's validation pass.")
     public PlanningGraphService.WriteResult setFact(
-            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
-            @ToolParam(description = "Fact path, e.g. /planning/priorYearTotalTax.") String path,
-            @ToolParam(
+            @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @McpToolParam(description = "Fact path, e.g. /planning/priorYearTotalTax.") String path,
+            @McpToolParam(
                             description = "Short type alias: dollar | int | boolean | string | day | enum | ein | tin. "
                                     + "Either 'type' or 'typeCode' must be supplied.",
                             required = false)
                     String type,
-            @ToolParam(
+            @McpToolParam(
                             description = "Full Scala persister type code, used when 'type' is not one of the aliases.",
                             required = false)
                     String typeCode,
-            @ToolParam(
+            @McpToolParam(
                             description = "Value to write, as a string: e.g. \"608\" (dollar), "
                                     + "\"2025-04-15\" (day), \"true\" (boolean).")
                     String value,
-            @ToolParam(
+            @McpToolParam(
                             description = "Optional free-text provenance as stated by the taxpayer, e.g. "
                                     + "\"2024 1099-NEC box 1, Uber\". Recorded for the export report and "
                                     + "shown there as self-reported; it is not verified and never enters "
@@ -251,19 +252,23 @@ public class PlanningTools {
                     + "deductible half. Use this to build the projected current-year tax that "
                     + "estimate_quarterly_payment needs.")
     public Map<String, Object> calculateSeTax(
-            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
-            @ToolParam(description = "Gross self-employment receipts (Schedule C line 1), as a string, e.g. \"24000\".")
+            @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @McpToolParam(
+                            description =
+                                    "Gross self-employment receipts (Schedule C line 1), as a string, e.g. \"24000\".")
                     String grossReceipts,
-            @ToolParam(
+            @McpToolParam(
                             description =
                                     "Business miles driven (standard-mileage method), as a whole number. Default 0.",
                             required = false)
                     String businessMiles,
-            @ToolParam(description = "Platform/commission fees withheld, as a string. Default 0.", required = false)
+            @McpToolParam(description = "Platform/commission fees withheld, as a string. Default 0.", required = false)
                     String platformFees,
-            @ToolParam(description = "Supplies and other business expenses, as a string. Default 0.", required = false)
+            @McpToolParam(
+                            description = "Supplies and other business expenses, as a string. Default 0.",
+                            required = false)
                     String suppliesAndOther,
-            @ToolParam(
+            @McpToolParam(
                             description = "Social Security wages already reported on W-2s this year, as a string. "
                                     + "Default 0.",
                             required = false)
@@ -313,8 +318,8 @@ public class PlanningTools {
                     + "counted first, reducing the threshold left for SE income. Returns the wage portion, "
                     + "the self-employment portion, and the total (Form 8959 Line 18).")
     public Map<String, Object> calculateAdditionalMedicare(
-            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
-            @ToolParam(
+            @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @McpToolParam(
                             description = "Medicare wages already reported on W-2 box 5 (wages subject to "
                                     + "Medicare), as a string. Default 0 for a purely self-employed taxpayer.",
                             required = false)
@@ -373,12 +378,12 @@ public class PlanningTools {
                     + "income is at or below the filing-status threshold; above it, Form 8995-A wage/property "
                     + "limits apply and the result is only an upper bound (flagged in the response).")
     public Map<String, Object> estimateQbiDeduction(
-            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
-            @ToolParam(
+            @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @McpToolParam(
                             description = "Taxable income before the QBI deduction (Form 1040 taxable income "
                                     + "computed without this deduction), as a string. Caps the deduction at 20% of it.")
                     String taxableIncomeBeforeQbi,
-            @ToolParam(
+            @McpToolParam(
                             description = "Net capital gains, including qualified dividends, as a string. "
                                     + "Excluded from the income cap. Default 0.",
                             required = false)
@@ -434,24 +439,26 @@ public class PlanningTools {
                     + "across the year — for seasonal income or a known full-year figure, use "
                     + "calculate_se_tax with full-year numbers instead.")
     public Map<String, Object> projectNetProfit(
-            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
-            @ToolParam(
+            @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @McpToolParam(
                             description = "ISO date (YYYY-MM-DD) the year-to-date figures run through. Required "
                                     + "because the fact graph has no clock; it sets how many months to annualize from.")
                     String asOfDate,
-            @ToolParam(description = "Year-to-date gross self-employment receipts, as a string, e.g. \"21000\".")
+            @McpToolParam(description = "Year-to-date gross self-employment receipts, as a string, e.g. \"21000\".")
                     String ytdGrossReceipts,
-            @ToolParam(
+            @McpToolParam(
                             description = "Year-to-date business miles driven, as a whole number. Default 0.",
                             required = false)
                     String ytdBusinessMiles,
-            @ToolParam(description = "Year-to-date platform/commission fees, as a string. Default 0.", required = false)
+            @McpToolParam(
+                            description = "Year-to-date platform/commission fees, as a string. Default 0.",
+                            required = false)
                     String ytdPlatformFees,
-            @ToolParam(
+            @McpToolParam(
                             description = "Year-to-date supplies and other business expenses, as a string. Default 0.",
                             required = false)
                     String ytdSuppliesAndOther,
-            @ToolParam(
+            @McpToolParam(
                             description = "Social Security wages already reported on W-2s this year, as a string. "
                                     + "Not annualized. Default 0.",
                             required = false)
@@ -503,14 +510,15 @@ public class PlanningTools {
         return out;
     }
 
-    @Tool(
+    @McpTool(
             name = "explain",
             description = "Explain how a fact's value was derived: returns the fact's name, "
                     + "description, computed value, and the values of every fact it directly "
-                    + "depends on. Useful for grounding 'why is my number X?' answers.")
+                    + "depends on. Useful for grounding 'why is my number X?' answers.",
+            generateOutputSchema = true)
     public PlanningGraphService.ExplainResult explain(
-            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
-            @ToolParam(description = "Fact path to explain.") String path) {
+            @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @McpToolParam(description = "Fact path to explain.") String path) {
         return graph.explain(sessionId, path);
     }
 
@@ -523,8 +531,10 @@ public class PlanningTools {
                     + "from the fact's actual computation, so a result cites every statutory constant it "
                     + "depends on.")
     public Map<String, Object> cite(
-            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
-            @ToolParam(description = "Fact path to explain the basis for, e.g. /seTax or /planning/safeHarborTarget.")
+            @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @McpToolParam(
+                            description =
+                                    "Fact path to explain the basis for, e.g. /seTax or /planning/safeHarborTarget.")
                     String path) {
         int taxYear = graph.taxYearOf(sessionId);
         ReadResult value = graph.readFact(sessionId, path);
@@ -556,7 +566,7 @@ public class PlanningTools {
         return out;
     }
 
-    @Tool(
+    @McpTool(
             name = "export_plan",
             description = "Generate a self-contained, printable planning summary for the session and "
                     + "return it as Markdown sealed with a SHA-256 content hash. The summary lists the "
@@ -565,28 +575,36 @@ public class PlanningTools {
                     + "cites the legal authority behind each result and appends a plain-language 'Sources' "
                     + "section; pass includeCitations=false to omit citations. The service stores nothing — "
                     + "this artifact is the taxpayer's own record to save or print; hand the Markdown to the "
-                    + "user verbatim. Use after the relevant figures have been computed.")
-    public Map<String, Object> exportPlan(
-            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
-            @ToolParam(
+                    + "user verbatim. Use after the relevant figures have been computed.",
+            generateOutputSchema = true)
+    public ExportPlanResult exportPlan(
+            @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @McpToolParam(
                             description = "Include legal citations and a plain-language Sources section. "
                                     + "Defaults to true.",
                             required = false)
                     Boolean includeCitations) {
         PlanReport report = reportService.generate(sessionId, includeCitations == null || includeCitations);
-        Map<String, Object> out = new LinkedHashMap<>();
-        out.put(STATUS_KEY, "ok");
-        out.put(TAX_YEAR_KEY, report.taxYear());
-        out.put("generated_at", report.generatedAt());
-        out.put("hash_algorithm", "SHA-256");
-        out.put("sha256", report.sha256());
-        out.put("report_markdown", report.markdown());
-        out.put(
-                NOTE_KEY,
-                "This report is not stored by the service. Give the report_markdown to the taxpayer to "
-                        + "keep; the sha256 lets them later confirm the document was not altered.");
-        return out;
+        return new ExportPlanResult(
+                "ok",
+                report.taxYear(),
+                report.generatedAt().toString(),
+                "SHA-256",
+                report.sha256(),
+                report.markdown(),
+                "This report is not stored by the service. Give the reportMarkdown to the taxpayer to keep;"
+                        + " the sha256 lets them later confirm the document was not altered.");
     }
+
+    /** Structured result of {@code export_plan} (all fields non-null for output-schema conformance). */
+    public record ExportPlanResult(
+            String status,
+            int taxYear,
+            String generatedAt,
+            String hashAlgorithm,
+            String sha256,
+            String reportMarkdown,
+            String note) {}
 
     @Tool(
             name = "estimate_quarterly_payment",
@@ -596,8 +614,8 @@ public class PlanningTools {
                     + "next deadline, and a derivation chain. If required facts are missing, "
                     + "returns a 'needs_facts' response so the agent can gather them.")
     public Map<String, Object> estimateQuarterlyPayment(
-            @ToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
-            @ToolParam(description = "ISO date (YYYY-MM-DD). Required because the fact graph has no clock.")
+            @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @McpToolParam(description = "ISO date (YYYY-MM-DD). Required because the fact graph has no clock.")
                     String asOfDate) {
 
         LocalDate asOf = LocalDate.parse(asOfDate);
@@ -684,28 +702,28 @@ public class PlanningTools {
                     + "profile data, and previous answers. Returns candidate facts that require "
                     + "confirmation, review conflicts, and the next applicable questions.")
     public Object planQuestions(
-            @ToolParam(
+            @McpToolParam(
                             description =
                                     "Optional planning session id. If supplied, the session's facts are merged in.",
                             required = false)
                     String sessionId,
-            @ToolParam(description = "Tax year to plan for. Defaults to 2025.", required = false) Integer taxYear,
-            @ToolParam(description = "Jurisdiction. Defaults to 'federal'.", required = false) String jurisdiction,
-            @ToolParam(
+            @McpToolParam(description = "Tax year to plan for. Defaults to 2025.", required = false) Integer taxYear,
+            @McpToolParam(description = "Jurisdiction. Defaults to 'federal'.", required = false) String jurisdiction,
+            @McpToolParam(
                             description = "Optional fact map. Values may be raw values or {value, status}; "
                                     + "status defaults to confirmed.",
                             required = false)
                     Map<String, Object> facts,
-            @ToolParam(
+            @McpToolParam(
                             description = "Document evidence. Items may be strings like 'form_w2' or objects with "
                                     + "documentType plus arbitrary fields.",
                             required = false)
                     List<Object> evidence,
-            @ToolParam(description = "Taxpayer profile signals, such as prior_year_topics.", required = false)
+            @McpToolParam(description = "Taxpayer profile signals, such as prior_year_topics.", required = false)
                     Map<String, Object> profile,
-            @ToolParam(description = "Include questions already answered in this session.", required = false)
+            @McpToolParam(description = "Include questions already answered in this session.", required = false)
                     Boolean includeAnswered,
-            @ToolParam(description = "Maximum applicable questions to return.", required = false) Integer limit) {
+            @McpToolParam(description = "Maximum applicable questions to return.", required = false) Integer limit) {
 
         Map<String, Object> mergedFacts = new LinkedHashMap<>();
         if (sessionId != null && !sessionId.isBlank()) {

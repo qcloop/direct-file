@@ -156,12 +156,12 @@ class PlanReportTest {
 
     @Test
     void exportPlanToolReturnsTheArtifactWithoutPersisting() {
-        Map<String, Object> out = tools.exportPlan(seededSession(), null);
+        PlanningTools.ExportPlanResult out = tools.exportPlan(seededSession(), null);
 
-        assertThat(out).containsEntry("status", "ok");
-        assertThat(out).containsEntry("tax_year", 2025);
-        assertThat(out).containsEntry("hash_algorithm", "SHA-256");
-        assertThat((String) out.get("sha256")).matches("[0-9a-f]{64}");
-        assertThat((String) out.get("report_markdown")).contains("Tax Year 2025");
+        assertThat(out.status()).isEqualTo("ok");
+        assertThat(out.taxYear()).isEqualTo(2025);
+        assertThat(out.hashAlgorithm()).isEqualTo("SHA-256");
+        assertThat(out.sha256()).matches("[0-9a-f]{64}");
+        assertThat(out.reportMarkdown()).contains("Tax Year 2025");
     }
 }

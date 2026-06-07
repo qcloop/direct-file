@@ -448,10 +448,31 @@ public class PlanningGraphService {
 
     public record WriteResult(boolean ok, List<String> violations) {}
 
-    public record ReadResult(String path, Object value, String typeName, boolean complete, String note) {}
+    // ReadResult/ExplainResult are returned by the get_fact/explain MCP tools, which publish an MCP
+    // outputSchema (via @McpTool generateOutputSchema). The schema generator marks every String field
+    // `required: string`, so a null string makes the result fail output-schema validation. Normalize
+    // the descriptive strings to "" here (null `value` stays null — it maps to a permissive `{}`
+    // schema). path is always supplied non-null by callers.
+    public record ReadResult(String path, Object value, String typeName, boolean complete, String note) {
+        public ReadResult {
+            typeName = typeName == null ? "" : typeName;
+            note = note == null ? "" : note;
+        }
+    }
 
     public record ExplainResult(
             String path, String name, String description, Object value, boolean complete, List<Dep> dependencies) {
-        public record Dep(String path, String name, String description, Object value, boolean complete) {}
+        public ExplainResult {
+            name = name == null ? "" : name;
+            description = description == null ? "" : description;
+            dependencies = dependencies == null ? List.of() : dependencies;
+        }
+
+        public record Dep(String path, String name, String description, Object value, boolean complete) {
+            public Dep {
+                name = name == null ? "" : name;
+                description = description == null ? "" : description;
+            }
+        }
     }
 }
