@@ -69,10 +69,12 @@ on `PlanningTools` (camelCase, not snake_case).
 
 | Tool                          | Purpose                                                |
 | ----------------------------- | ------------------------------------------------------ |
-| `create_session`              | Allocate a new in-memory planning session              |
+| `create_session`              | Allocate a new in-memory planning session (year + filing status) |
 | `get_fact`                    | Read a fact from a session's graph                     |
 | `set_fact`                    | Write a value to a writable fact                       |
 | `calculate_se_tax`            | Schedule C/SE tax from full-year figures               |
+| `calculate_additional_medicare` | Form 8959 0.9% Additional Medicare Tax (wage + SE portions) |
+| `estimate_qbi_deduction`      | Form 8995 / §199A 20% QBI deduction (simple method)    |
 | `project_net_profit`          | Project full-year net profit + SE tax from YTD figures |
 | `explain`                     | One-level derivation explanation for a fact            |
 | `cite`                        | Legal authority behind a fact + plain-language explanation |
