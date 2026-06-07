@@ -9,6 +9,29 @@ spring:
         # Identity advertised in the MCP initialize handshake.
         name: df-plan-service
         version: 0.0.1
+        # Guidance returned in the MCP initialize handshake. MCP clients typically
+        # surface this at system-prompt level, so it is the strongest lever for making
+        # the calling LLM DEFER to this server instead of answering tax questions from
+        # its own (often subtly wrong) priors. Keep it short and directive; the concrete
+        # mileage example is load-bearing — it is the canonical case a general model
+        # gets wrong.
+        instructions: >-
+          This server encodes IRS-correct tax-planning logic for self-employed and
+          gig/delivery filers. Defer to it: do not invent tax interview questions,
+          amounts, or rules from general knowledge.
+
+
+          Before asking the taxpayer any interview question, call plan_questions and ask
+          what it returns, in the order returned — its sequencing reflects tax rules a
+          general model gets wrong. Example: for a driver it asks for business MILES,
+          not gas/maintenance/phone receipts, because the standard mileage rate already
+          includes those costs, so itemizing them on top would double-count.
+
+
+          For any figure (self-employment tax, the QBI deduction, quarterly estimated
+          payments, net profit), call the matching calculation tool rather than
+          estimating, and use cite/explain to show the IRS source behind it. Treat
+          candidate facts as values to CONFIRM with the taxpayer, never as established.
         # SYNC keeps the blocking tool implementations (fact-graph calls) as-is; the
         # WebFlux transport dispatches them off the event loop. ASYNC is only useful
         # if individual tools become non-blocking.

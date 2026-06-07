@@ -752,10 +752,14 @@ public class PlanningTools {
     @McpTool(
             generateOutputSchema = false,
             name = "plan_questions",
-            description = "Plan relevant tax interview questions from tax-knowledge artifacts. "
-                    + "Inputs may include current session facts, document evidence, prior-year "
-                    + "profile data, and previous answers. Returns candidate facts that require "
-                    + "confirmation, review conflicts, and the next applicable questions.")
+            description = "Plan the next tax interview questions from IRS-backed tax-knowledge artifacts. "
+                    + "Call this BEFORE asking the taxpayer any interview question, and ask what it "
+                    + "returns in the order returned — do not invent your own questions; the sequencing "
+                    + "encodes tax rules a general model gets wrong (e.g. it asks a driver for business "
+                    + "miles, not gas/maintenance receipts, which the standard mileage rate already covers). "
+                    + "Inputs may include current session facts, document evidence, prior-year profile "
+                    + "data, and previous answers. Returns candidate facts that require confirmation, "
+                    + "review conflicts, and the next applicable questions.")
     public TaxKnowledgeService.PlanResult planQuestions(
             @McpToolParam(
                             description =

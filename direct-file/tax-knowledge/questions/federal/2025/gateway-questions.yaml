@@ -58,8 +58,8 @@ questions:
   - question_id: se_vehicle_business_miles
     topic_id: self_employment
     prompt: How many business miles did you drive for this work in 2025?
-    help_text: Do not include commuting miles or personal driving.
-    why_we_ask: Business miles are needed to calculate the standard mileage deduction.
+    help_text: Do not include commuting miles or personal driving. Use the standard mileage method here — ask for miles, not gas/maintenance/insurance/depreciation receipts, because the standard mileage rate already includes all of those vehicle costs.
+    why_we_ask: For most drivers the standard mileage deduction is the largest single deduction and is simpler than tracking actual vehicle costs; it already bundles gas, maintenance, insurance, and depreciation, so business miles are the only input needed.
     writes:
       - /seVehicleBusinessMiles
     asks_when:
@@ -100,7 +100,7 @@ questions:
   - question_id: se_supplies_and_other_expenses
     topic_id: self_employment
     prompt: Did you have other business expenses for this work — supplies, an insulated bag, the business-use portion of your phone, etc.?
-    help_text: Include the ordinary and necessary costs of doing the work. Do not include vehicle mileage, which is captured separately.
+    help_text: Include the ordinary and necessary costs of doing the work. Do NOT include gas, car maintenance, insurance, or depreciation — those vehicle costs are already covered by the standard mileage deduction (captured separately as business miles), and deducting them here too would double-count.
     why_we_ask: Other ordinary business expenses further reduce your net profit and self-employment tax.
     writes:
       - /seSuppliesAndOther
