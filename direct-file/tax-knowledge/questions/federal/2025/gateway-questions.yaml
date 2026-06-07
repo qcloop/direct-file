@@ -78,6 +78,63 @@ questions:
     source_ids:
       - se_standard_mileage_vehicle_deduction_ty2025
 
+  - question_id: se_platform_fees
+    topic_id: self_employment
+    prompt: Did the platforms you worked for (Uber, Lyft, DoorDash, Instacart, etc.) keep commissions or service fees out of your pay?
+    help_text: These are amounts the platform withheld; they are deductible business expenses on Schedule C, separate from vehicle mileage.
+    why_we_ask: Platform and commission fees reduce your net self-employment profit and the self-employment tax on it.
+    writes:
+      - /sePlatformFees
+    asks_when:
+      all:
+        - fact: /hasSelfEmploymentIncome
+          equals: true
+    skip_when:
+      any:
+        - fact: /hasSelfEmploymentIncome
+          equals: false
+    priority: detail
+    source_ids:
+      - irs_instruction_1040_schedule_c_2025
+
+  - question_id: se_supplies_and_other_expenses
+    topic_id: self_employment
+    prompt: Did you have other business expenses for this work — supplies, an insulated bag, the business-use portion of your phone, etc.?
+    help_text: Include the ordinary and necessary costs of doing the work. Do not include vehicle mileage, which is captured separately.
+    why_we_ask: Other ordinary business expenses further reduce your net profit and self-employment tax.
+    writes:
+      - /seSuppliesAndOther
+    asks_when:
+      all:
+        - fact: /hasSelfEmploymentIncome
+          equals: true
+    skip_when:
+      any:
+        - fact: /hasSelfEmploymentIncome
+          equals: false
+    priority: detail
+    source_ids:
+      - irs_instruction_1040_schedule_c_2025
+
+  - question_id: se_prior_year_total_tax
+    topic_id: self_employment
+    prompt: To plan your quarterly estimated payments, what was your total federal tax last year (Form 1040, line 24)?
+    help_text: Gig pay usually has no withholding, so you may owe quarterly estimated tax. Last year's tax sets the safe-harbor target.
+    why_we_ask: The IRC §6654 safe harbor is a percentage of your prior-year tax, so it anchors the quarterly-payment estimate.
+    writes:
+      - /planning/priorYearTotalTax
+    asks_when:
+      all:
+        - fact: /hasSelfEmploymentIncome
+          equals: true
+    skip_when:
+      any:
+        - fact: /hasSelfEmploymentIncome
+          equals: false
+    priority: detail
+    source_ids:
+      - irs_form_1040_es_2025
+
   - question_id: has_digital_asset_activity
     topic_id: digital_assets
     prompt: At any time during 2025, did you receive, sell, exchange, or otherwise dispose of digital assets?

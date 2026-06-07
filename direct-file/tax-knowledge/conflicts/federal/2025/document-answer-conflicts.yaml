@@ -35,6 +35,22 @@ conflicts:
       - irs_instruction_1040_schedule_c_2025
     owner: small_business_tax_specialist
 
+  - conflict_id: no_self_employment_but_1099_k_present
+    status: draft
+    when:
+      all:
+        - fact: /hasSelfEmploymentIncome
+          equals: false
+          status: confirmed
+        - evidence: form_1099_k
+          exists: true
+    severity: review_required
+    message: A Form 1099-K is present, but the taxpayer said they did not have self-employment income.
+    resolution_prompt: Ask whether the 1099-K reflects business or gig sales or only personal payments; only the business portion belongs on Schedule C.
+    source_ids:
+      - irs_instruction_1040_schedule_c_2025
+    owner: small_business_tax_specialist
+
   - conflict_id: prior_year_schedule_c_but_current_year_denied
     status: draft
     when:
