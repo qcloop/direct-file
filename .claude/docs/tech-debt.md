@@ -42,3 +42,9 @@ is resolved, delete it (git history keeps the record).
   multi-step library.
 - **Doc-gardening is manual.** The drift gate (`ToolDocumentationDriftTest`) catches the README tool
   list; broader staleness (architecture.md, this file) could be swept on a schedule.
+- **Only `create_session` publishes an MCP `outputSchema`/`structuredContent`** (it uses the
+  `@McpTool` path). The other 11 tools use `@Tool` + `MethodToolCallbackProvider`, which emits no
+  output schema in spring-ai 2.0.0-M8. If clients want structured output across the board, migrate
+  the rest to `@McpTool` with typed result records — but watch the schema-gen bugs (no `@JsonProperty`
+  renames; avoid nullable/optional fields, or they're marked required and fail validation). Revisit
+  at spring-ai 2.0.0 GA, where the generator may improve.

@@ -27,6 +27,16 @@ Newest last. Each entry: the decision, the reason, and the alternative rejected.
   `HttpStatus`) + explicit `jackson-databind`, NOT `spring-boot-starter-web`. A web starter on a
   library forces every consumer into SERVLET mode and broke the reactive `/mcp` router. Enforced by
   `WebStackFreeConstraintTest`.
+- **`create_session` uses the `@McpTool` annotation path (others use `@Tool`)** so the server
+  publishes a real MCP `outputSchema` + matching `structuredContent` that strict clients can
+  validate. *Why:* in spring-ai 2.0.0-M8 the `@Tool`/`MethodToolCallbackProvider` path emits **no**
+  output schema regardless of return type (verified) — `@McpTool` + `generateOutputSchema=true` is
+  the only way. The two paths coexist (annotation scanner + `MethodToolCallbackProvider`). To dodge
+  the known schema-gen bugs ([spring-ai#4825](https://github.com/spring-projects/spring-ai/issues/4825),
+  [#4487](https://github.com/spring-projects/spring-ai/issues/4487)) the result record uses no
+  `@JsonProperty` (schema names == content names) and a non-null `provisionalWarning` (empty string
+  when finalized, so the `required` schema validates). *Trade-off:* the output contract became
+  camelCase + schema-backed (was snake_case `Map`).
 
 ## df-plan-service tax modeling
 

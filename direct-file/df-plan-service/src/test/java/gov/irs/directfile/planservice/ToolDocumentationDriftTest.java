@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.tool.annotation.Tool;
 
 import gov.irs.directfile.planservice.mcp.PlanningTools;
@@ -32,11 +33,17 @@ class ToolDocumentationDriftTest {
 
         List<String> undocumented = new ArrayList<>();
         for (Method m : PlanningTools.class.getDeclaredMethods()) {
+            // Tools register via either @Tool (MethodToolCallbackProvider) or @McpTool (annotation scanner).
             Tool tool = m.getAnnotation(Tool.class);
-            if (tool == null) {
+            McpTool mcpTool = m.getAnnotation(McpTool.class);
+            String name;
+            if (tool != null) {
+                name = tool.name().isBlank() ? m.getName() : tool.name();
+            } else if (mcpTool != null) {
+                name = mcpTool.name().isBlank() ? m.getName() : mcpTool.name();
+            } else {
                 continue;
             }
-            String name = tool.name().isBlank() ? m.getName() : tool.name();
             // Expect the wire name in backticks, matching the README's tool table format.
             if (!readme.contains("`" + name + "`")) {
                 undocumented.add(name);

@@ -29,7 +29,7 @@ class AdditionalMedicareTaxTest {
 
     @Test
     void singleFilerSeOnlyOverTheTwoHundredKThreshold() {
-        String sid = (String) tools.createSession("2025", "single").get("sessionId");
+        String sid = tools.createSession("2025", "single").sessionId();
         // Net profit $300,000, no expenses -> net earnings = 300,000 x 92.35% = $277,050.
         tools.calculateSeTax(sid, "300000", null, null, null, null);
 
@@ -45,7 +45,7 @@ class AdditionalMedicareTaxTest {
 
     @Test
     void mfjW2WagesReduceTheThresholdRemainingForSeIncome() {
-        String sid = (String) tools.createSession("2025", "mfj").get("sessionId");
+        String sid = tools.createSession("2025", "mfj").sessionId();
         // Net profit $200,000 -> net earnings = 200,000 x 92.35% = $184,700.
         tools.calculateSeTax(sid, "200000", null, null, null, null);
 
@@ -63,7 +63,7 @@ class AdditionalMedicareTaxTest {
 
     @Test
     void wagePortionAppliesWhenW2WagesAloneExceedTheThreshold() {
-        String sid = (String) tools.createSession("2025", "single").get("sessionId");
+        String sid = tools.createSession("2025", "single").sessionId();
         tools.calculateSeTax(sid, "0", null, null, null, null); // no SE income
 
         // $220,000 Medicare wages, single threshold $200,000: wage portion = 20,000 x 0.9% = $180.

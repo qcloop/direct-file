@@ -67,14 +67,13 @@ class PlanningAgentEvalTest {
     private void runScenario(JsonNode scenario, Map<String, ToolCallback> tools) throws Exception {
         String name = scenario.get("name").asText();
 
-        // Create the session through the real create_session tool so the eval exercises it too.
-        ObjectNode createArgs = objectMapper.createObjectNode();
-        createArgs.put("taxYear", scenario.get("taxYear").asText());
-        createArgs.put("filingStatus", scenario.get("filingStatus").asText());
-        String sessionId = objectMapper
-                .readTree(invoke(tools, "create_session", createArgs))
-                .get("sessionId")
-                .asText();
+        // create_session is registered via the @McpTool annotation path (not @Tool), so it isn't in
+        // the MethodToolCallbackProvider used for the step tools below; call it directly for setup.
+        String sessionId = planningTools
+                .createSession(
+                        scenario.get("taxYear").asText(),
+                        scenario.get("filingStatus").asText())
+                .sessionId();
 
         for (JsonNode step : scenario.get("steps")) {
             String tool = step.get("tool").asText();

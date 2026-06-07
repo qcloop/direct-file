@@ -6,6 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.ai.mcp.annotation.McpTool;
+import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
@@ -102,7 +104,11 @@ public class PlanningTools {
         this.citationService = citationService;
     }
 
-    @Tool(
+    // create_session uses the @McpTool annotation path (not @Tool) so Spring AI publishes a real MCP
+    // outputSchema and matching structuredContent for it. This coexists with the @Tool tools: the
+    // annotation scanner registers @McpTool methods, while McpServerConfig's MethodToolCallbackProvider
+    // registers the @Tool methods on the same bean.
+    @McpTool(
             name = "create_session",
             description = "Create a new in-memory planning session for a tax year and return its id. "
                     + "The session is seeded with that year's indexed tax constants (standard mileage "
@@ -110,13 +116,14 @@ public class PlanningTools {
                     + "constants the call fails rather than silently using another year's rates. All "
                     + "subsequent tool calls require this id. Sessions are not persisted and live only "
                     + "for the duration of the server process — if a later call reports an "
-                    + "unknown/expired session, call this again and re-enter the facts.")
-    public Map<String, Object> createSession(
-            @ToolParam(
+                    + "unknown/expired session, call this again and re-enter the facts.",
+            generateOutputSchema = true)
+    public CreateSessionResult createSession(
+            @McpToolParam(
                             description = "Tax year to plan for, e.g. \"2025\". Defaults to the current calendar year.",
                             required = false)
                     String taxYear,
-            @ToolParam(
+            @McpToolParam(
                             description = "Filing status: single | mfj | mfs. Defaults to single. Drives"
                                     + " filing-status thresholds such as the Additional Medicare Tax line."
                                     + " Head-of-household and qualifying surviving spouse use the 'single'"
@@ -126,14 +133,24 @@ public class PlanningTools {
         int year = (taxYear == null || taxYear.isBlank())
                 ? java.time.Year.now().getValue()
                 : Integer.parseInt(taxYear.trim());
-        Map<String, Object> out = new LinkedHashMap<>();
         String sessionId = graph.createSession(year, filingStatus);
-        out.put("sessionId", sessionId);
-        out.put("taxYear", year);
-        out.put("filing_status", graph.filingStatusOf(sessionId));
-        addProvisionalWarning(out, year);
-        return out;
+        String warning = taxKnowledge.provisionalWarning(year);
+        return new CreateSessionResult(
+                sessionId, year, graph.filingStatusOf(sessionId), warning == null ? "" : warning);
     }
+
+    /**
+     * Structured result of {@code create_session}. Returned as a typed record (via the {@code @McpTool}
+     * path with {@code generateOutputSchema=true}) so the server publishes an accurate MCP
+     * {@code outputSchema} and matching {@code structuredContent} that strict clients can validate.
+     *
+     * <p>Two deliberate choices avoid spring-ai's known schema-generation pitfalls: no
+     * {@code @JsonProperty} renames (the schema generator ignores them, which would desync schema
+     * field names from the serialized content), so the wire names are the record component names; and
+     * {@code provisionalWarning} is always present (empty string when the year is finalized) rather
+     * than nullable, since generators tend to mark every property required.
+     */
+    public record CreateSessionResult(String sessionId, int taxYear, String filingStatus, String provisionalWarning) {}
 
     /**
      * Attach a {@code provisional_warning} to a tool response when the session's tax year carries

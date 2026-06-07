@@ -82,6 +82,26 @@ on `PlanningTools` (camelCase, not snake_case).
 | `export_plan`                 | Sealed, printable summary the taxpayer keeps (nothing stored) |
 | `plan_questions`              | Plan next interview questions from tax-knowledge YAML  |
 
+### Structured output (`create_session`)
+
+`create_session` is registered via the `@McpTool` annotation path (the others use `@Tool`), so it
+publishes an MCP `outputSchema` and returns matching `structuredContent`. Clients that validate
+structured output (per MCP spec 2025-06-18+) should validate against the advertised schema and **not**
+pin a closed (`additionalProperties: false`) schema of their own — tool outputs evolve additively.
+
+Its output fields (camelCase wire names, matching the schema):
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `sessionId` | string | Pass to every subsequent tool call. |
+| `taxYear` | integer | The planning tax year. |
+| `filingStatus` | string | `single` \| `mfj` \| `mfs`. |
+| `provisionalWarning` | string | Empty when the year is finalized; warning text when the year's constants are provisional (e.g. 2026). |
+
+> Contract note: this is the camelCase, schema-backed shape. It supersedes the earlier `Map`-shaped
+> output that used snake_case keys (`filing_status`, `provisional_warning`) and omitted the warning
+> key when absent. Consumers validating the result must use these field names.
+
 ## Build prerequisites
 
 This module depends on two things the open-source Direct File repo does not

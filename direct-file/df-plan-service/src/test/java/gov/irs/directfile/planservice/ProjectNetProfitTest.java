@@ -29,7 +29,7 @@ class ProjectNetProfitTest {
 
     @Test
     void annualizesYearToDateFiguresToAFullYear() {
-        String sid = (String) tools.createSession("2025", null).get("sessionId");
+        String sid = tools.createSession("2025", null).sessionId();
 
         // Seven months of data (through July 1). Numbers chosen to annualize cleanly (× 12/7).
         Map<String, Object> out = tools.projectNetProfit(sid, "2025-07-01", "21000", "7000", "1750", "0", "0");
@@ -56,7 +56,7 @@ class ProjectNetProfitTest {
 
     @Test
     void directFullYearPathIsUnchangedByAnnualization() {
-        String sid = (String) tools.createSession("2025", null).get("sessionId");
+        String sid = tools.createSession("2025", null).sessionId();
 
         // calculate_se_tax writes an annualization factor of 1/1, so full-year actuals pass through.
         tools.calculateSeTax(sid, "40000", "10000", "3000", "1000", "0");
@@ -80,7 +80,7 @@ class ProjectNetProfitTest {
     @Test
     void flagsProvisionalConstantsForADraftYearButNotAFinalizedOne() {
         // 2026's mileage rate and wage base are provisional (draft); the tool must say so, naming them.
-        String s2026 = (String) tools.createSession("2026", null).get("sessionId");
+        String s2026 = tools.createSession("2026", null).sessionId();
         Map<String, Object> out2026 = tools.projectNetProfit(s2026, "2026-07-01", "21000", "7000", "0", "0", "0");
         assertThat((String) out2026.get("provisional_warning"))
                 .contains("2026")
@@ -88,20 +88,20 @@ class ProjectNetProfitTest {
                 .contains("Social Security wage base");
 
         // 2025 is finalized — no warning.
-        String s2025 = (String) tools.createSession("2025", null).get("sessionId");
+        String s2025 = tools.createSession("2025", null).sessionId();
         Map<String, Object> out2025 = tools.projectNetProfit(s2025, "2025-07-01", "21000", "7000", "0", "0", "0");
         assertThat(out2025).doesNotContainKey("provisional_warning");
     }
 
     @Test
     void createSessionWarnsOnlyForADraftYear() {
-        assertThat(tools.createSession("2026", null)).containsKey("provisional_warning");
-        assertThat(tools.createSession("2025", null)).doesNotContainKey("provisional_warning");
+        assertThat(tools.createSession("2026", null).provisionalWarning()).isNotEmpty();
+        assertThat(tools.createSession("2025", null).provisionalWarning()).isEmpty();
     }
 
     @Test
     void refusesToProjectFromBeforeTheTaxYearStarted() {
-        String sid = (String) tools.createSession("2025", null).get("sessionId");
+        String sid = tools.createSession("2025", null).sessionId();
 
         assertThatThrownBy(() -> tools.projectNetProfit(sid, "2024-11-30", "5000", "0", "0", "0", "0"))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -112,7 +112,7 @@ class ProjectNetProfitTest {
     void refusesToProjectFromAfterTheTaxYearEndedInsteadOfSilentlyClampingToAFullYear() {
         // Bug 1 repro: a 2025 session with a 2026 asOfDate must NOT clamp to 12 months (factor 12/12),
         // which would silently return the year-to-date figure unchanged as if it were full-year.
-        String sid = (String) tools.createSession("2025", null).get("sessionId");
+        String sid = tools.createSession("2025", null).sessionId();
 
         assertThatThrownBy(() -> tools.projectNetProfit(sid, "2026-05-31", "11690", "15000", "0", "0", "0"))
                 .isInstanceOf(IllegalArgumentException.class)

@@ -28,7 +28,7 @@ class QbiDeductionTest {
     PlanningTools tools;
 
     private String sessionWith60kProfit(String filingStatus) {
-        String sid = (String) tools.createSession("2025", filingStatus).get("sessionId");
+        String sid = tools.createSession("2025", filingStatus).sessionId();
         tools.calculateSeTax(sid, "60000", null, null, null, null);
         return sid;
     }
