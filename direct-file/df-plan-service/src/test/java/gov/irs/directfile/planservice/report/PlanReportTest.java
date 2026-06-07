@@ -1,7 +1,5 @@
 package gov.irs.directfile.planservice.report;
 
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -114,23 +112,19 @@ class PlanReportTest {
 
         // Self-employment tax flows from the Schedule SE rates and the SSA wage base, so those are
         // the authorities the cite tool surfaces — derived from the computation, not hand-mapped.
-        Map<String, Object> seTax = tools.cite(sid, "/seTax");
-        assertThat(seTax).containsEntry("status", "ok");
-        @SuppressWarnings("unchecked")
-        var authorities = (java.util.List<Map<String, Object>>) seTax.get("authorities");
-        assertThat(authorities).isNotEmpty();
-        assertThat(authorities).anySatisfy(a -> {
-            assertThat((String) a.get("citation")).contains("Schedule SE");
-            assertThat((String) a.get("plain_language")).isNotBlank();
-            assertThat((String) a.get("url")).startsWith("http");
+        var seTax = tools.cite(sid, "/seTax");
+        assertThat(seTax.status()).isEqualTo("ok");
+        assertThat(seTax.authorities()).isNotEmpty();
+        assertThat(seTax.authorities()).anySatisfy(a -> {
+            assertThat(a.citation()).contains("Schedule SE");
+            assertThat(a.plainLanguage()).isNotBlank();
+            assertThat(a.url()).startsWith("http");
         });
 
         // The safe-harbor target is governed by IRC § 6654.
-        Map<String, Object> safeHarbor = tools.cite(sid, "/planning/safeHarborTarget");
-        @SuppressWarnings("unchecked")
-        var shAuthorities = (java.util.List<Map<String, Object>>) safeHarbor.get("authorities");
-        assertThat(shAuthorities)
-                .anySatisfy(a -> assertThat((String) a.get("citation")).contains("§ 6654"));
+        var safeHarbor = tools.cite(sid, "/planning/safeHarborTarget");
+        assertThat(safeHarbor.authorities())
+                .anySatisfy(a -> assertThat(a.citation()).contains("§ 6654"));
     }
 
     @Test

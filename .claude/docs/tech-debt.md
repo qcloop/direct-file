@@ -42,9 +42,11 @@ is resolved, delete it (git history keeps the record).
   multi-step library.
 - **Doc-gardening is manual.** The drift gate (`ToolDocumentationDriftTest`) catches the README tool
   list; broader staleness (architecture.md, this file) could be swept on a schedule.
-- **Only `create_session` publishes an MCP `outputSchema`/`structuredContent`** (it uses the
-  `@McpTool` path). The other 11 tools use `@Tool` + `MethodToolCallbackProvider`, which emits no
-  output schema in spring-ai 2.0.0-M8. If clients want structured output across the board, migrate
-  the rest to `@McpTool` with typed result records — but watch the schema-gen bugs (no `@JsonProperty`
-  renames; avoid nullable/optional fields, or they're marked required and fail validation). Revisit
-  at spring-ai 2.0.0 GA, where the generator may improve.
+- **All 12 MCP tools now use the `@McpTool` path** and publish a conforming `outputSchema` +
+  `structuredContent` — except `plan_questions` (`generateOutputSchema = false`), whose open
+  interview-planning `PlanResult` has nested records with business-significant null fields
+  (e.g. `CandidateFact.sourceField` drives `withEvidence()`); giving it a strict schema would
+  require coercing those nulls and changing behavior. If a strict schema for it is ever wanted,
+  build an output-only DTO that projects `PlanResult` with non-null strings rather than mutating
+  the shared records. Revisit the whole approach at spring-ai 2.0.0 GA (the schema generator and
+  its null-field handling may improve, allowing simpler typed returns).

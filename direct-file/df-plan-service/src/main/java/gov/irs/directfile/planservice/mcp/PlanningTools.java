@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpToolParam;
-import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
 import gov.irs.directfile.planservice.citation.CitationService;
@@ -22,14 +21,18 @@ import gov.irs.directfile.planservice.report.PlanReportService.PlanReport;
 /**
  * Spring AI MCP tools exposed by df-plan-service.
  *
- * <p>Each {@code @Tool}-annotated method is auto-registered with the MCP server via
- * {@link gov.irs.directfile.planservice.config.McpServerConfig#planningToolCallbacks}.
- * Spring AI introspects the method signature to produce the JSON Schema advertised
- * in {@code tools/list}, and routes incoming {@code tools/call} invocations here.
+ * <p>Every method is annotated with {@code @McpTool} and is auto-registered with the MCP server by
+ * Spring AI's annotation scanner. {@code generateOutputSchema = true} makes the server publish an MCP
+ * {@code outputSchema} for each tool and return matching {@code structuredContent}; tools therefore
+ * return typed records (not {@code Map}). plan_questions is the one exception
+ * ({@code generateOutputSchema = false}) — its result is an open interview-planning structure whose
+ * nested records carry business-significant null fields, so it is left without a strict schema.
  *
- * <p>Wire-format note: parameter names in the generated JSON Schema follow the Java
- * camelCase identifiers ({@code sessionId}, {@code asOfDate}). This is a deliberate
- * break from the hand-rolled JSON-RPC server's snake_case shape.
+ * <p>Wire-format note: both the input parameter names and the output record field names are the Java
+ * camelCase identifiers ({@code sessionId}, {@code filingStatus}). No {@code @JsonProperty} renames —
+ * Spring AI's schema generator ignores them, which would desync the schema from the serialized
+ * content. Result records keep all descriptive strings non-null (empty when absent) and type
+ * heterogeneous/nullable fact values as {@code Object} so the generated schema validates.
  */
 @Component
 public class PlanningTools {
@@ -52,17 +55,8 @@ public class PlanningTools {
     /** Shared description for the {@code sessionId} tool parameter (returned by {@code create_session}). */
     private static final String SESSION_ID_DESCRIPTION = "Planning session id from create_session.";
 
-    /** Key for the status field returned by the tool responses. */
+    /** Key for the status field returned in the plan_questions confirmed-fact wrapper. */
     private static final String STATUS_KEY = "status";
-
-    /** Key for the free-text note field returned by several tool responses. */
-    private static final String NOTE_KEY = "note";
-
-    /** Key for the tax-year field echoed back in tool responses. */
-    private static final String TAX_YEAR_KEY = "tax_year";
-
-    /** Key for the derivation/explanation tree returned by the calculation tools. */
-    private static final String EXPLANATION_TREE_KEY = "explanation_tree";
 
     /** Self-employment tax fact path, read by several tools. */
     private static final String SE_TAX_PATH = "/seTax";
@@ -151,17 +145,6 @@ public class PlanningTools {
      */
     public record CreateSessionResult(String sessionId, int taxYear, String filingStatus, String provisionalWarning) {}
 
-    /**
-     * Attach a {@code provisional_warning} to a tool response when the session's tax year carries
-     * provisional (draft, unverified) constants, so the agent never presents those numbers as final.
-     */
-    private void addProvisionalWarning(Map<String, Object> out, int taxYear) {
-        String warning = taxKnowledge.provisionalWarning(taxYear);
-        if (warning != null) {
-            out.put("provisional_warning", warning);
-        }
-    }
-
     @McpTool(
             name = "get_fact",
             description = "Read a single fact from a planning session's fact graph. Returns the "
@@ -243,7 +226,8 @@ public class PlanningTools {
         return result;
     }
 
-    @Tool(
+    @McpTool(
+            generateOutputSchema = true,
             name = "calculate_se_tax",
             description = "Compute self-employment tax (Schedule SE) for a planning session from gross "
                     + "receipts and business expenses. Returns net profit, net earnings (92.35% of "
@@ -251,7 +235,7 @@ public class PlanningTools {
                     + "by any W-2 Social Security wages), the Medicare portion, total SE tax, and the "
                     + "deductible half. Use this to build the projected current-year tax that "
                     + "estimate_quarterly_payment needs.")
-    public Map<String, Object> calculateSeTax(
+    public SeTaxResult calculateSeTax(
             @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @McpToolParam(
                             description =
@@ -285,30 +269,43 @@ public class PlanningTools {
                 sessionId, "/seSocialSecurityWagesFromW2", DOLLAR_WRAPPER, dollarOrZero(socialSecurityWagesFromW2));
         graph.writeFact(sessionId, "/seAnnualizationFactor", RATIONAL_WRAPPER, Map.of("n", 1, "d", 1));
 
-        Map<String, Object> out = new LinkedHashMap<>();
-        out.put(STATUS_KEY, "ok");
         // Surface the tax year and the rate actually used, so a wrong-year session (e.g. planning
         // 2026 on a 2025 session) is visible rather than silently using stale constants.
-        out.put(TAX_YEAR_KEY, graph.taxYearOf(sessionId));
-        out.put("standard_mileage_rate", graph.readDecimal(sessionId, "/standardMileageRate"));
-        out.put("net_profit", graph.readFact(sessionId, SE_NET_PROFIT_PATH).value());
-        out.put(
-                "net_earnings_from_se",
-                graph.readFact(sessionId, "/seNetEarnings").value());
-        out.put(
-                "social_security_portion",
-                graph.readFact(sessionId, "/seSocialSecurityTax").value());
-        out.put("medicare_portion", graph.readFact(sessionId, "/seMedicareTax").value());
-        out.put("self_employment_tax", graph.readFact(sessionId, SE_TAX_PATH).value());
-        out.put(
-                "deductible_half",
-                graph.readFact(sessionId, "/deductibleHalfOfSETax").value());
-        out.put(EXPLANATION_TREE_KEY, graph.explain(sessionId, SE_TAX_PATH));
-        addProvisionalWarning(out, graph.taxYearOf(sessionId));
-        return out;
+        int year = graph.taxYearOf(sessionId);
+        return new SeTaxResult(
+                "ok",
+                year,
+                graph.readDecimal(sessionId, "/standardMileageRate"),
+                graph.readFact(sessionId, SE_NET_PROFIT_PATH).value(),
+                graph.readFact(sessionId, "/seNetEarnings").value(),
+                graph.readFact(sessionId, "/seSocialSecurityTax").value(),
+                graph.readFact(sessionId, "/seMedicareTax").value(),
+                graph.readFact(sessionId, SE_TAX_PATH).value(),
+                graph.readFact(sessionId, "/deductibleHalfOfSETax").value(),
+                graph.explain(sessionId, SE_TAX_PATH),
+                nullToEmpty(taxKnowledge.provisionalWarning(year)));
     }
 
-    @Tool(
+    /**
+     * Structured result of {@code calculate_se_tax}. Fact values are typed {@code Object} (they may be
+     * a dollar number or null when incomplete; {@code Object} maps to a permissive schema), strings are
+     * non-null, and the explanation tree is the null-safe {@link PlanningGraphService.ExplainResult}.
+     */
+    public record SeTaxResult(
+            String status,
+            int taxYear,
+            Object standardMileageRate,
+            Object netProfit,
+            Object netEarningsFromSe,
+            Object socialSecurityPortion,
+            Object medicarePortion,
+            Object selfEmploymentTax,
+            Object deductibleHalf,
+            PlanningGraphService.ExplainResult explanationTree,
+            String provisionalWarning) {}
+
+    @McpTool(
+            generateOutputSchema = true,
             name = "calculate_additional_medicare",
             description = "Compute the 0.9% Additional Medicare Tax (Form 8959) for a planning session. "
                     + "Run calculate_se_tax or project_net_profit first so the session has self-employment "
@@ -317,7 +314,7 @@ public class PlanningTools {
                     + "The surtax hits combined Medicare wages + SE income above the threshold — wages are "
                     + "counted first, reducing the threshold left for SE income. Returns the wage portion, "
                     + "the self-employment portion, and the total (Form 8959 Line 18).")
-    public Map<String, Object> calculateAdditionalMedicare(
+    public AdditionalMedicareResult calculateAdditionalMedicare(
             @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @McpToolParam(
                             description = "Medicare wages already reported on W-2 box 5 (wages subject to "
@@ -326,49 +323,51 @@ public class PlanningTools {
                     String medicareWagesFromW2) {
         graph.writeFact(sessionId, "/medicareWagesFromW2", DOLLAR_WRAPPER, dollarOrZero(medicareWagesFromW2));
 
-        Map<String, Object> out = new LinkedHashMap<>();
-        out.put(STATUS_KEY, "ok");
-        out.put(TAX_YEAR_KEY, graph.taxYearOf(sessionId));
-        out.put("filing_status", graph.filingStatusOf(sessionId));
-        out.put(
-                "additional_medicare_threshold",
-                graph.readFact(sessionId, "/additionalMedicareThreshold").value());
-        out.put(
-                "medicare_wages_from_w2",
-                graph.readFact(sessionId, "/medicareWagesFromW2").value());
-
         // The SE portion needs net earnings from a prior calculate_se_tax / project_net_profit call.
         // If they aren't populated yet, surface a note rather than silently returning a null SE portion.
         ReadResult netEarnings = graph.readFact(sessionId, "/seNetEarnings");
-        if (!netEarnings.complete()) {
-            out.put(
-                    NOTE_KEY,
-                    "Self-employment net earnings aren't set yet — run calculate_se_tax or project_net_profit"
-                            + " first for the SE portion. The wage portion (if any) is still computed.");
-        }
-        out.put("net_earnings_from_se", netEarnings.value());
-        out.put(
-                "se_income_over_threshold",
+        String note = netEarnings.complete()
+                ? ""
+                : "Self-employment net earnings aren't set yet — run calculate_se_tax or project_net_profit"
+                        + " first for the SE portion. The wage portion (if any) is still computed.";
+        int year = graph.taxYearOf(sessionId);
+        return new AdditionalMedicareResult(
+                "ok",
+                year,
+                graph.filingStatusOf(sessionId),
+                graph.readFact(sessionId, "/additionalMedicareThreshold").value(),
+                graph.readFact(sessionId, "/medicareWagesFromW2").value(),
+                netEarnings.value(),
                 graph.readFact(sessionId, "/seIncomeSubjectToAdditionalMedicare")
-                        .value());
-        out.put(
-                "additional_medicare_tax_on_se",
-                graph.readFact(sessionId, "/additionalMedicareTaxOnSE").value());
-        out.put(
-                "wages_over_threshold",
-                graph.readFact(sessionId, "/wagesSubjectToAdditionalMedicare").value());
-        out.put(
-                "additional_medicare_tax_on_wages",
-                graph.readFact(sessionId, "/additionalMedicareTaxOnWages").value());
-        out.put(
-                "additional_medicare_tax",
-                graph.readFact(sessionId, "/additionalMedicareTax").value());
-        out.put(EXPLANATION_TREE_KEY, graph.explain(sessionId, "/additionalMedicareTax"));
-        addProvisionalWarning(out, graph.taxYearOf(sessionId));
-        return out;
+                        .value(),
+                graph.readFact(sessionId, "/additionalMedicareTaxOnSE").value(),
+                graph.readFact(sessionId, "/wagesSubjectToAdditionalMedicare").value(),
+                graph.readFact(sessionId, "/additionalMedicareTaxOnWages").value(),
+                graph.readFact(sessionId, "/additionalMedicareTax").value(),
+                graph.explain(sessionId, "/additionalMedicareTax"),
+                note,
+                nullToEmpty(taxKnowledge.provisionalWarning(year)));
     }
 
-    @Tool(
+    /** Structured result of {@code calculate_additional_medicare} (Form 8959). */
+    public record AdditionalMedicareResult(
+            String status,
+            int taxYear,
+            String filingStatus,
+            Object additionalMedicareThreshold,
+            Object medicareWagesFromW2,
+            Object netEarningsFromSe,
+            Object seIncomeOverThreshold,
+            Object additionalMedicareTaxOnSe,
+            Object wagesOverThreshold,
+            Object additionalMedicareTaxOnWages,
+            Object additionalMedicareTax,
+            PlanningGraphService.ExplainResult explanationTree,
+            String note,
+            String provisionalWarning) {}
+
+    @McpTool(
+            generateOutputSchema = true,
             name = "estimate_qbi_deduction",
             description = "Estimate the 20% Qualified Business Income (QBI) deduction (Form 8995, IRC 199A) "
                     + "for a planning session. Run calculate_se_tax or project_net_profit first so the session "
@@ -377,7 +376,7 @@ public class PlanningTools {
                     + "income minus net capital gains). This is the SIMPLE Form 8995 method, valid when taxable "
                     + "income is at or below the filing-status threshold; above it, Form 8995-A wage/property "
                     + "limits apply and the result is only an upper bound (flagged in the response).")
-    public Map<String, Object> estimateQbiDeduction(
+    public QbiResult estimateQbiDeduction(
             @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @McpToolParam(
                             description = "Taxable income before the QBI deduction (Form 1040 taxable income "
@@ -395,41 +394,52 @@ public class PlanningTools {
                 dollarOrZero(taxableIncomeBeforeQbi));
         graph.writeFact(sessionId, "/planning/netCapitalGains", DOLLAR_WRAPPER, dollarOrZero(netCapitalGains));
 
-        Map<String, Object> out = new LinkedHashMap<>();
-        out.put(STATUS_KEY, "ok");
-        out.put(TAX_YEAR_KEY, graph.taxYearOf(sessionId));
-        out.put("filing_status", graph.filingStatusOf(sessionId));
-
         ReadResult netProfit = graph.readFact(sessionId, SE_NET_PROFIT_PATH);
-        if (!netProfit.complete()) {
-            out.put(
-                    NOTE_KEY,
-                    "Self-employment net profit isn't set yet — run calculate_se_tax or project_net_profit"
-                            + " first so QBI can be computed from it.");
-        }
-        out.put(
-                "qualified_business_income",
-                graph.readFact(sessionId, "/qualifiedBusinessIncome").value());
-        out.put("qbi_component", graph.readFact(sessionId, "/qbiComponent").value());
-        out.put("qbi_income_limit", graph.readFact(sessionId, "/qbiIncomeLimit").value());
-        out.put("qbi_deduction", graph.readFact(sessionId, "/qbiDeduction").value());
-        out.put("qbi_threshold", graph.readFact(sessionId, "/qbiThreshold").value());
-
+        String note = netProfit.complete()
+                ? ""
+                : "Self-employment net profit isn't set yet — run calculate_se_tax or project_net_profit"
+                        + " first so QBI can be computed from it.";
         ReadResult above = graph.readFact(sessionId, "/qbiAboveThreshold");
-        out.put("above_threshold", above.value());
-        if (Boolean.TRUE.equals(above.value())) {
-            out.put(
-                    "above_threshold_warning",
-                    "Taxable income is above the filing-status threshold for the simple method, so Form 8995-A"
-                            + " (specified-service-business, W-2-wage, and qualified-property limits) governs. The"
-                            + " qbi_deduction shown is an UPPER BOUND and may be reduced or eliminated.");
-        }
-        out.put(EXPLANATION_TREE_KEY, graph.explain(sessionId, "/qbiDeduction"));
-        addProvisionalWarning(out, graph.taxYearOf(sessionId));
-        return out;
+        String aboveWarning = Boolean.TRUE.equals(above.value())
+                ? "Taxable income is above the filing-status threshold for the simple method, so Form 8995-A"
+                        + " (specified-service-business, W-2-wage, and qualified-property limits) governs. The"
+                        + " qbiDeduction shown is an UPPER BOUND and may be reduced or eliminated."
+                : "";
+        int year = graph.taxYearOf(sessionId);
+        return new QbiResult(
+                "ok",
+                year,
+                graph.filingStatusOf(sessionId),
+                graph.readFact(sessionId, "/qualifiedBusinessIncome").value(),
+                graph.readFact(sessionId, "/qbiComponent").value(),
+                graph.readFact(sessionId, "/qbiIncomeLimit").value(),
+                graph.readFact(sessionId, "/qbiDeduction").value(),
+                graph.readFact(sessionId, "/qbiThreshold").value(),
+                above.value(),
+                aboveWarning,
+                graph.explain(sessionId, "/qbiDeduction"),
+                note,
+                nullToEmpty(taxKnowledge.provisionalWarning(year)));
     }
 
-    @Tool(
+    /** Structured result of {@code estimate_qbi_deduction} (Form 8995). */
+    public record QbiResult(
+            String status,
+            int taxYear,
+            String filingStatus,
+            Object qualifiedBusinessIncome,
+            Object qbiComponent,
+            Object qbiIncomeLimit,
+            Object qbiDeduction,
+            Object qbiThreshold,
+            Object aboveThreshold,
+            String aboveThresholdWarning,
+            PlanningGraphService.ExplainResult explanationTree,
+            String note,
+            String provisionalWarning) {}
+
+    @McpTool(
+            generateOutputSchema = true,
             name = "project_net_profit",
             description = "Project full-year self-employment net profit (and SE tax) from year-to-date "
                     + "raw numbers. Give the receipts, miles, fees, and supplies accumulated so far this "
@@ -438,7 +448,7 @@ public class PlanningTools {
                     + "profit, net earnings, and SE tax with a derivation chain. Assumes income is even "
                     + "across the year — for seasonal income or a known full-year figure, use "
                     + "calculate_se_tax with full-year numbers instead.")
-    public Map<String, Object> projectNetProfit(
+    public ProjectNetProfitResult projectNetProfit(
             @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @McpToolParam(
                             description = "ISO date (YYYY-MM-DD) the year-to-date figures run through. Required "
@@ -478,37 +488,41 @@ public class PlanningTools {
         graph.writeFact(sessionId, "/seMonthsElapsed", INT_WRAPPER, (long) monthsElapsed);
         graph.writeFact(sessionId, "/seAnnualizationFactor", RATIONAL_WRAPPER, Map.of("n", 12, "d", monthsElapsed));
 
-        Map<String, Object> out = new LinkedHashMap<>();
-        out.put(STATUS_KEY, "ok");
-        out.put(TAX_YEAR_KEY, taxYear);
-        out.put("standard_mileage_rate", graph.readDecimal(sessionId, "/standardMileageRate"));
-        out.put("months_elapsed", monthsElapsed);
-        out.put("annualization_factor", "12/" + monthsElapsed);
-        out.put("ytd_gross_receipts", dollarOrZero(ytdGrossReceipts));
-        out.put(
-                "projected_gross_receipts",
-                graph.readFact(sessionId, "/seEffectiveGrossReceipts").value());
-        out.put(
-                "projected_net_profit",
-                graph.readFact(sessionId, SE_NET_PROFIT_PATH).value());
-        out.put(
-                "projected_net_earnings_from_se",
-                graph.readFact(sessionId, "/seNetEarnings").value());
-        out.put(
-                "projected_self_employment_tax",
-                graph.readFact(sessionId, SE_TAX_PATH).value());
-        out.put(
-                "deductible_half",
-                graph.readFact(sessionId, "/deductibleHalfOfSETax").value());
-        out.put(
-                NOTE_KEY,
-                "Projected figures annualize your year-to-date numbers assuming income is even across "
-                        + "the year (straight-line). Seasonal income will differ. This projects "
-                        + "self-employment tax only; it does not include income tax.");
-        out.put(EXPLANATION_TREE_KEY, graph.explain(sessionId, SE_NET_PROFIT_PATH));
-        addProvisionalWarning(out, taxYear);
-        return out;
+        return new ProjectNetProfitResult(
+                "ok",
+                taxYear,
+                graph.readDecimal(sessionId, "/standardMileageRate"),
+                monthsElapsed,
+                "12/" + monthsElapsed,
+                dollarOrZero(ytdGrossReceipts),
+                graph.readFact(sessionId, "/seEffectiveGrossReceipts").value(),
+                graph.readFact(sessionId, SE_NET_PROFIT_PATH).value(),
+                graph.readFact(sessionId, "/seNetEarnings").value(),
+                graph.readFact(sessionId, SE_TAX_PATH).value(),
+                graph.readFact(sessionId, "/deductibleHalfOfSETax").value(),
+                "Projected figures annualize your year-to-date numbers assuming income is even across"
+                        + " the year (straight-line). Seasonal income will differ. This projects"
+                        + " self-employment tax only; it does not include income tax.",
+                graph.explain(sessionId, SE_NET_PROFIT_PATH),
+                nullToEmpty(taxKnowledge.provisionalWarning(taxYear)));
     }
+
+    /** Structured result of {@code project_net_profit} (year-to-date projection). */
+    public record ProjectNetProfitResult(
+            String status,
+            int taxYear,
+            Object standardMileageRate,
+            int monthsElapsed,
+            String annualizationFactor,
+            String ytdGrossReceipts,
+            Object projectedGrossReceipts,
+            Object projectedNetProfit,
+            Object projectedNetEarningsFromSe,
+            Object projectedSelfEmploymentTax,
+            Object deductibleHalf,
+            String note,
+            PlanningGraphService.ExplainResult explanationTree,
+            String provisionalWarning) {}
 
     @McpTool(
             name = "explain",
@@ -522,7 +536,8 @@ public class PlanningTools {
         return graph.explain(sessionId, path);
     }
 
-    @Tool(
+    @McpTool(
+            generateOutputSchema = true,
             name = "cite",
             description = "Explain the legal basis for a fact: returns the authorities (IRC sections, "
                     + "IRS forms/instructions/publications) behind the fact's value, each with a formal "
@@ -530,7 +545,7 @@ public class PlanningTools {
                     + "answer 'why / on what basis is this number what it is?'. Authorities are derived "
                     + "from the fact's actual computation, so a result cites every statutory constant it "
                     + "depends on.")
-    public Map<String, Object> cite(
+    public CiteResult cite(
             @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @McpToolParam(
                             description =
@@ -538,33 +553,30 @@ public class PlanningTools {
                     String path) {
         int taxYear = graph.taxYearOf(sessionId);
         ReadResult value = graph.readFact(sessionId, path);
-        List<Citation> found = citationService.citationsForFact(taxYear, path);
 
-        List<Map<String, Object>> authorities = new ArrayList<>();
-        for (Citation c : found) {
-            Map<String, Object> a = new LinkedHashMap<>();
-            a.put("source_id", c.sourceId());
-            a.put("authority", c.authority());
-            a.put("citation", c.citation());
-            a.put("title", c.title());
-            a.put("url", c.url());
-            a.put("plain_language", c.plainLanguage());
-            authorities.add(a);
+        List<Authority> authorities = new ArrayList<>();
+        for (Citation c : citationService.citationsForFact(taxYear, path)) {
+            authorities.add(new Authority(
+                    nullToEmpty(c.sourceId()),
+                    nullToEmpty(c.authority()),
+                    nullToEmpty(c.citation()),
+                    nullToEmpty(c.title()),
+                    nullToEmpty(c.url()),
+                    nullToEmpty(c.plainLanguage())));
         }
-
-        Map<String, Object> out = new LinkedHashMap<>();
-        out.put(STATUS_KEY, "ok");
-        out.put("path", path);
-        out.put("value", value.value());
-        out.put("authorities", authorities);
-        if (authorities.isEmpty()) {
-            out.put(
-                    NOTE_KEY,
-                    "No statutory authority is attached to this value — it is either a raw input you "
-                            + "provided or pure arithmetic with no tax-law constant behind it.");
-        }
-        return out;
+        String note = authorities.isEmpty()
+                ? "No statutory authority is attached to this value — it is either a raw input you provided"
+                        + " or pure arithmetic with no tax-law constant behind it."
+                : "";
+        return new CiteResult("ok", path, value.value(), authorities, note);
     }
+
+    /** One legal authority behind a fact (a resolved citation), all strings non-null. */
+    public record Authority(
+            String sourceId, String authority, String citation, String title, String url, String plainLanguage) {}
+
+    /** Structured result of {@code cite}. */
+    public record CiteResult(String status, String path, Object value, List<Authority> authorities, String note) {}
 
     @McpTool(
             name = "export_plan",
@@ -606,14 +618,15 @@ public class PlanningTools {
             String reportMarkdown,
             String note) {}
 
-    @Tool(
+    @McpTool(
+            generateOutputSchema = true,
             name = "estimate_quarterly_payment",
             description = "Compute the next federal estimated tax payment for a self-employed "
                     + "taxpayer using IRC §6654 safe-harbor logic (lesser of 100%/110% prior-year "
                     + "tax or 90% projected current-year tax). Returns the recommended payment, "
                     + "next deadline, and a derivation chain. If required facts are missing, "
                     + "returns a 'needs_facts' response so the agent can gather them.")
-    public Map<String, Object> estimateQuarterlyPayment(
+    public QuarterlyPaymentResult estimateQuarterlyPayment(
             @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @McpToolParam(description = "ISO date (YYYY-MM-DD). Required because the fact graph has no clock.")
                     String asOfDate) {
@@ -621,19 +634,28 @@ public class PlanningTools {
         LocalDate asOf = LocalDate.parse(asOfDate);
 
         // 1. Check that required writable facts are populated.
-        List<Map<String, String>> missing = new ArrayList<>();
+        List<MissingFact> missing = new ArrayList<>();
         for (RequiredFact rf : REQUIRED_FACTS) {
             ReadResult r = graph.readFact(sessionId, rf.path);
             if (!r.complete()) {
-                missing.add(Map.of("path", rf.path, "prompt", rf.prompt));
+                missing.add(new MissingFact(rf.path, rf.prompt));
             }
         }
         if (!missing.isEmpty()) {
-            Map<String, Object> out = new LinkedHashMap<>();
-            out.put(STATUS_KEY, "needs_facts");
-            out.put("missing_facts", missing);
-            out.put("hint", "Ask the user for these values, write each via set_fact, then call this tool again.");
-            return out;
+            return new QuarterlyPaymentResult(
+                    "needs_facts",
+                    missing,
+                    "Ask the user for these values, write each via set_fact, then call this tool again.",
+                    null,
+                    "",
+                    "",
+                    null,
+                    null,
+                    "",
+                    null,
+                    null,
+                    "",
+                    "");
         }
 
         // 2. Resolve the next deadline and remaining quarters for the session's tax year
@@ -661,47 +683,80 @@ public class PlanningTools {
         ReadResult projectedTax = graph.readFact(sessionId, "/planning/projectedCurrentYearTax");
         ReadResult balanceDueAtFiling = graph.readFact(sessionId, "/planning/projectedBalanceDueAtFiling");
 
+        // Keep the two questions distinct: the safe-harbor recommendation ("least to prepay to avoid
+        // the penalty") is not the same as what's actually owed for the year. derivation is a free-form
+        // map surfaced under the permissive `derivation` Object field.
         Map<String, Object> derivation = new LinkedHashMap<>();
-        derivation.put("self_employment_tax", seTax.value());
+        derivation.put("selfEmploymentTax", seTax.value());
         derivation.put(
-                "safe_harbor_rule",
+                "safeHarborRule",
                 Boolean.TRUE.equals(highIncomeRule.value())
                         ? "110% of prior-year tax (AGI > $150,000)"
                         : "100% of prior-year tax");
-        derivation.put("safe_harbor_target", safeHarbor.value());
-        derivation.put("ytd_payments_already_applied", ytdApplied.value());
-        derivation.put("remaining_due_through_year_end", remainingDue.value());
-        derivation.put("remaining_quarters", remainingQuarters);
+        derivation.put("safeHarborTarget", safeHarbor.value());
+        derivation.put("ytdPaymentsAlreadyApplied", ytdApplied.value());
+        derivation.put("remainingDueThroughYearEnd", remainingDue.value());
+        derivation.put("remainingQuarters", remainingQuarters);
 
-        Map<String, Object> out = new LinkedHashMap<>();
-        out.put(STATUS_KEY, "ok");
-        out.put("recommended_payment", suggested.value());
-        out.put("next_deadline", next.due.toString());
-        out.put("quarter", next.quarter);
-        // Keep the two questions distinct: the safe-harbor recommendation ("least to prepay to
-        // avoid the penalty") is not the same as what's actually owed for the year.
-        out.put("projected_total_tax", projectedTax.value());
-        out.put("projected_balance_due_at_filing", balanceDueAtFiling.value());
-        out.put(
-                NOTE_KEY,
-                "recommended_payment is the safe-harbor minimum that avoids the IRC §6654 "
-                        + "underpayment penalty; it does NOT settle the year's tax. "
-                        + "projected_balance_due_at_filing is what would still be owed at filing if no "
-                        + "further payments are made beyond those already counted (negative = refund).");
-        out.put("derivation", derivation);
-        out.put(EXPLANATION_TREE_KEY, graph.explain(sessionId, "/planning/nextQuarterlyPaymentSuggested"));
-        out.put("payment_url", "https://www.irs.gov/payments/direct-pay");
-        addProvisionalWarning(out, graph.taxYearOf(sessionId));
-        return out;
+        int year = graph.taxYearOf(sessionId);
+        return new QuarterlyPaymentResult(
+                "ok",
+                List.of(),
+                "",
+                suggested.value(),
+                next.due.toString(),
+                next.quarter,
+                projectedTax.value(),
+                balanceDueAtFiling.value(),
+                "recommendedPayment is the safe-harbor minimum that avoids the IRC §6654 underpayment"
+                        + " penalty; it does NOT settle the year's tax. projectedBalanceDueAtFiling is what"
+                        + " would still be owed at filing if no further payments are made beyond those already"
+                        + " counted (negative = refund).",
+                derivation,
+                graph.explain(sessionId, "/planning/nextQuarterlyPaymentSuggested"),
+                "https://www.irs.gov/payments/direct-pay",
+                nullToEmpty(taxKnowledge.provisionalWarning(year)));
     }
 
-    @Tool(
+    /** A required fact the agent must collect before estimate_quarterly_payment can run. */
+    public record MissingFact(String path, String prompt) {}
+
+    /**
+     * Structured result of {@code estimate_quarterly_payment}. Two shapes share one record: with facts
+     * missing, {@code status="needs_facts"}, {@code missingFacts} populated and the rest empty/null;
+     * otherwise {@code status="ok"} with the recommendation. {@code derivation}/{@code explanationTree}
+     * are typed {@code Object} (permissive schema) because they are absent in the needs-facts shape.
+     */
+    public record QuarterlyPaymentResult(
+            String status,
+            List<MissingFact> missingFacts,
+            String hint,
+            Object recommendedPayment,
+            String nextDeadline,
+            String quarter,
+            Object projectedTotalTax,
+            Object projectedBalanceDueAtFiling,
+            String note,
+            Object derivation,
+            Object explanationTree,
+            String paymentUrl,
+            String provisionalWarning) {}
+
+    // plan_questions deliberately does NOT publish an outputSchema (generateOutputSchema = false). Its
+    // PlanResult is an open, evolving interview-planning structure whose nested records carry
+    // business-logic-significant null fields (e.g. CandidateFact.sourceField, whose null-ness drives
+    // withEvidence()). A generated schema marks every string required, so a null would make
+    // structuredContent fail validation; and coercing those nulls to "" would change behavior. Omitting
+    // the schema means no strict validation (and no validation failure) — the correct trade-off for an
+    // open structure. The other 11 tools publish strict, conforming schemas.
+    @McpTool(
+            generateOutputSchema = false,
             name = "plan_questions",
             description = "Plan relevant tax interview questions from tax-knowledge artifacts. "
                     + "Inputs may include current session facts, document evidence, prior-year "
                     + "profile data, and previous answers. Returns candidate facts that require "
                     + "confirmation, review conflicts, and the next applicable questions.")
-    public Object planQuestions(
+    public TaxKnowledgeService.PlanResult planQuestions(
             @McpToolParam(
                             description =
                                     "Optional planning session id. If supplied, the session's facts are merged in.",
@@ -817,6 +872,11 @@ public class PlanningTools {
     /** Dollar inputs are written as strings (DollarWrapper reads a string); blank means $0. */
     private static String dollarOrZero(String v) {
         return (v == null || v.isBlank()) ? "0" : v.trim();
+    }
+
+    /** Tool result strings must be non-null for MCP output-schema conformance (required: string). */
+    private static String nullToEmpty(String v) {
+        return v == null ? "" : v;
     }
 
     /** Int inputs (e.g. miles) are written as a JSON number; blank means 0. */

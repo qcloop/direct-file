@@ -1,7 +1,6 @@
 package gov.irs.directfile.planservice;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,45 +37,45 @@ class QbiDeductionTest {
         String sid = sessionWith60kProfit("single");
         // Taxable income 70,000 -> income cap = 20% x 70,000 = 14,000, which exceeds the 11,152
         // component, so the component binds.
-        Map<String, Object> r = tools.estimateQbiDeduction(sid, "70000", "0");
+        var r = tools.estimateQbiDeduction(sid, "70000", "0");
 
-        assertThat((BigDecimal) r.get("qualified_business_income")).isEqualByComparingTo("55761");
-        assertThat((BigDecimal) r.get("qbi_component")).isEqualByComparingTo("11152");
-        assertThat((BigDecimal) r.get("qbi_income_limit")).isEqualByComparingTo("14000");
-        assertThat((BigDecimal) r.get("qbi_deduction")).isEqualByComparingTo("11152");
-        assertThat(r.get("above_threshold")).isEqualTo(false);
-        assertThat(r).doesNotContainKey("above_threshold_warning");
+        assertThat((BigDecimal) r.qualifiedBusinessIncome()).isEqualByComparingTo("55761");
+        assertThat((BigDecimal) r.qbiComponent()).isEqualByComparingTo("11152");
+        assertThat((BigDecimal) r.qbiIncomeLimit()).isEqualByComparingTo("14000");
+        assertThat((BigDecimal) r.qbiDeduction()).isEqualByComparingTo("11152");
+        assertThat(r.aboveThreshold()).isEqualTo(false);
+        assertThat(r.aboveThresholdWarning()).isEmpty();
     }
 
     @Test
     void deductionIsCappedAtTwentyPercentOfTaxableIncome() {
         String sid = sessionWith60kProfit("single");
         // Taxable income 40,000 -> cap = 8,000, below the 11,152 component, so the cap binds.
-        Map<String, Object> r = tools.estimateQbiDeduction(sid, "40000", "0");
+        var r = tools.estimateQbiDeduction(sid, "40000", "0");
 
-        assertThat((BigDecimal) r.get("qbi_income_limit")).isEqualByComparingTo("8000");
-        assertThat((BigDecimal) r.get("qbi_deduction")).isEqualByComparingTo("8000");
+        assertThat((BigDecimal) r.qbiIncomeLimit()).isEqualByComparingTo("8000");
+        assertThat((BigDecimal) r.qbiDeduction()).isEqualByComparingTo("8000");
     }
 
     @Test
     void netCapitalGainsReduceTheIncomeCapBase() {
         String sid = sessionWith60kProfit("single");
         // Taxable income 70,000 minus 20,000 net capital gains = 50,000 -> cap = 10,000 < 11,152.
-        Map<String, Object> r = tools.estimateQbiDeduction(sid, "70000", "20000");
+        var r = tools.estimateQbiDeduction(sid, "70000", "20000");
 
-        assertThat((BigDecimal) r.get("qbi_income_limit")).isEqualByComparingTo("10000");
-        assertThat((BigDecimal) r.get("qbi_deduction")).isEqualByComparingTo("10000");
+        assertThat((BigDecimal) r.qbiIncomeLimit()).isEqualByComparingTo("10000");
+        assertThat((BigDecimal) r.qbiDeduction()).isEqualByComparingTo("10000");
     }
 
     @Test
     void aboveTheThresholdTheSimpleResultIsFlaggedAsAnUpperBound() {
         String sid = sessionWith60kProfit("single");
         // Single threshold for TY2025 is 197,300; 250,000 is above it.
-        Map<String, Object> r = tools.estimateQbiDeduction(sid, "250000", "0");
+        var r = tools.estimateQbiDeduction(sid, "250000", "0");
 
-        assertThat((BigDecimal) r.get("qbi_threshold")).isEqualByComparingTo("197300");
-        assertThat(r.get("above_threshold")).isEqualTo(true);
-        assertThat(r).containsKey("above_threshold_warning");
+        assertThat((BigDecimal) r.qbiThreshold()).isEqualByComparingTo("197300");
+        assertThat(r.aboveThreshold()).isEqualTo(true);
+        assertThat(r.aboveThresholdWarning()).isNotEmpty();
     }
 
     @Test

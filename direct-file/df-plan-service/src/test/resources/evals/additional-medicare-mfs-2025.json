@@ -6,16 +6,16 @@
     {
       "tool": "calculate_se_tax",
       "args": { "grossReceipts": "200000" },
-      "expect": { "net_earnings_from_se": 184700 }
+      "expect": { "netEarningsFromSe": 184700 }
     },
     {
       "tool": "calculate_additional_medicare",
       "args": { "medicareWagesFromW2": "0" },
       "expect": {
-        "additional_medicare_threshold": 125000,
-        "se_income_over_threshold": 59700,
-        "additional_medicare_tax_on_se": 537,
-        "additional_medicare_tax": 537
+        "additionalMedicareThreshold": 125000,
+        "seIncomeOverThreshold": 59700,
+        "additionalMedicareTaxOnSe": 537,
+        "additionalMedicareTax": 537
       }
     }
   ]

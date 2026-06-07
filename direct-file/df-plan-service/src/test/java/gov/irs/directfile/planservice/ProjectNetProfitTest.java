@@ -1,7 +1,6 @@
 package gov.irs.directfile.planservice;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,26 +31,26 @@ class ProjectNetProfitTest {
         String sid = tools.createSession("2025", null).sessionId();
 
         // Seven months of data (through July 1). Numbers chosen to annualize cleanly (× 12/7).
-        Map<String, Object> out = tools.projectNetProfit(sid, "2025-07-01", "21000", "7000", "1750", "0", "0");
+        var out = tools.projectNetProfit(sid, "2025-07-01", "21000", "7000", "1750", "0", "0");
 
-        assertThat(out).containsEntry("status", "ok");
-        assertThat(out).containsEntry("months_elapsed", 7);
-        assertThat(out).containsEntry("annualization_factor", "12/7");
+        assertThat(out.status()).isEqualTo("ok");
+        assertThat(out.monthsElapsed()).isEqualTo(7);
+        assertThat(out.annualizationFactor()).isEqualTo("12/7");
 
         // Output surfaces the tax year and the rate actually used (so a wrong-year session is visible).
-        assertThat(out).containsEntry("tax_year", 2025);
-        assertThat((BigDecimal) out.get("standard_mileage_rate")).isEqualByComparingTo("0.70");
+        assertThat(out.taxYear()).isEqualTo(2025);
+        assertThat((BigDecimal) out.standardMileageRate()).isEqualByComparingTo("0.70");
 
         // Receipts: 21,000 × 12/7 = 36,000.
-        assertThat((BigDecimal) out.get("projected_gross_receipts")).isEqualByComparingTo("36000");
+        assertThat((BigDecimal) out.projectedGrossReceipts()).isEqualByComparingTo("36000");
 
         // Expenses annualized too: vehicle 7,000 mi × $0.70 × 12/7 = $8,400; fees 1,750 × 12/7 = $3,000.
         // Net profit = 36,000 − (8,400 + 3,000 + 0) = 24,600.
-        assertThat((BigDecimal) out.get("projected_net_profit")).isEqualByComparingTo("24600");
+        assertThat((BigDecimal) out.projectedNetProfit()).isEqualByComparingTo("24600");
 
         // SE tax is computed from the projected profit and is complete.
         assertThat(graph.readFact(sid, "/seTax").complete()).isTrue();
-        assertThat((BigDecimal) out.get("projected_self_employment_tax")).isGreaterThan(BigDecimal.ZERO);
+        assertThat((BigDecimal) out.projectedSelfEmploymentTax()).isGreaterThan(BigDecimal.ZERO);
     }
 
     @Test
@@ -81,16 +80,16 @@ class ProjectNetProfitTest {
     void flagsProvisionalConstantsForADraftYearButNotAFinalizedOne() {
         // 2026's mileage rate and wage base are provisional (draft); the tool must say so, naming them.
         String s2026 = tools.createSession("2026", null).sessionId();
-        Map<String, Object> out2026 = tools.projectNetProfit(s2026, "2026-07-01", "21000", "7000", "0", "0", "0");
-        assertThat((String) out2026.get("provisional_warning"))
+        var out2026 = tools.projectNetProfit(s2026, "2026-07-01", "21000", "7000", "0", "0", "0");
+        assertThat(out2026.provisionalWarning())
                 .contains("2026")
                 .contains("mileage")
                 .contains("Social Security wage base");
 
         // 2025 is finalized — no warning.
         String s2025 = tools.createSession("2025", null).sessionId();
-        Map<String, Object> out2025 = tools.projectNetProfit(s2025, "2025-07-01", "21000", "7000", "0", "0", "0");
-        assertThat(out2025).doesNotContainKey("provisional_warning");
+        var out2025 = tools.projectNetProfit(s2025, "2025-07-01", "21000", "7000", "0", "0", "0");
+        assertThat(out2025.provisionalWarning()).isEmpty();
     }
 
     @Test

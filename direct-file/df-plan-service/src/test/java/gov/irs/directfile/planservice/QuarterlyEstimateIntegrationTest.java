@@ -1,7 +1,6 @@
 package gov.irs.directfile.planservice;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +37,9 @@ class QuarterlyEstimateIntegrationTest {
         String sid = tools.createSession("2025", null).sessionId();
 
         // 1) Without any facts populated, the tool should ask for what's missing.
-        Map<String, Object> before = tools.estimateQuarterlyPayment(sid, "2025-08-20");
-        assertThat(before).containsEntry("status", "needs_facts");
-        assertThat((Iterable<?>) before.get("missing_facts")).isNotEmpty();
+        var before = tools.estimateQuarterlyPayment(sid, "2025-08-20");
+        assertThat(before.status()).isEqualTo("needs_facts");
+        assertThat(before.missingFacts()).isNotEmpty();
 
         // 2) Gather facts the way the LLM agent would after a short interview.
         writeDollar(sid, "/planning/priorYearTotalTax", 3800);
@@ -50,12 +49,12 @@ class QuarterlyEstimateIntegrationTest {
         writeDollar(sid, "/planning/ytdEstimatedPaymentsMade", 1800); // Q1 + Q2 already paid
 
         // 3) Run again — now we should get a real recommendation.
-        Map<String, Object> after = tools.estimateQuarterlyPayment(sid, "2025-08-20");
-        assertThat(after).containsEntry("status", "ok");
-        assertThat(after.get("next_deadline")).isEqualTo("2025-09-15");
-        assertThat(after.get("quarter")).isEqualTo("Q3");
+        var after = tools.estimateQuarterlyPayment(sid, "2025-08-20");
+        assertThat(after.status()).isEqualTo("ok");
+        assertThat(after.nextDeadline()).isEqualTo("2025-09-15");
+        assertThat(after.quarter()).isEqualTo("Q3");
 
-        BigDecimal recommended = (BigDecimal) after.get("recommended_payment");
+        BigDecimal recommended = (BigDecimal) after.recommendedPayment();
         // Safe harbor = lesser of (100% of $3,800 = $3,800) and (90% of $7,200 = $6,480) -> $3,800.
         // Remaining due = $3,800 - $2,200 (withholding + paid) = $1,600.
         // Split across remaining 2 quarters (Q3 + Q4) -> $800 per quarter.

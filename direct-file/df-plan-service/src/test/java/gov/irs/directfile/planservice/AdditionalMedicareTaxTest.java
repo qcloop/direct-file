@@ -1,7 +1,6 @@
 package gov.irs.directfile.planservice;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,14 +32,14 @@ class AdditionalMedicareTaxTest {
         // Net profit $300,000, no expenses -> net earnings = 300,000 x 92.35% = $277,050.
         tools.calculateSeTax(sid, "300000", null, null, null, null);
 
-        Map<String, Object> r = tools.calculateAdditionalMedicare(sid, "0");
+        var r = tools.calculateAdditionalMedicare(sid, "0");
 
-        assertThat((BigDecimal) r.get("additional_medicare_threshold")).isEqualByComparingTo("200000");
+        assertThat((BigDecimal) r.additionalMedicareThreshold()).isEqualByComparingTo("200000");
         // SE earnings over the threshold = 277,050 - 200,000 = 77,050; x 0.9% = $693.45 -> $693.
-        assertThat((BigDecimal) r.get("se_income_over_threshold")).isEqualByComparingTo("77050");
-        assertThat((BigDecimal) r.get("additional_medicare_tax_on_se")).isEqualByComparingTo("693");
-        assertThat((BigDecimal) r.get("additional_medicare_tax_on_wages")).isEqualByComparingTo("0");
-        assertThat((BigDecimal) r.get("additional_medicare_tax")).isEqualByComparingTo("693");
+        assertThat((BigDecimal) r.seIncomeOverThreshold()).isEqualByComparingTo("77050");
+        assertThat((BigDecimal) r.additionalMedicareTaxOnSe()).isEqualByComparingTo("693");
+        assertThat((BigDecimal) r.additionalMedicareTaxOnWages()).isEqualByComparingTo("0");
+        assertThat((BigDecimal) r.additionalMedicareTax()).isEqualByComparingTo("693");
     }
 
     @Test
@@ -51,14 +50,14 @@ class AdditionalMedicareTaxTest {
 
         // $100,000 W-2 Medicare wages. MFJ threshold $250,000; wages counted first leave $150,000
         // of threshold for SE income. SE over remaining = 184,700 - 150,000 = 34,700; x 0.9% = $312.30 -> $312.
-        Map<String, Object> r = tools.calculateAdditionalMedicare(sid, "100000");
+        var r = tools.calculateAdditionalMedicare(sid, "100000");
 
-        assertThat((BigDecimal) r.get("additional_medicare_threshold")).isEqualByComparingTo("250000");
-        assertThat((BigDecimal) r.get("se_income_over_threshold")).isEqualByComparingTo("34700");
-        assertThat((BigDecimal) r.get("additional_medicare_tax_on_se")).isEqualByComparingTo("312");
+        assertThat((BigDecimal) r.additionalMedicareThreshold()).isEqualByComparingTo("250000");
+        assertThat((BigDecimal) r.seIncomeOverThreshold()).isEqualByComparingTo("34700");
+        assertThat((BigDecimal) r.additionalMedicareTaxOnSe()).isEqualByComparingTo("312");
         // Wages ($100K) are below the threshold, so there is no wage-portion surtax.
-        assertThat((BigDecimal) r.get("additional_medicare_tax_on_wages")).isEqualByComparingTo("0");
-        assertThat((BigDecimal) r.get("additional_medicare_tax")).isEqualByComparingTo("312");
+        assertThat((BigDecimal) r.additionalMedicareTaxOnWages()).isEqualByComparingTo("0");
+        assertThat((BigDecimal) r.additionalMedicareTax()).isEqualByComparingTo("312");
     }
 
     @Test
@@ -67,11 +66,11 @@ class AdditionalMedicareTaxTest {
         tools.calculateSeTax(sid, "0", null, null, null, null); // no SE income
 
         // $220,000 Medicare wages, single threshold $200,000: wage portion = 20,000 x 0.9% = $180.
-        Map<String, Object> r = tools.calculateAdditionalMedicare(sid, "220000");
+        var r = tools.calculateAdditionalMedicare(sid, "220000");
 
-        assertThat((BigDecimal) r.get("additional_medicare_tax_on_wages")).isEqualByComparingTo("180");
-        assertThat((BigDecimal) r.get("additional_medicare_tax_on_se")).isEqualByComparingTo("0");
-        assertThat((BigDecimal) r.get("additional_medicare_tax")).isEqualByComparingTo("180");
+        assertThat((BigDecimal) r.additionalMedicareTaxOnWages()).isEqualByComparingTo("180");
+        assertThat((BigDecimal) r.additionalMedicareTaxOnSe()).isEqualByComparingTo("0");
+        assertThat((BigDecimal) r.additionalMedicareTax()).isEqualByComparingTo("180");
     }
 
     @Test

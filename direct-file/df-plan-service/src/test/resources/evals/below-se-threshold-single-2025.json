@@ -7,19 +7,19 @@
       "tool": "calculate_se_tax",
       "args": { "grossReceipts": "400" },
       "expect": {
-        "net_earnings_from_se": 369,
-        "self_employment_tax": 0,
-        "deductible_half": 0
+        "netEarningsFromSe": 369,
+        "selfEmploymentTax": 0,
+        "deductibleHalf": 0
       }
     },
     {
       "tool": "estimate_qbi_deduction",
       "args": { "taxableIncomeBeforeQbi": "30000", "netCapitalGains": "0" },
       "expect": {
-        "qualified_business_income": 400,
-        "qbi_component": 80,
-        "qbi_deduction": 80,
-        "above_threshold": false
+        "qualifiedBusinessIncome": 400,
+        "qbiComponent": 80,
+        "qbiDeduction": 80,
+        "aboveThreshold": false
       }
     }
   ]
