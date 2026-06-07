@@ -1,0 +1,33 @@
+{
+  "name": "Gig worker, single, TY2025 — SE tax, no Additional Medicare (under threshold), QBI component binds",
+  "taxYear": 2025,
+  "filingStatus": "single",
+  "steps": [
+    {
+      "tool": "calculate_se_tax",
+      "args": { "grossReceipts": "60000" },
+      "expect": {
+        "net_profit": 60000,
+        "net_earnings_from_se": 55410,
+        "self_employment_tax": 8478,
+        "deductible_half": 4239
+      }
+    },
+    {
+      "tool": "calculate_additional_medicare",
+      "args": { "medicareWagesFromW2": "0" },
+      "expect": { "additional_medicare_tax": 0 }
+    },
+    {
+      "tool": "estimate_qbi_deduction",
+      "args": { "taxableIncomeBeforeQbi": "70000", "netCapitalGains": "0" },
+      "expect": {
+        "qualified_business_income": 55761,
+        "qbi_component": 11152,
+        "qbi_income_limit": 14000,
+        "qbi_deduction": 11152,
+        "above_threshold": false
+      }
+    }
+  ]
+}

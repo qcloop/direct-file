@@ -1,0 +1,35 @@
+{
+  "name": "High earner, MFJ, TY2025 — Additional Medicare on SE income, QBI income-limit binds",
+  "taxYear": 2025,
+  "filingStatus": "mfj",
+  "steps": [
+    {
+      "tool": "calculate_se_tax",
+      "args": { "grossReceipts": "400000" },
+      "expect": {
+        "net_earnings_from_se": 369400,
+        "self_employment_tax": 32549,
+        "deductible_half": 16275
+      }
+    },
+    {
+      "tool": "calculate_additional_medicare",
+      "args": { "medicareWagesFromW2": "0" },
+      "expect": {
+        "se_income_over_threshold": 119400,
+        "additional_medicare_tax_on_se": 1075,
+        "additional_medicare_tax": 1075
+      }
+    },
+    {
+      "tool": "estimate_qbi_deduction",
+      "args": { "taxableIncomeBeforeQbi": "350000", "netCapitalGains": "0" },
+      "expect": {
+        "qbi_component": 76745,
+        "qbi_income_limit": 70000,
+        "qbi_deduction": 70000,
+        "above_threshold": false
+      }
+    }
+  ]
+}

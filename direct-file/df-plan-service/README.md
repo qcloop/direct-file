@@ -179,6 +179,12 @@ End-to-end smoke testing is covered by the integration tests
 (`QuarterlyEstimateIntegrationTest`, `TaxKnowledgePlanningIntegrationTest`),
 which invoke the same `@Tool` methods that the MCP server exposes.
 
+Golden-scenario **evals** live in `src/test/resources/evals/*.json` and are run by
+`PlanningAgentEvalTest`: each file is a full-run scenario (a filing situation + a sequence of
+tool calls with expected output fields), driven through the real MCP tool surface as JSON — the
+deterministic regression check for what an agent actually receives. Add a scenario by dropping a
+new JSON file in that directory; no Java changes needed.
+
 ## Wiring to an LLM
 
 This service is the *MCP server* side. An LLM gateway (Azure OpenAI Gov,
