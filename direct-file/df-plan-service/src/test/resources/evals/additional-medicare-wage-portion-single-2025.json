@@ -1,0 +1,22 @@
+{
+  "name": "Additional Medicare wage portion (Form 8959 Part I), single, TY2025 — W-2 wages alone over the threshold",
+  "taxYear": 2025,
+  "filingStatus": "single",
+  "steps": [
+    {
+      "tool": "calculate_se_tax",
+      "args": { "grossReceipts": "0" },
+      "expect": { "self_employment_tax": 0 }
+    },
+    {
+      "tool": "calculate_additional_medicare",
+      "args": { "medicareWagesFromW2": "220000" },
+      "expect": {
+        "wages_over_threshold": 20000,
+        "additional_medicare_tax_on_wages": 180,
+        "additional_medicare_tax_on_se": 0,
+        "additional_medicare_tax": 180
+      }
+    }
+  ]
+}
