@@ -93,6 +93,8 @@ Key types:
   0.9% surtax), `estimate_qbi_deduction` (Form 8995 / §199A 20% deduction, simple method),
   `project_net_profit`, `project_total_tax` (the full net-profit → AGI → taxable income → income tax
   + SE + Additional Medicare ladder; total tax is **derived**, not an agent guess — see decisions.md),
+  `compare_filing_statuses` (re-runs the session's income under single/MFJ/MFS so "does my filing
+  status matter?" is computed, not estimated; filing status is fixed at `create_session`),
   `estimate_quarterly_payment`, `plan_questions`, `export_plan`. Each returns
   a typed record and (except `plan_questions`) publishes an MCP `outputSchema` + matching
   `structuredContent` via `generateOutputSchema = true`; the Spring AI annotation scanner registers

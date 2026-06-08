@@ -178,6 +178,41 @@ public class PlanningGraphService {
         return id;
     }
 
+    /**
+     * Create a new session for the same tax year but a different filing status, copying the source
+     * session's INPUT facts. The injected year/filing-status parameters (standard deduction, brackets,
+     * QBI and Additional Medicare thresholds, rates, …) are deliberately NOT copied — the new session
+     * re-injects the rows for its own status. Used by compare_filing_statuses to project identical
+     * income across statuses without the agent re-entering anything. Returns the new session id.
+     */
+    public String cloneSessionWithFilingStatus(String sourceSessionId, String filingStatus) {
+        int year = taxYearOf(sourceSessionId);
+        Set<String> paramPaths = new LinkedHashSet<>();
+        for (TaxKnowledgeService.TaxParameter p : taxKnowledge.taxParametersForYear(year)) {
+            paramPaths.add(p.factPath());
+        }
+        SessionState src = require(sourceSessionId);
+        // The new session is freshly created and not yet shared with any other thread, so only the
+        // source needs locking while we read its facts.
+        String newSid = createSession(year, filingStatus);
+        SessionState dst = require(newSid);
+        synchronized (src) {
+            src.facts.forEach((path, fact) -> {
+                // FactTypeWithItem is effectively immutable (a typeCode + a JsonNode we never mutate),
+                // so sharing the reference between sessions is safe.
+                if (!paramPaths.contains(path)) {
+                    dst.facts.put(path, fact);
+                }
+            });
+        }
+        return newSid;
+    }
+
+    /** Discard an in-memory session — e.g. the throwaway sessions a filing-status comparison spins up. */
+    public void discardSession(String sessionId) {
+        sessions.remove(sessionId);
+    }
+
     public int taxYearOf(String sessionId) {
         return require(sessionId).taxYear();
     }

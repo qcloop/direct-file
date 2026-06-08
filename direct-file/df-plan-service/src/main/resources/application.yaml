@@ -29,9 +29,17 @@ spring:
 
 
           For any figure (self-employment tax, the QBI deduction, quarterly estimated
-          payments, net profit), call the matching calculation tool rather than
-          estimating, and use cite/explain to show the IRS source behind it. Treat
+          payments, net profit, total tax), call the matching calculation tool rather
+          than estimating, and use cite/explain to show the IRS source behind it. Treat
           candidate facts as values to CONFIRM with the taxpayer, never as established.
+
+
+          Filing status: for a quick set-aside estimate, default to single and SAY SO —
+          self-employment tax (usually most of a gig driver's bill) does not depend on
+          filing status; only income tax does. Status is fixed when a session is created.
+          If the taxpayer is married or asks whether status changes their tax, do not
+          estimate the difference — call compare_filing_statuses to get computed totals
+          for single / MFJ / MFS on the same income.
         # SYNC keeps the blocking tool implementations (fact-graph calls) as-is; the
         # WebFlux transport dispatches them off the event loop. ASYNC is only useful
         # if individual tools become non-blocking.

@@ -77,6 +77,7 @@ on `PlanningTools` (camelCase, not snake_case).
 | `estimate_qbi_deduction`      | Form 8995 / §199A 20% QBI deduction (taxable-income cap derived) |
 | `project_net_profit`          | Project full-year net profit + SE tax from YTD figures |
 | `project_total_tax`           | Full net-profit → AGI → taxable income → income tax + SE + Additional Medicare (total tax derived, not guessed) |
+| `compare_filing_statuses`     | Project total tax under single / MFJ / MFS on the same income, in one call |
 | `explain`                     | One-level derivation explanation for a fact            |
 | `cite`                        | Legal authority behind a fact + plain-language explanation |
 | `estimate_quarterly_payment`  | IRC §6654 safe-harbor quarterly recommendation         |

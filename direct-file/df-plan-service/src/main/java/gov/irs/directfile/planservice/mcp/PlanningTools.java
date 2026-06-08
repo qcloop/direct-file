@@ -67,6 +67,9 @@ public class PlanningTools {
     /** Derived projected current-year total tax (income tax + SE tax + Additional Medicare). */
     private static final String PROJECTED_TOTAL_TAX_PATH = "/planning/projectedCurrentYearTax";
 
+    /** Form 8959 Additional Medicare Tax fact path, read by several tools. */
+    private static final String ADDITIONAL_MEDICARE_TAX_PATH = "/additionalMedicareTax";
+
     private static final List<RequiredFact> REQUIRED_FACTS = List.of(
             new RequiredFact(
                     "/planning/priorYearTotalTax",
@@ -127,7 +130,12 @@ public class PlanningTools {
                     String taxYear,
             @McpToolParam(
                             description = "Filing status: single | mfj | mfs. Defaults to single. Drives"
-                                    + " filing-status thresholds such as the Additional Medicare Tax line."
+                                    + " filing-status thresholds (standard deduction, income-tax brackets, QBI"
+                                    + " and Additional Medicare thresholds). Self-employment tax does NOT depend"
+                                    + " on it. For a quick set-aside estimate it is fine to default to single and"
+                                    + " tell the taxpayer you assumed it; status is fixed for the life of the"
+                                    + " session, so to change it (or to compare) create a new session or call"
+                                    + " compare_filing_statuses — do not estimate the difference by hand."
                                     + " Head-of-household and qualifying surviving spouse use the 'single'"
                                     + " thresholds for these provisions.",
                             required = false)
@@ -352,8 +360,8 @@ public class PlanningTools {
                 graph.readFact(sessionId, "/additionalMedicareTaxOnSE").value(),
                 graph.readFact(sessionId, "/wagesSubjectToAdditionalMedicare").value(),
                 graph.readFact(sessionId, "/additionalMedicareTaxOnWages").value(),
-                graph.readFact(sessionId, "/additionalMedicareTax").value(),
-                graph.explain(sessionId, "/additionalMedicareTax"),
+                graph.readFact(sessionId, ADDITIONAL_MEDICARE_TAX_PATH).value(),
+                graph.explain(sessionId, ADDITIONAL_MEDICARE_TAX_PATH),
                 note,
                 nullToEmpty(taxKnowledge.provisionalWarning(year)));
     }
@@ -502,7 +510,7 @@ public class PlanningTools {
                 graph.readFact(sessionId, "/planning/taxableIncome").value(),
                 graph.readFact(sessionId, "/incomeTax/projectedIncomeTax").value(),
                 graph.readFact(sessionId, SE_TAX_PATH).value(),
-                graph.readFact(sessionId, "/additionalMedicareTax").value(),
+                graph.readFact(sessionId, ADDITIONAL_MEDICARE_TAX_PATH).value(),
                 graph.readFact(sessionId, PROJECTED_TOTAL_TAX_PATH).value(),
                 note,
                 graph.explain(sessionId, PROJECTED_TOTAL_TAX_PATH),
@@ -527,6 +535,77 @@ public class PlanningTools {
             Object projectedTotalTax,
             String note,
             PlanningGraphService.ExplainResult explanationTree,
+            String provisionalWarning) {}
+
+    @McpTool(
+            generateOutputSchema = true,
+            name = "compare_filing_statuses",
+            description = "Project this session's total tax under each filing status (single, married filing "
+                    + "jointly, married filing separately) on identical income, in one call. Run "
+                    + "calculate_se_tax or project_net_profit first so there is income to compare. Use this to "
+                    + "answer 'would my filing status change what I owe?' with COMPUTED numbers rather than "
+                    + "estimating: self-employment tax is the same under every status (it is based on business "
+                    + "profit), so only income tax differs — through the standard deduction and bracket widths — "
+                    + "plus the Additional Medicare surtax threshold, which is lower for MFS. A session's filing "
+                    + "status is fixed at create_session, so this spins up throwaway sessions to compare; to "
+                    + "actually switch, create a new session with the chosen status.")
+    public CompareFilingStatusesResult compareFilingStatuses(
+            @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId) {
+        int year = graph.taxYearOf(sessionId);
+        if (!graph.readFact(sessionId, SE_NET_PROFIT_PATH).complete()) {
+            return new CompareFilingStatusesResult(
+                    "needs_facts",
+                    year,
+                    List.of(),
+                    "Run calculate_se_tax or project_net_profit first so there is income to compare across"
+                            + " filing statuses.",
+                    nullToEmpty(taxKnowledge.provisionalWarning(year)));
+        }
+        List<FilingStatusProjection> projections = new ArrayList<>();
+        for (String status : List.of("single", "mfj", "mfs")) {
+            String sid = graph.cloneSessionWithFilingStatus(sessionId, status);
+            try {
+                projections.add(new FilingStatusProjection(
+                        status,
+                        graph.readFact(sid, "/standardDeduction").value(),
+                        graph.readFact(sid, "/planning/taxableIncome").value(),
+                        graph.readFact(sid, "/incomeTax/projectedIncomeTax").value(),
+                        graph.readFact(sid, SE_TAX_PATH).value(),
+                        graph.readFact(sid, ADDITIONAL_MEDICARE_TAX_PATH).value(),
+                        graph.readFact(sid, PROJECTED_TOTAL_TAX_PATH).value()));
+            } finally {
+                // The comparison sessions are throwaway — don't leak them into the in-memory map.
+                graph.discardSession(sid);
+            }
+        }
+        return new CompareFilingStatusesResult(
+                "ok",
+                year,
+                projections,
+                "Self-employment tax (Social Security + Medicare) is identical across filing statuses; only"
+                        + " income tax differs, through the standard deduction and bracket widths (the Additional"
+                        + " Medicare surtax threshold also differs — lower for MFS). Married filing separately is"
+                        + " rarely beneficial. These are estimates on identical inputs, not a recommendation of"
+                        + " which status to file.",
+                nullToEmpty(taxKnowledge.provisionalWarning(year)));
+    }
+
+    /** One filing status's projection within a {@code compare_filing_statuses} result. */
+    public record FilingStatusProjection(
+            String filingStatus,
+            Object standardDeduction,
+            Object taxableIncome,
+            Object incomeTax,
+            Object selfEmploymentTax,
+            Object additionalMedicareTax,
+            Object projectedTotalTax) {}
+
+    /** Structured result of {@code compare_filing_statuses}: one projection per filing status. */
+    public record CompareFilingStatusesResult(
+            String status,
+            int taxYear,
+            List<FilingStatusProjection> projections,
+            String note,
             String provisionalWarning) {}
 
     @McpTool(

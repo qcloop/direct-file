@@ -48,7 +48,7 @@ is resolved, delete it (git history keeps the record).
   multi-step library.
 - **Doc-gardening is manual.** The drift gate (`ToolDocumentationDriftTest`) catches the README tool
   list; broader staleness (architecture.md, this file) could be swept on a schedule.
-- **All 13 MCP tools now use the `@McpTool` path** and publish a conforming `outputSchema` +
+- **All 14 MCP tools now use the `@McpTool` path** and publish a conforming `outputSchema` +
   `structuredContent` — except `plan_questions` (`generateOutputSchema = false`), whose open
   interview-planning `PlanResult` has nested records with business-significant null fields
   (e.g. `CandidateFact.sourceField` drives `withEvidence()`); giving it a strict schema would
