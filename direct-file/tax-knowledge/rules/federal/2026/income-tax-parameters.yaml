@@ -1,0 +1,252 @@
+parameter_set_id: income_tax_parameters_ty2026
+tax_year: 2026
+jurisdiction: federal
+topic_id: income_tax
+status: draft
+source_ids:
+  - irc_1
+  - irc_63
+  - irs_rev_proc_2025_32
+description: >
+  Federal ordinary income-tax schedule for tax year 2026. STATUS IS DRAFT: the seven marginal rates
+  are the statutory IRC 1(j) rates (confident), but the dollar figures — the standard deduction and
+  the bracket ceilings — are PROVISIONAL (Rev. Proc. 2025-32, reflecting post-OBBBA amounts) and must
+  be confirmed against the final 2026 IRS figures before this set is promoted to published. Ordinary
+  income only; no capital-gains rates, credits, NIIT, or AMT.
+parameters:
+  - fact_path: /incomeTax/bracket1Rate
+    name: First bracket marginal rate (10%)
+    type: rational
+    value: "10/100"
+    source_id: irc_1
+    note: 10% — lowest ordinary-income bracket. Statutory rate (IRC 1(j)); not provisional.
+  - fact_path: /incomeTax/bracket2Rate
+    name: Second bracket marginal rate (12%)
+    type: rational
+    value: "12/100"
+    source_id: irc_1
+    note: 12% ordinary-income bracket. Statutory rate (IRC 1(j)); not provisional.
+  - fact_path: /incomeTax/bracket3Rate
+    name: Third bracket marginal rate (22%)
+    type: rational
+    value: "22/100"
+    source_id: irc_1
+    note: 22% ordinary-income bracket. Statutory rate (IRC 1(j)); not provisional.
+  - fact_path: /incomeTax/bracket4Rate
+    name: Fourth bracket marginal rate (24%)
+    type: rational
+    value: "24/100"
+    source_id: irc_1
+    note: 24% ordinary-income bracket. Statutory rate (IRC 1(j)); not provisional.
+  - fact_path: /incomeTax/bracket5Rate
+    name: Fifth bracket marginal rate (32%)
+    type: rational
+    value: "32/100"
+    source_id: irc_1
+    note: 32% ordinary-income bracket. Statutory rate (IRC 1(j)); not provisional.
+  - fact_path: /incomeTax/bracket6Rate
+    name: Sixth bracket marginal rate (35%)
+    type: rational
+    value: "35/100"
+    source_id: irc_1
+    note: 35% ordinary-income bracket. Statutory rate (IRC 1(j)); not provisional.
+  - fact_path: /incomeTax/bracket7Rate
+    name: Seventh bracket marginal rate (37%)
+    type: rational
+    value: "37/100"
+    source_id: irc_1
+    note: 37% — top ordinary-income bracket. Statutory rate (IRC 1(j)); not provisional.
+
+  - fact_path: /standardDeduction
+    name: Standard deduction (single)
+    type: dollar
+    value: "16100"
+    unit: dollars
+    filing_status: single
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — single / MFS 2026 standard deduction ~$16,100 (Rev. Proc. 2025-32, post-OBBBA). Verify before publishing.
+  - fact_path: /standardDeduction
+    name: Standard deduction (married filing jointly)
+    type: dollar
+    value: "32200"
+    unit: dollars
+    filing_status: mfj
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFJ 2026 standard deduction ~$32,200 (Rev. Proc. 2025-32). Verify before publishing.
+  - fact_path: /standardDeduction
+    name: Standard deduction (married filing separately)
+    type: dollar
+    value: "16100"
+    unit: dollars
+    filing_status: mfs
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFS 2026 standard deduction ~$16,100 (Rev. Proc. 2025-32). Verify before publishing.
+
+  # SINGLE
+  - fact_path: /incomeTax/bracket1Ceiling
+    name: Top of 10% bracket (single)
+    type: dollar
+    value: "12400"
+    unit: dollars
+    filing_status: single
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — single 10% bracket runs to ~$12,400 (2026).
+  - fact_path: /incomeTax/bracket2Ceiling
+    name: Top of 12% bracket (single)
+    type: dollar
+    value: "50400"
+    unit: dollars
+    filing_status: single
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — single 12% bracket runs to ~$50,400 (2026).
+  - fact_path: /incomeTax/bracket3Ceiling
+    name: Top of 22% bracket (single)
+    type: dollar
+    value: "105700"
+    unit: dollars
+    filing_status: single
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — single 22% bracket runs to ~$105,700 (2026).
+  - fact_path: /incomeTax/bracket4Ceiling
+    name: Top of 24% bracket (single)
+    type: dollar
+    value: "201775"
+    unit: dollars
+    filing_status: single
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — single 24% bracket runs to ~$201,775 (2026).
+  - fact_path: /incomeTax/bracket5Ceiling
+    name: Top of 32% bracket (single)
+    type: dollar
+    value: "256225"
+    unit: dollars
+    filing_status: single
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — single 32% bracket runs to ~$256,225 (2026).
+  - fact_path: /incomeTax/bracket6Ceiling
+    name: Top of 35% bracket (single)
+    type: dollar
+    value: "640600"
+    unit: dollars
+    filing_status: single
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — single 35% bracket runs to ~$640,600 (2026); income above is taxed at 37%.
+  # MARRIED FILING JOINTLY
+  - fact_path: /incomeTax/bracket1Ceiling
+    name: Top of 10% bracket (mfj)
+    type: dollar
+    value: "24800"
+    unit: dollars
+    filing_status: mfj
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFJ 10% bracket runs to ~$24,800 (2026).
+  - fact_path: /incomeTax/bracket2Ceiling
+    name: Top of 12% bracket (mfj)
+    type: dollar
+    value: "100800"
+    unit: dollars
+    filing_status: mfj
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFJ 12% bracket runs to ~$100,800 (2026).
+  - fact_path: /incomeTax/bracket3Ceiling
+    name: Top of 22% bracket (mfj)
+    type: dollar
+    value: "211400"
+    unit: dollars
+    filing_status: mfj
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFJ 22% bracket runs to ~$211,400 (2026).
+  - fact_path: /incomeTax/bracket4Ceiling
+    name: Top of 24% bracket (mfj)
+    type: dollar
+    value: "403550"
+    unit: dollars
+    filing_status: mfj
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFJ 24% bracket runs to ~$403,550 (2026).
+  - fact_path: /incomeTax/bracket5Ceiling
+    name: Top of 32% bracket (mfj)
+    type: dollar
+    value: "512450"
+    unit: dollars
+    filing_status: mfj
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFJ 32% bracket runs to ~$512,450 (2026).
+  - fact_path: /incomeTax/bracket6Ceiling
+    name: Top of 35% bracket (mfj)
+    type: dollar
+    value: "768700"
+    unit: dollars
+    filing_status: mfj
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFJ 35% bracket runs to ~$768,700 (2026); income above is taxed at 37%.
+  # MARRIED FILING SEPARATELY
+  - fact_path: /incomeTax/bracket1Ceiling
+    name: Top of 10% bracket (mfs)
+    type: dollar
+    value: "12400"
+    unit: dollars
+    filing_status: mfs
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFS 10% bracket runs to ~$12,400 (2026).
+  - fact_path: /incomeTax/bracket2Ceiling
+    name: Top of 12% bracket (mfs)
+    type: dollar
+    value: "50400"
+    unit: dollars
+    filing_status: mfs
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFS 12% bracket runs to ~$50,400 (2026).
+  - fact_path: /incomeTax/bracket3Ceiling
+    name: Top of 22% bracket (mfs)
+    type: dollar
+    value: "105700"
+    unit: dollars
+    filing_status: mfs
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFS 22% bracket runs to ~$105,700 (2026).
+  - fact_path: /incomeTax/bracket4Ceiling
+    name: Top of 24% bracket (mfs)
+    type: dollar
+    value: "201775"
+    unit: dollars
+    filing_status: mfs
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFS 24% bracket runs to ~$201,775 (2026).
+  - fact_path: /incomeTax/bracket5Ceiling
+    name: Top of 32% bracket (mfs)
+    type: dollar
+    value: "256225"
+    unit: dollars
+    filing_status: mfs
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFS 32% bracket runs to ~$256,225 (2026).
+  - fact_path: /incomeTax/bracket6Ceiling
+    name: Top of 35% bracket (mfs)
+    type: dollar
+    value: "384350"
+    unit: dollars
+    filing_status: mfs
+    provisional: true
+    source_id: irs_rev_proc_2025_32
+    note: PROVISIONAL — MFS 35% bracket runs to ~$384,350 (2026); income above is taxed at 37%.

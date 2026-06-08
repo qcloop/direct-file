@@ -31,9 +31,15 @@ is resolved, delete it (git history keeps the record).
 - **Single consolidated Schedule C** (one SE business). Multi-business is additive (Collection +
   re-rolled sums).
 - **Annualization is straight-line** (12 ÷ months) — seasonal income will differ.
-- **`projectedCurrentYearTax` and `taxableIncomeBeforeQBIDeduction` are agent-supplied** — the graph
-  does not model the full 1040, so neither the Additional Medicare surtax nor the QBI deduction
-  flows automatically into a total-tax figure. A true total-tax derivation would need the full graph.
+- **Income tax is an ordinary-rate model only.** Total tax is now derived (standard deduction + the
+  seven ordinary brackets + QBI + SE tax + Additional Medicare via `project_total_tax`), but it omits
+  tax credits (EITC, CTC, education…), capital-gains/qualified-dividend preferential rates, the NIIT,
+  the AMT, and itemized deductions; it always assumes the standard deduction. Income besides the
+  Schedule C is a single agent-supplied `/planning/otherTaxableIncome` (e.g. W-2 box 1), not a modeled
+  W-2 with its own withholding. So `projectedCurrentYearTax` is a planning estimate, not a 1040 line 22/24.
+- **2026 ordinary brackets + standard deduction are `provisional`** (Rev. Proc. 2025-32, post-OBBBA) —
+  confirm against the final 2026 figures. 2024/2025 are final (Rev. Procs. 2023-34 / 2024-40), but the
+  2025 standard deduction here is the Rev. Proc. baseline; verify any OBBBA mid-year adjustment.
 
 ## Harness / process (from the harness-engineering adoption)
 
@@ -42,7 +48,7 @@ is resolved, delete it (git history keeps the record).
   multi-step library.
 - **Doc-gardening is manual.** The drift gate (`ToolDocumentationDriftTest`) catches the README tool
   list; broader staleness (architecture.md, this file) could be swept on a schedule.
-- **All 12 MCP tools now use the `@McpTool` path** and publish a conforming `outputSchema` +
+- **All 13 MCP tools now use the `@McpTool` path** and publish a conforming `outputSchema` +
   `structuredContent` — except `plan_questions` (`generateOutputSchema = false`), whose open
   interview-planning `PlanResult` has nested records with business-significant null fields
   (e.g. `CandidateFact.sourceField` drives `withEvidence()`); giving it a strict schema would

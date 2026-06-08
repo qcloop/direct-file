@@ -91,7 +91,9 @@ Key types:
   (takes a `filing_status`: single/mfj/mfs, driving filing-status thresholds), `get_fact`,
   `set_fact`, `explain`, `cite`, `calculate_se_tax`, `calculate_additional_medicare` (Form 8959
   0.9% surtax), `estimate_qbi_deduction` (Form 8995 / §199A 20% deduction, simple method),
-  `project_net_profit`, `estimate_quarterly_payment`, `plan_questions`, `export_plan`. Each returns
+  `project_net_profit`, `project_total_tax` (the full net-profit → AGI → taxable income → income tax
+  + SE + Additional Medicare ladder; total tax is **derived**, not an agent guess — see decisions.md),
+  `estimate_quarterly_payment`, `plan_questions`, `export_plan`. Each returns
   a typed record and (except `plan_questions`) publishes an MCP `outputSchema` + matching
   `structuredContent` via `generateOutputSchema = true`; the Spring AI annotation scanner registers
   them (no `MethodToolCallbackProvider`). Filing-status-dependent constants are status-scoped

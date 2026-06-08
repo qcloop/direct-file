@@ -34,7 +34,8 @@ class PlanReportTest {
         tools.calculateSeTax(sid, "40000", "10000", "3000", "1000", "0");
         tools.setFact(sid, "/planning/priorYearTotalTax", "dollar", null, "3800", "2024 Form 1040, line 24");
         tools.setFact(sid, "/planning/priorYearAGI", "dollar", null, "58000", null);
-        tools.setFact(sid, "/planning/projectedCurrentYearTax", "dollar", null, "7200", null);
+        // projectedCurrentYearTax is derived (income + SE + Additional Medicare) from the calculate_se_tax
+        // inputs above — no longer an agent-entered fact.
         tools.setFact(sid, "/planning/ytdWithholding", "dollar", null, "400", null);
         tools.setFact(sid, "/planning/ytdEstimatedPaymentsMade", "dollar", null, "1800", null);
         // Populates /planning/remainingQuarters so the suggested-payment result row renders.

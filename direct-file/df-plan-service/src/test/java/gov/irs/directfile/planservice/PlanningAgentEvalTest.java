@@ -96,8 +96,9 @@ class PlanningAgentEvalTest {
                         txt(a, "socialSecurityWagesFromW2"));
             case "calculate_additional_medicare" ->
                 tools.calculateAdditionalMedicare(sessionId, txt(a, "medicareWagesFromW2"));
-            case "estimate_qbi_deduction" ->
-                tools.estimateQbiDeduction(sessionId, txt(a, "taxableIncomeBeforeQbi"), txt(a, "netCapitalGains"));
+            case "estimate_qbi_deduction" -> tools.estimateQbiDeduction(sessionId, txt(a, "netCapitalGains"));
+            case "project_total_tax" ->
+                tools.projectTotalTax(sessionId, txt(a, "otherOrdinaryIncome"), txt(a, "netCapitalGains"));
             default -> throw new IllegalArgumentException("eval dispatch has no case for tool: " + tool);
         };
     }

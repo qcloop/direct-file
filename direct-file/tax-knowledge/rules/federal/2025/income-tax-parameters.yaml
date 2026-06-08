@@ -1,0 +1,239 @@
+parameter_set_id: income_tax_parameters_ty2025
+tax_year: 2025
+jurisdiction: federal
+topic_id: income_tax
+status: published
+source_ids:
+  - irc_1
+  - irc_63
+  - irs_rev_proc_2024_40
+description: >
+  Year/filing-status-scoped federal ordinary income-tax schedule: the standard deduction and the
+  seven ordinary-rate bracket ceilings (the top of brackets 1-6; bracket 7 is open-ended) plus the
+  seven marginal rates. The planning service injects the standard deduction and the bracket ceilings
+  for the session's filing status, and the (status-invariant) rates always. These let the graph
+  DERIVE projected income tax and total tax instead of accepting an agent-supplied guess.
+
+  Bracket ceilings and the standard deduction are the 2025 inflation-adjusted figures from IRS
+  Rev. Proc. 2024-40; the marginal rates are the statutory IRC 1(j) rates. Scope is ordinary income
+  only: capital-gains/qualified-dividend rates, credits, NIIT, and AMT are not modeled here.
+parameters:
+  # Seven marginal rates (status-invariant: the rate schedule is the same for every filing status;
+  # only the dollar ceilings differ). IRC 1(j).
+  - fact_path: /incomeTax/bracket1Rate
+    name: First bracket marginal rate (10%)
+    type: rational
+    value: "10/100"
+    source_id: irc_1
+    note: 10% — lowest ordinary-income bracket. Statutory rate (IRC 1(j)).
+  - fact_path: /incomeTax/bracket2Rate
+    name: Second bracket marginal rate (12%)
+    type: rational
+    value: "12/100"
+    source_id: irc_1
+    note: 12% ordinary-income bracket. Statutory rate (IRC 1(j)).
+  - fact_path: /incomeTax/bracket3Rate
+    name: Third bracket marginal rate (22%)
+    type: rational
+    value: "22/100"
+    source_id: irc_1
+    note: 22% ordinary-income bracket. Statutory rate (IRC 1(j)).
+  - fact_path: /incomeTax/bracket4Rate
+    name: Fourth bracket marginal rate (24%)
+    type: rational
+    value: "24/100"
+    source_id: irc_1
+    note: 24% ordinary-income bracket. Statutory rate (IRC 1(j)).
+  - fact_path: /incomeTax/bracket5Rate
+    name: Fifth bracket marginal rate (32%)
+    type: rational
+    value: "32/100"
+    source_id: irc_1
+    note: 32% ordinary-income bracket. Statutory rate (IRC 1(j)).
+  - fact_path: /incomeTax/bracket6Rate
+    name: Sixth bracket marginal rate (35%)
+    type: rational
+    value: "35/100"
+    source_id: irc_1
+    note: 35% ordinary-income bracket. Statutory rate (IRC 1(j)).
+  - fact_path: /incomeTax/bracket7Rate
+    name: Seventh bracket marginal rate (37%)
+    type: rational
+    value: "37/100"
+    source_id: irc_1
+    note: 37% — top ordinary-income bracket. Statutory rate (IRC 1(j)).
+
+  # Standard deduction — filing-status-scoped (IRC 63; 2025 amounts from Rev. Proc. 2024-40).
+  - fact_path: /standardDeduction
+    name: Standard deduction (single)
+    type: dollar
+    value: "15000"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2024_40
+    note: Single / married filing separately — 2025 standard deduction is $15,000 (Rev. Proc. 2024-40).
+  - fact_path: /standardDeduction
+    name: Standard deduction (married filing jointly)
+    type: dollar
+    value: "30000"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2024_40
+    note: Married filing jointly — 2025 standard deduction is $30,000 (Rev. Proc. 2024-40).
+  - fact_path: /standardDeduction
+    name: Standard deduction (married filing separately)
+    type: dollar
+    value: "15000"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2024_40
+    note: Married filing separately — 2025 standard deduction is $15,000 (Rev. Proc. 2024-40).
+
+  # Bracket ceilings (top of brackets 1-6) — filing-status-scoped; 2025 figures (Rev. Proc. 2024-40).
+  # SINGLE
+  - fact_path: /incomeTax/bracket1Ceiling
+    name: Top of 10% bracket (single)
+    type: dollar
+    value: "11925"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2024_40
+    note: Single — 10% bracket runs to $11,925 (2025).
+  - fact_path: /incomeTax/bracket2Ceiling
+    name: Top of 12% bracket (single)
+    type: dollar
+    value: "48475"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2024_40
+    note: Single — 12% bracket runs to $48,475 (2025).
+  - fact_path: /incomeTax/bracket3Ceiling
+    name: Top of 22% bracket (single)
+    type: dollar
+    value: "103350"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2024_40
+    note: Single — 22% bracket runs to $103,350 (2025).
+  - fact_path: /incomeTax/bracket4Ceiling
+    name: Top of 24% bracket (single)
+    type: dollar
+    value: "197300"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2024_40
+    note: Single — 24% bracket runs to $197,300 (2025).
+  - fact_path: /incomeTax/bracket5Ceiling
+    name: Top of 32% bracket (single)
+    type: dollar
+    value: "250525"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2024_40
+    note: Single — 32% bracket runs to $250,525 (2025).
+  - fact_path: /incomeTax/bracket6Ceiling
+    name: Top of 35% bracket (single)
+    type: dollar
+    value: "626350"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2024_40
+    note: Single — 35% bracket runs to $626,350 (2025); income above is taxed at 37%.
+  # MARRIED FILING JOINTLY
+  - fact_path: /incomeTax/bracket1Ceiling
+    name: Top of 10% bracket (mfj)
+    type: dollar
+    value: "23850"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2024_40
+    note: Married filing jointly — 10% bracket runs to $23,850 (2025).
+  - fact_path: /incomeTax/bracket2Ceiling
+    name: Top of 12% bracket (mfj)
+    type: dollar
+    value: "96950"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2024_40
+    note: Married filing jointly — 12% bracket runs to $96,950 (2025).
+  - fact_path: /incomeTax/bracket3Ceiling
+    name: Top of 22% bracket (mfj)
+    type: dollar
+    value: "206700"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2024_40
+    note: Married filing jointly — 22% bracket runs to $206,700 (2025).
+  - fact_path: /incomeTax/bracket4Ceiling
+    name: Top of 24% bracket (mfj)
+    type: dollar
+    value: "394600"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2024_40
+    note: Married filing jointly — 24% bracket runs to $394,600 (2025).
+  - fact_path: /incomeTax/bracket5Ceiling
+    name: Top of 32% bracket (mfj)
+    type: dollar
+    value: "501050"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2024_40
+    note: Married filing jointly — 32% bracket runs to $501,050 (2025).
+  - fact_path: /incomeTax/bracket6Ceiling
+    name: Top of 35% bracket (mfj)
+    type: dollar
+    value: "751600"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2024_40
+    note: Married filing jointly — 35% bracket runs to $751,600 (2025); income above is taxed at 37%.
+  # MARRIED FILING SEPARATELY
+  - fact_path: /incomeTax/bracket1Ceiling
+    name: Top of 10% bracket (mfs)
+    type: dollar
+    value: "11925"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2024_40
+    note: Married filing separately — 10% bracket runs to $11,925 (2025).
+  - fact_path: /incomeTax/bracket2Ceiling
+    name: Top of 12% bracket (mfs)
+    type: dollar
+    value: "48475"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2024_40
+    note: Married filing separately — 12% bracket runs to $48,475 (2025).
+  - fact_path: /incomeTax/bracket3Ceiling
+    name: Top of 22% bracket (mfs)
+    type: dollar
+    value: "103350"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2024_40
+    note: Married filing separately — 22% bracket runs to $103,350 (2025).
+  - fact_path: /incomeTax/bracket4Ceiling
+    name: Top of 24% bracket (mfs)
+    type: dollar
+    value: "197300"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2024_40
+    note: Married filing separately — 24% bracket runs to $197,300 (2025).
+  - fact_path: /incomeTax/bracket5Ceiling
+    name: Top of 32% bracket (mfs)
+    type: dollar
+    value: "250525"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2024_40
+    note: Married filing separately — 32% bracket runs to $250,525 (2025).
+  - fact_path: /incomeTax/bracket6Ceiling
+    name: Top of 35% bracket (mfs)
+    type: dollar
+    value: "375800"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2024_40
+    note: Married filing separately — 35% bracket runs to $375,800 (2025); income above is taxed at 37%.

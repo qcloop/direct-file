@@ -67,7 +67,11 @@ public class PlanReportService {
             new ResultLine("/seTax", null),
             new ResultLine("/deductibleHalfOfSETax", null),
             new ResultLine("/additionalMedicareTax", "Additional Medicare Tax (Form 8959)"),
+            new ResultLine("/planning/projectedAGI", "Projected AGI (Form 1040 Line 11)"),
             new ResultLine("/qbiDeduction", "QBI deduction (Form 8995)"),
+            new ResultLine("/planning/taxableIncome", "Projected taxable income (Form 1040 Line 15)"),
+            new ResultLine("/incomeTax/projectedIncomeTax", "Projected income tax (ordinary rates)"),
+            new ResultLine("/planning/projectedCurrentYearTax", "Projected total federal tax"),
             new ResultLine("/planning/safeHarborTarget", null),
             new ResultLine("/planning/remainingPaymentDue", null),
             new ResultLine("/planning/projectedBalanceDueAtFiling", null),
@@ -136,10 +140,12 @@ public class PlanReportService {
                 .append("> based on values you provided. Those values are **self-reported and have not been\n")
                 .append("> verified** against source documents (1099s, bank records, mileage logs); this\n")
                 .append("> summary traces the arithmetic from your inputs, it does not confirm the inputs\n")
-                .append("> are correct. It also omits items outside this planning tool's scope — the\n")
-                .append("> Additional Medicare 0.9% surtax (Form 8959), the QBI deduction, and state tax.\n")
-                .append("> This document is generated on demand and **is not stored by the service**; keep\n")
-                .append("> your own copy.\n\n");
+                .append("> are correct. Income tax here is an **ordinary-rate estimate** — it applies the\n")
+                .append("> standard deduction, the §199A QBI deduction, and the regular tax brackets, and\n")
+                .append("> includes self-employment tax and the Additional Medicare surtax, but it omits\n")
+                .append("> tax credits, capital-gains/qualified-dividend rates, the NIIT, the AMT, itemized\n")
+                .append("> deductions, and state tax. This document is generated on demand and is\n")
+                .append("> **not stored by the service**; keep your own copy.\n\n");
 
         // Loudly flag any provisional (draft, unverified) constants so a year whose parameters are
         // not yet finalized (e.g. before the IRS/SSA publish the new rates) is never read as final.

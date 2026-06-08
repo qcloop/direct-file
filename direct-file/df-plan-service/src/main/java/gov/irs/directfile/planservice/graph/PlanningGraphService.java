@@ -100,6 +100,17 @@ public class PlanningGraphService {
     /** Filing statuses recognized for status-scoped parameters (e.g. filing-status thresholds). */
     private static final Set<String> FILING_STATUSES = Set.of("single", "mfj", "mfs");
 
+    /**
+     * Optional dollar inputs initialized to 0 at session creation so the derived income-tax / total-tax
+     * chain is computable for a pure self-employed filer with no other income. Each is overwritten when
+     * the agent supplies a real value (see createSession).
+     */
+    private static final List<String> INCOME_ZERO_DEFAULTS = List.of(
+            "/planning/otherTaxableIncome",
+            "/planning/netCapitalGains",
+            "/seSocialSecurityWagesFromW2",
+            "/medicareWagesFromW2");
+
     /** Create a session for the given year, defaulting to the {@code single} filing status. */
     public String createSession(int taxYear) {
         return createSession(taxYear, "single");
@@ -154,6 +165,15 @@ public class PlanningGraphService {
                 }
             }
             writeFact(id, p.factPath(), typeCode, value);
+        }
+        // Zero-default the optional income inputs so the derived income-tax / total-tax chain is
+        // computable from just the Schedule C inputs (the pure-gig case). Each is overwritten when
+        // the agent supplies a real value: otherTaxableIncome via project_total_tax, netCapitalGains
+        // via estimate_qbi_deduction, and the W-2 wage facts via calculate_se_tax /
+        // calculate_additional_medicare. Without these defaults projectedAGI (hence total tax) would
+        // stay incomplete until every optional input was set by hand.
+        for (String zeroDefault : INCOME_ZERO_DEFAULTS) {
+            writeFact(id, zeroDefault, DOLLAR_WRAPPER, "0");
         }
         return id;
     }

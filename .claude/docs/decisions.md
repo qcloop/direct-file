@@ -46,6 +46,22 @@ Newest last. Each entry: the decision, the reason, and the alternative rejected.
 - **Tax constants are YAML data; calculations are declarative fact-graph XML.** Adding a year or
   tweaking a constant is data-only, no code change. Persister type codes are validated before
   reaching the engine; writes are atomic (rollback) so one bad `set_fact` can't poison a session.
+- **Total tax is DERIVED, not agent-supplied.** Previously `/planning/projectedCurrentYearTax` and
+  `/planning/taxableIncomeBeforeQBIDeduction` were `Writable` facts the LLM had to estimate; the
+  service then presented that guess as authoritative (a real chat transcript showed a hallucinated
+  $5,534 "balance due" that didn't equal its own breakdown, and an uncapped QBI deduction because the
+  agent passed taxable income too high). Now an ordinary income-tax engine (`tax-plan/selfEmployment.xml`
+  + `income-tax-parameters.yaml`) derives net profit → AGI → taxable income → bracket tax, and
+  `projectedCurrentYearTax = income tax + SE tax + Additional Medicare`. A new `project_total_tax` tool
+  exposes the whole ladder so the agent calls it instead of doing 1040 math by hand. *Scope:* ordinary
+  income only (no credits, capital-gains/qualified-dividend rates, NIIT, AMT, or itemized deductions);
+  income besides the Schedule C enters via `/planning/otherTaxableIncome`. Optional income inputs are
+  zero-defaulted at session creation so the chain computes from just the Schedule C figures. *Rejected:*
+  keeping the agent guess with only a provenance label (cheaper, but still launders a hallucination).
+- **Standard deduction and the seven ordinary brackets are status-scoped YAML** (`income-tax-parameters.yaml`,
+  one file per year). Brackets modeled as six injected ceilings + seven rates, tax summed per bracket
+  (not a compressed marginal-difference formula) so `explain`/`cite` read naturally. 2026 figures are
+  `provisional` (Rev. Proc. 2025-32); 2024/2025 are final.
 - **Filing-status-dependent constants are status-scoped YAML rows** (a `filing_status` field);
   `createSession(year, status)` injects only the matching row. *Rejected:* modeling filing status as
   an enum fact in the graph (more XML + an enum-options wiring), and hard-coding a status→bracket map

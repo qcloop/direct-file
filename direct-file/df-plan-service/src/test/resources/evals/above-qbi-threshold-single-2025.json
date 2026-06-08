@@ -9,8 +9,16 @@
       "expect": { "deductibleHalf": 4239 }
     },
     {
+      "tool": "project_total_tax",
+      "args": { "otherOrdinaryIncome": "200000" },
+      "expect": {
+        "adjustedGrossIncome": 255761,
+        "taxableIncome": 229609
+      }
+    },
+    {
       "tool": "estimate_qbi_deduction",
-      "args": { "taxableIncomeBeforeQbi": "250000", "netCapitalGains": "0" },
+      "args": { "netCapitalGains": "0" },
       "expect": {
         "qbiThreshold": 197300,
         "qbiComponent": 11152,

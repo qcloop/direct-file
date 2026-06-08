@@ -253,3 +253,55 @@ citations:
       The short form for the 20% qualified-business-income deduction, used when your
       taxable income is under the year's limit. It takes 20% of your business profit and
       caps it at 20% of your taxable income (excluding capital gains).
+
+  irc_1:
+    authority: statute
+    citation: "26 U.S.C. § 1"
+    title: "Tax imposed (individual income tax rates)"
+    url: "https://www.law.cornell.edu/uscode/text/26/1"
+    plain_language: >
+      The law that sets the regular income-tax rates — 10%, 12%, 22%, 24%, 32%, 35%, and
+      37%. The rates stay the same from year to year; only the dollar amounts where each
+      bracket starts and stops move with inflation. Your income is taxed in slices: the
+      first slice at 10%, the next at 12%, and so on, so only the part in a higher bracket
+      pays the higher rate.
+
+  irc_63:
+    authority: statute
+    citation: "26 U.S.C. § 63"
+    title: "Taxable income defined (standard deduction)"
+    url: "https://www.law.cornell.edu/uscode/text/26/63"
+    plain_language: >
+      The law that lets you subtract a flat "standard deduction" from your income before
+      figuring tax, instead of itemizing. The dollar amount depends on your filing status
+      and goes up a little each year with inflation.
+
+  irs_rev_proc_2023_34:
+    authority: revenue_procedure
+    citation: "Rev. Proc. 2023-34, 2023-48 I.R.B. 1287"
+    title: "2024 inflation-adjusted tax brackets and standard deduction"
+    url: "https://www.irs.gov/pub/irs-drop/rp-23-34.pdf"
+    plain_language: >
+      The IRS announcement that set the 2024 dollar figures — where each tax bracket
+      starts and stops, and the standard deduction for each filing status — after adjusting
+      the prior year's amounts for inflation.
+
+  irs_rev_proc_2024_40:
+    authority: revenue_procedure
+    citation: "Rev. Proc. 2024-40, 2024-45 I.R.B. 1100"
+    title: "2025 inflation-adjusted tax brackets and standard deduction"
+    url: "https://www.irs.gov/pub/irs-drop/rp-24-40.pdf"
+    plain_language: >
+      The IRS announcement that set the 2025 dollar figures — where each tax bracket
+      starts and stops, and the standard deduction for each filing status — after adjusting
+      the prior year's amounts for inflation.
+
+  irs_rev_proc_2025_32:
+    authority: revenue_procedure
+    citation: "Rev. Proc. 2025-32 (2026 inflation adjustments)"
+    title: "2026 inflation-adjusted tax brackets and standard deduction (provisional)"
+    url: "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf"
+    plain_language: >
+      The IRS announcement that sets the 2026 dollar figures — the tax-bracket edges and
+      the standard deduction for each filing status. These are used here as provisional
+      planning values until the final 2026 forms confirm them.

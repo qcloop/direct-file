@@ -23,12 +23,22 @@
     },
     {
       "tool": "estimate_qbi_deduction",
-      "args": { "taxableIncomeBeforeQbi": "350000", "netCapitalGains": "0" },
+      "args": { "netCapitalGains": "0" },
       "expect": {
         "qbiComponent": 76745,
-        "qbiIncomeLimit": 70000,
-        "qbiDeduction": 70000,
+        "qbiIncomeLimit": 70745,
+        "qbiDeduction": 70745,
         "aboveThreshold": false
+      }
+    },
+    {
+      "tool": "project_total_tax",
+      "args": {},
+      "expect": {
+        "adjustedGrossIncome": 383725,
+        "qbiDeduction": 70745,
+        "taxableIncome": 282980,
+        "additionalMedicareTax": 1075
       }
     }
   ]

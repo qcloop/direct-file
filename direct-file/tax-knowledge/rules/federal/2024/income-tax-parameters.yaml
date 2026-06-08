@@ -1,0 +1,231 @@
+parameter_set_id: income_tax_parameters_ty2024
+tax_year: 2024
+jurisdiction: federal
+topic_id: income_tax
+status: published
+source_ids:
+  - irc_1
+  - irc_63
+  - irs_rev_proc_2023_34
+description: >
+  Year/filing-status-scoped federal ordinary income-tax schedule for 2024: standard deduction, the
+  six bracket ceilings (top of brackets 1-6; bracket 7 is open-ended), and the seven statutory
+  marginal rates. Dollar figures are the 2024 inflation-adjusted amounts from IRS Rev. Proc. 2023-34;
+  rates are the statutory IRC 1(j) rates. Ordinary income only — no capital-gains rates, credits,
+  NIIT, or AMT.
+parameters:
+  - fact_path: /incomeTax/bracket1Rate
+    name: First bracket marginal rate (10%)
+    type: rational
+    value: "10/100"
+    source_id: irc_1
+    note: 10% — lowest ordinary-income bracket. Statutory rate (IRC 1(j)).
+  - fact_path: /incomeTax/bracket2Rate
+    name: Second bracket marginal rate (12%)
+    type: rational
+    value: "12/100"
+    source_id: irc_1
+    note: 12% ordinary-income bracket. Statutory rate (IRC 1(j)).
+  - fact_path: /incomeTax/bracket3Rate
+    name: Third bracket marginal rate (22%)
+    type: rational
+    value: "22/100"
+    source_id: irc_1
+    note: 22% ordinary-income bracket. Statutory rate (IRC 1(j)).
+  - fact_path: /incomeTax/bracket4Rate
+    name: Fourth bracket marginal rate (24%)
+    type: rational
+    value: "24/100"
+    source_id: irc_1
+    note: 24% ordinary-income bracket. Statutory rate (IRC 1(j)).
+  - fact_path: /incomeTax/bracket5Rate
+    name: Fifth bracket marginal rate (32%)
+    type: rational
+    value: "32/100"
+    source_id: irc_1
+    note: 32% ordinary-income bracket. Statutory rate (IRC 1(j)).
+  - fact_path: /incomeTax/bracket6Rate
+    name: Sixth bracket marginal rate (35%)
+    type: rational
+    value: "35/100"
+    source_id: irc_1
+    note: 35% ordinary-income bracket. Statutory rate (IRC 1(j)).
+  - fact_path: /incomeTax/bracket7Rate
+    name: Seventh bracket marginal rate (37%)
+    type: rational
+    value: "37/100"
+    source_id: irc_1
+    note: 37% — top ordinary-income bracket. Statutory rate (IRC 1(j)).
+
+  - fact_path: /standardDeduction
+    name: Standard deduction (single)
+    type: dollar
+    value: "14600"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2023_34
+    note: Single / married filing separately — 2024 standard deduction is $14,600 (Rev. Proc. 2023-34).
+  - fact_path: /standardDeduction
+    name: Standard deduction (married filing jointly)
+    type: dollar
+    value: "29200"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2023_34
+    note: Married filing jointly — 2024 standard deduction is $29,200 (Rev. Proc. 2023-34).
+  - fact_path: /standardDeduction
+    name: Standard deduction (married filing separately)
+    type: dollar
+    value: "14600"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2023_34
+    note: Married filing separately — 2024 standard deduction is $14,600 (Rev. Proc. 2023-34).
+
+  # SINGLE
+  - fact_path: /incomeTax/bracket1Ceiling
+    name: Top of 10% bracket (single)
+    type: dollar
+    value: "11600"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2023_34
+    note: Single — 10% bracket runs to $11,600 (2024).
+  - fact_path: /incomeTax/bracket2Ceiling
+    name: Top of 12% bracket (single)
+    type: dollar
+    value: "47150"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2023_34
+    note: Single — 12% bracket runs to $47,150 (2024).
+  - fact_path: /incomeTax/bracket3Ceiling
+    name: Top of 22% bracket (single)
+    type: dollar
+    value: "100525"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2023_34
+    note: Single — 22% bracket runs to $100,525 (2024).
+  - fact_path: /incomeTax/bracket4Ceiling
+    name: Top of 24% bracket (single)
+    type: dollar
+    value: "191950"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2023_34
+    note: Single — 24% bracket runs to $191,950 (2024).
+  - fact_path: /incomeTax/bracket5Ceiling
+    name: Top of 32% bracket (single)
+    type: dollar
+    value: "243725"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2023_34
+    note: Single — 32% bracket runs to $243,725 (2024).
+  - fact_path: /incomeTax/bracket6Ceiling
+    name: Top of 35% bracket (single)
+    type: dollar
+    value: "609350"
+    unit: dollars
+    filing_status: single
+    source_id: irs_rev_proc_2023_34
+    note: Single — 35% bracket runs to $609,350 (2024); income above is taxed at 37%.
+  # MARRIED FILING JOINTLY
+  - fact_path: /incomeTax/bracket1Ceiling
+    name: Top of 10% bracket (mfj)
+    type: dollar
+    value: "23200"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2023_34
+    note: Married filing jointly — 10% bracket runs to $23,200 (2024).
+  - fact_path: /incomeTax/bracket2Ceiling
+    name: Top of 12% bracket (mfj)
+    type: dollar
+    value: "94300"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2023_34
+    note: Married filing jointly — 12% bracket runs to $94,300 (2024).
+  - fact_path: /incomeTax/bracket3Ceiling
+    name: Top of 22% bracket (mfj)
+    type: dollar
+    value: "201050"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2023_34
+    note: Married filing jointly — 22% bracket runs to $201,050 (2024).
+  - fact_path: /incomeTax/bracket4Ceiling
+    name: Top of 24% bracket (mfj)
+    type: dollar
+    value: "383900"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2023_34
+    note: Married filing jointly — 24% bracket runs to $383,900 (2024).
+  - fact_path: /incomeTax/bracket5Ceiling
+    name: Top of 32% bracket (mfj)
+    type: dollar
+    value: "487450"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2023_34
+    note: Married filing jointly — 32% bracket runs to $487,450 (2024).
+  - fact_path: /incomeTax/bracket6Ceiling
+    name: Top of 35% bracket (mfj)
+    type: dollar
+    value: "731200"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_rev_proc_2023_34
+    note: Married filing jointly — 35% bracket runs to $731,200 (2024); income above is taxed at 37%.
+  # MARRIED FILING SEPARATELY
+  - fact_path: /incomeTax/bracket1Ceiling
+    name: Top of 10% bracket (mfs)
+    type: dollar
+    value: "11600"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2023_34
+    note: Married filing separately — 10% bracket runs to $11,600 (2024).
+  - fact_path: /incomeTax/bracket2Ceiling
+    name: Top of 12% bracket (mfs)
+    type: dollar
+    value: "47150"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2023_34
+    note: Married filing separately — 12% bracket runs to $47,150 (2024).
+  - fact_path: /incomeTax/bracket3Ceiling
+    name: Top of 22% bracket (mfs)
+    type: dollar
+    value: "100525"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2023_34
+    note: Married filing separately — 22% bracket runs to $100,525 (2024).
+  - fact_path: /incomeTax/bracket4Ceiling
+    name: Top of 24% bracket (mfs)
+    type: dollar
+    value: "191950"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2023_34
+    note: Married filing separately — 24% bracket runs to $191,950 (2024).
+  - fact_path: /incomeTax/bracket5Ceiling
+    name: Top of 32% bracket (mfs)
+    type: dollar
+    value: "243725"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2023_34
+    note: Married filing separately — 32% bracket runs to $243,725 (2024).
+  - fact_path: /incomeTax/bracket6Ceiling
+    name: Top of 35% bracket (mfs)
+    type: dollar
+    value: "365600"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_rev_proc_2023_34
+    note: Married filing separately — 35% bracket runs to $365,600 (2024); income above is taxed at 37%.

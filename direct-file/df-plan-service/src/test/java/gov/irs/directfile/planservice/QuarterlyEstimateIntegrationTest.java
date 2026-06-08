@@ -44,7 +44,10 @@ class QuarterlyEstimateIntegrationTest {
         // 2) Gather facts the way the LLM agent would after a short interview.
         writeDollar(sid, "/planning/priorYearTotalTax", 3800);
         writeDollar(sid, "/planning/priorYearAGI", 58000);
-        writeDollar(sid, "/planning/projectedCurrentYearTax", 7200);
+        // projectedCurrentYearTax is now DERIVED (was an agent-entered guess). Populate the Schedule C
+        // inputs so it computes: ~$32K net profit -> total tax (income + SE) comfortably above the
+        // $4,222 the 90% leg would need to beat the $3,800 prior-year leg, so the prior-year leg governs.
+        tools.calculateSeTax(sid, "32000", null, null, null, null);
         writeDollar(sid, "/planning/ytdWithholding", 400);
         writeDollar(sid, "/planning/ytdEstimatedPaymentsMade", 1800); // Q1 + Q2 already paid
 
@@ -74,7 +77,9 @@ class QuarterlyEstimateIntegrationTest {
 
         writeDollar(sid, "/planning/priorYearTotalTax", 20000);
         writeDollar(sid, "/planning/priorYearAGI", 200000); // over the $150K high-income threshold
-        writeDollar(sid, "/planning/projectedCurrentYearTax", 30000); // 90% leg = $27,000, so it loses
+        // Derived current-year tax: ~$130K net profit yields total tax well above $24,445, so the 90%
+        // current-year leg (>= ~$28K) exceeds the 110% prior-year leg ($22,000) and the prior-year leg wins.
+        tools.calculateSeTax(sid, "130000", null, null, null, null);
 
         // High-income tier engaged.
         assertThat(graph.readFact(sid, "/planning/highIncomeSafeHarborApplies").value())

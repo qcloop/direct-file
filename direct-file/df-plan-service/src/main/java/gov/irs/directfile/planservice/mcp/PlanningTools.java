@@ -64,6 +64,9 @@ public class PlanningTools {
     /** Schedule C net-profit fact path, read by several tools. */
     private static final String SE_NET_PROFIT_PATH = "/seNetProfit";
 
+    /** Derived projected current-year total tax (income tax + SE tax + Additional Medicare). */
+    private static final String PROJECTED_TOTAL_TAX_PATH = "/planning/projectedCurrentYearTax";
+
     private static final List<RequiredFact> REQUIRED_FACTS = List.of(
             new RequiredFact(
                     "/planning/priorYearTotalTax",
@@ -72,14 +75,20 @@ public class PlanningTools {
                     "/planning/priorYearAGI",
                     "Adjusted gross income from your prior-year return (Form 1040, Line 11)."),
             new RequiredFact(
-                    "/planning/projectedCurrentYearTax",
-                    "Your best estimate of total federal tax (income tax + SE tax) for this year."),
-            new RequiredFact(
                     "/planning/ytdWithholding",
                     "Federal income tax already withheld by employers or platforms so far this year."),
             new RequiredFact(
                     "/planning/ytdEstimatedPaymentsMade",
                     "Quarterly estimated tax payments you've already made this year."));
+
+    // Projected current-year total tax is no longer an agent-supplied required fact — it is derived
+    // (income tax + SE tax + Additional Medicare). But it only computes once the Schedule C inputs are
+    // set, so the quarterly tool checks it is complete and, if not, points the agent to run the income
+    // projection first rather than silently treating a missing total as zero.
+    private static final RequiredFact PROJECTED_TAX_PREREQUISITE = new RequiredFact(
+            PROJECTED_TOTAL_TAX_PATH,
+            "Run project_total_tax (or project_net_profit / calculate_se_tax) first so the projected"
+                    + " current-year total tax can be computed from your income — it is no longer entered by hand.");
 
     private final PlanningGraphService graph;
     private final TaxKnowledgeService taxKnowledge;
@@ -373,26 +382,24 @@ public class PlanningTools {
                     + "for a planning session. Run calculate_se_tax or project_net_profit first so the session "
                     + "has self-employment net profit; for a sole proprietor, QBI is that net profit minus the "
                     + "deductible half of SE tax. The deduction is the lesser of 20% of QBI and 20% of (taxable "
-                    + "income minus net capital gains). This is the SIMPLE Form 8995 method, valid when taxable "
-                    + "income is at or below the filing-status threshold; above it, Form 8995-A wage/property "
-                    + "limits apply and the result is only an upper bound (flagged in the response).")
+                    + "income minus net capital gains). Taxable income before QBI is now DERIVED by the graph "
+                    + "(AGI minus the standard deduction) — you no longer pass it in, so the income cap binds on "
+                    + "the computed figure rather than an estimate. This is the SIMPLE Form 8995 method, valid "
+                    + "when taxable income is at or below the filing-status threshold; above it, Form 8995-A "
+                    + "wage/property limits apply and the result is only an upper bound (flagged in the response).")
     public QbiResult estimateQbiDeduction(
             @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @McpToolParam(
-                            description = "Taxable income before the QBI deduction (Form 1040 taxable income "
-                                    + "computed without this deduction), as a string. Caps the deduction at 20% of it.")
-                    String taxableIncomeBeforeQbi,
-            @McpToolParam(
                             description = "Net capital gains, including qualified dividends, as a string. "
-                                    + "Excluded from the income cap. Default 0.",
+                                    + "Excluded from the income cap. Optional; defaults to 0 (set at "
+                                    + "create_session). Pass a value only to override.",
                             required = false)
                     String netCapitalGains) {
-        graph.writeFact(
-                sessionId,
-                "/planning/taxableIncomeBeforeQBIDeduction",
-                DOLLAR_WRAPPER,
-                dollarOrZero(taxableIncomeBeforeQbi));
-        graph.writeFact(sessionId, "/planning/netCapitalGains", DOLLAR_WRAPPER, dollarOrZero(netCapitalGains));
+        // Taxable income before QBI is derived (AGI − standard deduction), so this tool no longer writes
+        // it. Net capital gains is zero-defaulted at session creation; only overwrite when supplied.
+        if (netCapitalGains != null && !netCapitalGains.isBlank()) {
+            graph.writeFact(sessionId, "/planning/netCapitalGains", DOLLAR_WRAPPER, dollarOrZero(netCapitalGains));
+        }
 
         ReadResult netProfit = graph.readFact(sessionId, SE_NET_PROFIT_PATH);
         String note = netProfit.complete()
@@ -436,6 +443,90 @@ public class PlanningTools {
             String aboveThresholdWarning,
             PlanningGraphService.ExplainResult explanationTree,
             String note,
+            String provisionalWarning) {}
+
+    @McpTool(
+            generateOutputSchema = true,
+            name = "project_total_tax",
+            description = "Project full-year total federal tax for a self-employed planning session: the "
+                    + "whole ladder from net profit to AGI to taxable income to income tax, plus SE tax and "
+                    + "the Additional Medicare surtax. Run calculate_se_tax or project_net_profit first so the "
+                    + "session has self-employment net profit. Income tax is computed in-graph from the year's "
+                    + "standard deduction, ordinary brackets, and the QBI deduction — you do NOT estimate any "
+                    + "of it. Call this instead of working out total tax yourself; it is also exactly what feeds "
+                    + "the projected balance due in estimate_quarterly_payment. Scope: ordinary income only (no "
+                    + "credits, capital-gains/qualified-dividend rates, NIIT, or AMT); income besides this "
+                    + "Schedule C enters via otherOrdinaryIncome.")
+    public TotalTaxResult projectTotalTax(
+            @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
+            @McpToolParam(
+                            description = "Ordinary income other than this self-employment (e.g. W-2 box 1 wages, "
+                                    + "interest), as a string. Optional; defaults to 0. Pass a value for a taxpayer "
+                                    + "who also has a W-2 or other ordinary income.",
+                            required = false)
+                    String otherOrdinaryIncome,
+            @McpToolParam(
+                            description = "Net capital gains incl. qualified dividends, as a string. Optional; "
+                                    + "defaults to 0. Excluded from the QBI income cap.",
+                            required = false)
+                    String netCapitalGains) {
+        // Both optional inputs are zero-defaulted at session creation; only overwrite when supplied.
+        if (otherOrdinaryIncome != null && !otherOrdinaryIncome.isBlank()) {
+            graph.writeFact(
+                    sessionId, "/planning/otherTaxableIncome", DOLLAR_WRAPPER, dollarOrZero(otherOrdinaryIncome));
+        }
+        if (netCapitalGains != null && !netCapitalGains.isBlank()) {
+            graph.writeFact(sessionId, "/planning/netCapitalGains", DOLLAR_WRAPPER, dollarOrZero(netCapitalGains));
+        }
+
+        ReadResult netProfit = graph.readFact(sessionId, SE_NET_PROFIT_PATH);
+        String incomplete = netProfit.complete()
+                ? ""
+                : "Self-employment net profit isn't set yet — run calculate_se_tax or project_net_profit"
+                        + " first so income tax and total tax can be computed. ";
+        String note = incomplete
+                + "projectedTotalTax is income tax + SE tax + Additional Medicare surtax. It excludes credits,"
+                + " capital-gains/qualified-dividend rates, the NIIT, and AMT, so a return with those will"
+                + " differ. Income tax is on taxable income after the standard and QBI deductions.";
+        int year = graph.taxYearOf(sessionId);
+        return new TotalTaxResult(
+                "ok",
+                year,
+                graph.filingStatusOf(sessionId),
+                graph.readFact(sessionId, SE_NET_PROFIT_PATH).value(),
+                graph.readFact(sessionId, "/planning/otherTaxableIncome").value(),
+                graph.readFact(sessionId, "/deductibleHalfOfSETax").value(),
+                graph.readFact(sessionId, "/planning/projectedAGI").value(),
+                graph.readFact(sessionId, "/standardDeduction").value(),
+                graph.readFact(sessionId, "/qbiDeduction").value(),
+                graph.readFact(sessionId, "/planning/taxableIncome").value(),
+                graph.readFact(sessionId, "/incomeTax/projectedIncomeTax").value(),
+                graph.readFact(sessionId, SE_TAX_PATH).value(),
+                graph.readFact(sessionId, "/additionalMedicareTax").value(),
+                graph.readFact(sessionId, PROJECTED_TOTAL_TAX_PATH).value(),
+                note,
+                graph.explain(sessionId, PROJECTED_TOTAL_TAX_PATH),
+                nullToEmpty(taxKnowledge.provisionalWarning(year)));
+    }
+
+    /** Structured result of {@code project_total_tax}: the full net-profit-to-total-tax ladder. */
+    public record TotalTaxResult(
+            String status,
+            int taxYear,
+            String filingStatus,
+            Object netProfit,
+            Object otherOrdinaryIncome,
+            Object deductibleHalfOfSeTax,
+            Object adjustedGrossIncome,
+            Object standardDeduction,
+            Object qbiDeduction,
+            Object taxableIncome,
+            Object incomeTax,
+            Object selfEmploymentTax,
+            Object additionalMedicareTax,
+            Object projectedTotalTax,
+            String note,
+            PlanningGraphService.ExplainResult explanationTree,
             String provisionalWarning) {}
 
     @McpTool(
@@ -641,6 +732,11 @@ public class PlanningTools {
                 missing.add(new MissingFact(rf.path, rf.prompt));
             }
         }
+        // The projected total tax is derived, not entered — but it only resolves once the income inputs
+        // are present. If it is still incomplete, surface that as a prerequisite to run first.
+        if (!graph.readFact(sessionId, PROJECTED_TAX_PREREQUISITE.path).complete()) {
+            missing.add(new MissingFact(PROJECTED_TAX_PREREQUISITE.path, PROJECTED_TAX_PREREQUISITE.prompt));
+        }
         if (!missing.isEmpty()) {
             return new QuarterlyPaymentResult(
                     "needs_facts",
@@ -680,7 +776,7 @@ public class PlanningTools {
         ReadResult remainingDue = graph.readFact(sessionId, "/planning/remainingPaymentDue");
         ReadResult seTax = graph.readFact(sessionId, SE_TAX_PATH);
         ReadResult highIncomeRule = graph.readFact(sessionId, "/planning/highIncomeSafeHarborApplies");
-        ReadResult projectedTax = graph.readFact(sessionId, "/planning/projectedCurrentYearTax");
+        ReadResult projectedTax = graph.readFact(sessionId, PROJECTED_TOTAL_TAX_PATH);
         ReadResult balanceDueAtFiling = graph.readFact(sessionId, "/planning/projectedBalanceDueAtFiling");
 
         // Keep the two questions distinct: the safe-harbor recommendation ("least to prepay to avoid

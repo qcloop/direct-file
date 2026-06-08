@@ -74,8 +74,9 @@ on `PlanningTools` (camelCase, not snake_case).
 | `set_fact`                    | Write a value to a writable fact                       |
 | `calculate_se_tax`            | Schedule C/SE tax from full-year figures               |
 | `calculate_additional_medicare` | Form 8959 0.9% Additional Medicare Tax (wage + SE portions) |
-| `estimate_qbi_deduction`      | Form 8995 / §199A 20% QBI deduction (simple method)    |
+| `estimate_qbi_deduction`      | Form 8995 / §199A 20% QBI deduction (taxable-income cap derived) |
 | `project_net_profit`          | Project full-year net profit + SE tax from YTD figures |
+| `project_total_tax`           | Full net-profit → AGI → taxable income → income tax + SE + Additional Medicare (total tax derived, not guessed) |
 | `explain`                     | One-level derivation explanation for a fact            |
 | `cite`                        | Legal authority behind a fact + plain-language explanation |
 | `estimate_quarterly_payment`  | IRC §6654 safe-harbor quarterly recommendation         |

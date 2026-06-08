@@ -1,5 +1,5 @@
 {
-  "name": "Below the $400 SE filing threshold, single, TY2025 — no SE tax, but QBI still applies",
+  "name": "Below the $400 SE filing threshold, single, TY2025 — no SE tax, and QBI is zero because the standard deduction wipes out taxable income",
   "taxYear": 2025,
   "filingStatus": "single",
   "steps": [
@@ -14,12 +14,24 @@
     },
     {
       "tool": "estimate_qbi_deduction",
-      "args": { "taxableIncomeBeforeQbi": "30000", "netCapitalGains": "0" },
+      "args": { "netCapitalGains": "0" },
       "expect": {
         "qualifiedBusinessIncome": 400,
         "qbiComponent": 80,
-        "qbiDeduction": 80,
+        "qbiIncomeLimit": 0,
+        "qbiDeduction": 0,
         "aboveThreshold": false
+      }
+    },
+    {
+      "tool": "project_total_tax",
+      "args": {},
+      "expect": {
+        "adjustedGrossIncome": 400,
+        "taxableIncome": 0,
+        "incomeTax": 0,
+        "selfEmploymentTax": 0,
+        "projectedTotalTax": 0
       }
     }
   ]
