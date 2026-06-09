@@ -61,6 +61,15 @@ spring:
 server:
   port: 8090
 
+# Expose metrics alongside health so the PII-free tool-call telemetry (ToolCallTelemetry:
+# planservice.tool.calls / .errors / .latency) is observable at /actuator/metrics. These
+# counters carry only tool name + outcome + exception class — never taxpayer values.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+
 df-plan:
   tax-knowledge-root: ${DF_TAX_KNOWLEDGE_ROOT:../tax-knowledge}
   fact-xml-patterns:

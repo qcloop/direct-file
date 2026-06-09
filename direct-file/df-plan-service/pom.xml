@@ -56,6 +56,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <!--
+            AOP, for the tool-call telemetry aspect (ToolCallTelemetry): a single @Around
+            advice on @McpTool methods records a PII-free {tool, outcome, errorClass} signal
+            to Micrometer + a structured log, so client-side tool MISUSE is visible without
+            persisting any taxpayer data. Boot 4 canonical artifact is -aspectj (was -aop).
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aspectj</artifactId>
+        </dependency>
 
         <!--
             Spring AI MCP server (reactive/WebFlux). This starter serves the Streamable

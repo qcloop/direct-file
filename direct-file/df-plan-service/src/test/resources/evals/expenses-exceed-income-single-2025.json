@@ -1,0 +1,25 @@
+{
+  "name": "Edge case — mileage deduction exceeds gross receipts, single, TY2025: net profit floors at zero (no negative SE tax)",
+  "taxYear": 2025,
+  "filingStatus": "single",
+  "steps": [
+    {
+      "tool": "calculate_se_tax",
+      "args": { "grossReceipts": "5000", "businessMiles": "20000" },
+      "expect": {
+        "netProfit": 0,
+        "selfEmploymentTax": 0,
+        "deductibleHalf": 0
+      }
+    },
+    {
+      "tool": "project_total_tax",
+      "args": {},
+      "expect": {
+        "adjustedGrossIncome": 0,
+        "taxableIncome": 0,
+        "projectedTotalTax": 0
+      }
+    }
+  ]
+}

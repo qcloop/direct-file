@@ -14,6 +14,7 @@ Supplemental detail (read these before non-trivial work):
 - @.claude/docs/operations.md — toolchain, build order, running services, profiles/ports, Docker, MCP transports.
 - @.claude/docs/decisions.md — why non-obvious engineering choices were made (decision log).
 - @.claude/docs/tech-debt.md — known gaps, limitations, and follow-ups.
+- @.claude/docs/findings.md — production signal → finding → eval → fix ledger (the self-improvement loop).
 
 ---
 
