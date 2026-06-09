@@ -73,3 +73,17 @@ Newest last. Each entry: the decision, the reason, and the alternative rejected.
   as structural tests with remediation in the failure message; the knowledge base is kept fresh with
   mechanical checks (tool-inventory drift gate). Context for agents lives in-repo (AGENTS.md map +
   `.claude/docs/`), not in external memory.
+- **Self-improvement loop, adapted (not copied) from the "self-improving tax agents" pattern.** The
+  loop is: production signal → finding → eval → scoped fix (the fix half is a coding agent against the
+  build gates). We do NOT copy the extraction-agent version: df-plan-service is a deterministic
+  calculator (no field-accuracy to climb) that persists no taxpayer data (no rich production traces).
+  So: (a) a `findings.md` ledger turns recurring client-app/transcript/SME signals into evals + fixes;
+  (b) telemetry is **aggregate and PII-free** — a single AOP aspect (`ToolCallTelemetry`) on `@McpTool`
+  methods records only `{tool, outcome, errorClass}` to Micrometer + a structured log, never args or
+  field values or exception messages, surfacing tool *misuse* (e.g. `needs_facts` / `error` rates) at
+  `/actuator/metrics` without storing anything; (c) the eval suite gained adversarial/edge fixtures, an
+  affordance-eval class (does `needs_facts`/notes steer the agent right?), and a coverage gate so eval
+  breadth can't silently shrink. *Rejected:* per-session or value-level traces (FTI/privacy), and a
+  trend-line "score over time" (needs external CI history — the coverage floor is the in-repo stand-in).
+  *Chose AOP* over instrumenting all 14 tools by hand: one advice, verified to intercept the MCP
+  scanner's invocations (`ToolCallTelemetryTest`). Boot 4 AOP starter is `spring-boot-starter-aspectj`.
