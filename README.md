@@ -11,6 +11,8 @@ Direct File was developed by an in-house team of technologists at the IRS. The b
 
 For a more details on the program and its history see https://www.irs.gov/pub/irs-pdf/p5969.pdf and https://www.irs.gov/filing/irs-direct-file-for-free
 
+**This repository has been archived and is no longer maintained.** The code is provided for historical reference and may contain unpatched or unknown vulnerabilities. It should **not** be used in production systems.
+
 ## Where do I start?
 See [ONBOARDING.md](/ONBOARDING.md) if you want to jump into running Direct File locally
 
