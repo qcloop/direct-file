@@ -121,5 +121,5 @@ Recurring breakages when touching these services (full mapping in architecture.m
 - `submit/` and `status/` depend on **proprietary MeF SDK jars** (`gov.irs.mef.*`,
   `gov.irs.a2a.mef.*`) not present in this repo — they cannot be fully built here. Don't
   treat their compile failures as regressions you introduced.
-- `spring-ai 2.0.0-M8` is a **milestone** (pre-GA). It works on Boot 4.1; if stability is
-  required, `spring-ai 1.1.x` GA also has Streamable HTTP but targets the Boot 3 line.
+- Spring versions are GA and resolve from Maven Central: Boot `4.1.2` (Framework 7.0.10) and
+  `spring-ai 2.0.2`. Boot 4.2 / spring-ai 2.1 were still release candidates when these were pinned.

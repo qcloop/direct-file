@@ -14,8 +14,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.realworld.tax.advisor.citation.CitationService;
+import com.realworld.tax.advisor.graph.FactPaths;
 import com.realworld.tax.advisor.graph.PlanningGraphService;
 import com.realworld.tax.advisor.graph.PlanningGraphService.ExplainResult;
 import com.realworld.tax.advisor.knowledge.TaxKnowledgeService;
@@ -59,22 +61,22 @@ public class PlanReportService {
      * Facts that lack a {@code <Name>} in the dictionary get a friendly label here.
      */
     private static final List<ResultLine> RESULT_LINES = List.of(
-            new ResultLine("/seNetProfit", null),
-            new ResultLine("/seNetEarnings", null),
-            new ResultLine("/seSocialSecurityTax", "Social Security portion of SE tax"),
-            new ResultLine("/seMedicareTax", "Medicare portion of SE tax"),
-            new ResultLine("/seTax", null),
-            new ResultLine("/deductibleHalfOfSETax", null),
-            new ResultLine("/additionalMedicareTax", "Additional Medicare Tax (Form 8959)"),
-            new ResultLine("/planning/projectedAGI", "Projected AGI (Form 1040 Line 11)"),
-            new ResultLine("/qbiDeduction", "QBI deduction (Form 8995)"),
-            new ResultLine("/planning/taxableIncome", "Projected taxable income (Form 1040 Line 15)"),
-            new ResultLine("/incomeTax/projectedIncomeTax", "Projected income tax (ordinary rates)"),
-            new ResultLine("/planning/projectedCurrentYearTax", "Projected total federal tax"),
-            new ResultLine("/planning/safeHarborTarget", null),
-            new ResultLine("/planning/remainingPaymentDue", null),
-            new ResultLine("/planning/projectedBalanceDueAtFiling", null),
-            new ResultLine("/planning/nextQuarterlyPaymentSuggested", null));
+            new ResultLine(FactPaths.SE_NET_PROFIT, null),
+            new ResultLine(FactPaths.SE_NET_EARNINGS, null),
+            new ResultLine(FactPaths.SE_SOCIAL_SECURITY_TAX, "Social Security portion of SE tax"),
+            new ResultLine(FactPaths.SE_MEDICARE_TAX, "Medicare portion of SE tax"),
+            new ResultLine(FactPaths.SE_TAX, null),
+            new ResultLine(FactPaths.DEDUCTIBLE_HALF_OF_SE_TAX, null),
+            new ResultLine(FactPaths.ADDITIONAL_MEDICARE_TAX, "Additional Medicare Tax (Form 8959)"),
+            new ResultLine(FactPaths.PROJECTED_AGI, "Projected AGI (Form 1040 Line 11)"),
+            new ResultLine(FactPaths.QBI_DEDUCTION, "QBI deduction (Form 8995)"),
+            new ResultLine(FactPaths.TAXABLE_INCOME, "Projected taxable income (Form 1040 Line 15)"),
+            new ResultLine(FactPaths.PROJECTED_INCOME_TAX, "Projected income tax (ordinary rates)"),
+            new ResultLine(FactPaths.PROJECTED_TOTAL_TAX, "Projected total federal tax"),
+            new ResultLine(FactPaths.SAFE_HARBOR_TARGET, null),
+            new ResultLine(FactPaths.REMAINING_PAYMENT_DUE, null),
+            new ResultLine(FactPaths.PROJECTED_BALANCE_DUE_AT_FILING, null),
+            new ResultLine(FactPaths.NEXT_QUARTERLY_PAYMENT_SUGGESTED, null));
 
     private final PlanningGraphService graph;
     private final TaxKnowledgeService taxKnowledge;
@@ -100,41 +102,42 @@ public class PlanReportService {
     public PlanReport generate(String sessionId, boolean includeCitations) {
         int taxYear = graph.taxYearOf(sessionId);
         List<TaxParameter> params = taxKnowledge.taxParametersForYear(taxYear);
-        Set<String> paramPaths = new LinkedHashSet<>();
-        for (TaxParameter p : params) {
-            paramPaths.add(p.factPath());
-        }
+        Set<String> paramPaths = params.stream().map(TaxParameter::factPath).collect(Collectors.toSet());
 
         // Inputs are the facts written into the session that are not injected year-parameters.
-        Map<String, Object> sessionFacts = graph.sessionFacts(sessionId);
-        List<String> inputPaths = new ArrayList<>();
-        for (String path : sessionFacts.keySet()) {
-            if (!paramPaths.contains(path)) {
-                inputPaths.add(path);
-            }
-        }
+        List<String> inputPaths = graph.sessionFacts(sessionId).keySet().stream()
+                .filter(path -> !paramPaths.contains(path))
+                .toList();
 
-        Map<String, String> sourceNotes = graph.sourceNotes(sessionId);
         String generatedAt = Instant.now().truncatedTo(ChronoUnit.SECONDS).toString();
-        String body = renderBody(sessionId, taxYear, generatedAt, inputPaths, sourceNotes, params, includeCitations);
+        String body = renderBody(new ReportContext(
+                sessionId, taxYear, generatedAt, inputPaths, graph.sourceNotes(sessionId), params, includeCitations));
         String sha256 = sha256Hex(body);
         String markdown = body + INTEGRITY_DELIMITER + renderIntegrity(sha256);
         return new PlanReport(markdown, sha256, generatedAt, taxYear);
     }
 
-    private String renderBody(
-            String sessionId,
-            int taxYear,
-            String generatedAt,
-            List<String> inputPaths,
-            Map<String, String> sourceNotes,
-            List<TaxParameter> params,
-            boolean includeCitations) {
+    private String renderBody(ReportContext ctx) {
         StringBuilder sb = new StringBuilder();
+        // Authorities cited anywhere below, in first-seen order, resolved in the Sources section.
+        Set<String> citedSourceIds = new LinkedHashSet<>();
+
+        appendHeader(sb, ctx);
+        appendProvisionalBanner(sb, ctx);
+        appendInputs(sb, ctx);
+        appendParameters(sb, ctx, citedSourceIds);
+        appendResults(sb, ctx, citedSourceIds);
+        if (ctx.includeCitations() && !citedSourceIds.isEmpty()) {
+            sb.append("\n").append(renderSources(citedSourceIds));
+        }
+        return sb.toString();
+    }
+
+    private static void appendHeader(StringBuilder sb, ReportContext ctx) {
         sb.append("# Self-Employment Tax Planning Summary — Tax Year ")
-                .append(taxYear)
+                .append(ctx.taxYear())
                 .append(" (federal)\n\n");
-        sb.append("Generated (UTC): ").append(generatedAt).append("\n\n");
+        sb.append("Generated (UTC): ").append(ctx.generatedAt()).append("\n\n");
         sb.append("> **This is a planning estimate, not a filed tax return.** The figures below are\n")
                 .append("> based on values you provided. Those values are **self-reported and have not been\n")
                 .append("> verified** against source documents (1099s, bank records, mileage logs); this\n")
@@ -145,63 +148,61 @@ public class PlanReportService {
                 .append("> tax credits, capital-gains/qualified-dividend rates, the NIIT, the AMT, itemized\n")
                 .append("> deductions, and state tax. This document is generated on demand and is\n")
                 .append("> **not stored by the service**; keep your own copy.\n\n");
+    }
 
-        // Loudly flag any provisional (draft, unverified) constants so a year whose parameters are
-        // not yet finalized (e.g. before the IRS/SSA publish the new rates) is never read as final.
-        List<String> provisional = new ArrayList<>();
-        for (TaxParameter p : params) {
-            if (p.provisional()) {
-                provisional.add(orPath(p.name(), p.factPath()));
-            }
-        }
+    /**
+     * Loudly flag any provisional (draft, unverified) constants so a year whose parameters are not yet
+     * finalized (e.g. before the IRS/SSA publish the new rates) is never read as final.
+     */
+    private static void appendProvisionalBanner(StringBuilder sb, ReportContext ctx) {
+        List<String> provisional = ctx.params().stream()
+                .filter(TaxParameter::provisional)
+                .map(TaxParameter::displayName)
+                .toList();
         if (!provisional.isEmpty()) {
             sb.append("> ⚠ **Provisional values for ")
-                    .append(taxYear)
+                    .append(ctx.taxYear())
                     .append(".** These constants are drafts pending official confirmation and may change: ")
                     .append(String.join(", ", provisional))
                     .append(". Any figure that depends on them is an estimate, not a final amount.\n\n");
         }
+    }
 
+    private void appendInputs(StringBuilder sb, ReportContext ctx) {
         sb.append("## Your inputs (self-reported, unverified)\n\n");
-        if (inputPaths.isEmpty()) {
+        if (ctx.inputPaths().isEmpty()) {
             sb.append("_No inputs were entered in this session._\n\n");
-        } else {
-            sb.append("| Item | Value | Source (as stated, unverified) |\n| --- | --- | --- |\n");
-            for (String path : inputPaths) {
-                ExplainResult e = graph.explain(sessionId, path);
-                sb.append("| ")
-                        .append(orPath(e.name(), path))
-                        .append(CELL)
-                        .append(formatValue(e.value()))
-                        .append(CELL)
-                        .append(blankToDash(sourceNotes.get(path)))
-                        .append(" |\n");
-            }
-            sb.append("\n");
+            return;
         }
+        sb.append("| Item | Value | Source (as stated, unverified) |\n| --- | --- | --- |\n");
+        for (String path : ctx.inputPaths()) {
+            ExplainResult e = graph.explain(ctx.sessionId(), path);
+            sb.append("| ")
+                    .append(orPath(e.name(), path))
+                    .append(CELL)
+                    .append(formatValue(e.value()))
+                    .append(CELL)
+                    .append(blankToDash(ctx.sourceNotes().get(path)))
+                    .append(" |\n");
+        }
+        sb.append("\n");
+    }
 
-        // Authorities cited anywhere below, in first-seen order, resolved in the Sources section.
-        Set<String> citedSourceIds = new LinkedHashSet<>();
-
+    private void appendParameters(StringBuilder sb, ReportContext ctx, Set<String> citedSourceIds) {
         sb.append("## Tax-year parameters used\n\n");
         sb.append("Statutory constants for ")
-                .append(taxYear)
+                .append(ctx.taxYear())
                 .append(", sourced from the tax-knowledge base and injected at session creation.\n\n");
-        String authorityHeader = includeCitations ? "Authority" : "IRS source";
+        String authorityHeader = ctx.includeCitations() ? "Authority" : "IRS source";
         sb.append("| Parameter | Value | ").append(authorityHeader).append(" | Note |\n| --- | --- | --- | --- |\n");
-        for (TaxParameter p : params) {
-            String authorityCell;
-            if (includeCitations) {
-                authorityCell = citationText(p.sourceId());
-                if (p.sourceId() != null) {
-                    citedSourceIds.add(p.sourceId());
-                }
-            } else {
-                authorityCell = blankToDash(p.sourceId());
+        for (TaxParameter p : ctx.params()) {
+            if (ctx.includeCitations() && p.sourceId() != null) {
+                citedSourceIds.add(p.sourceId());
             }
+            String authorityCell = ctx.includeCitations() ? citationText(p.sourceId()) : blankToDash(p.sourceId());
             String valueCell = p.provisional() ? formatParamValue(p) + " ⚠ provisional" : formatParamValue(p);
             sb.append("| ")
-                    .append(orPath(p.name(), p.factPath()))
+                    .append(p.displayName())
                     .append(CELL)
                     .append(valueCell)
                     .append(CELL)
@@ -211,47 +212,44 @@ public class PlanReportService {
                     .append(" |\n");
         }
         sb.append("\n");
+    }
 
+    private void appendResults(StringBuilder sb, ReportContext ctx, Set<String> citedSourceIds) {
         sb.append("## Results\n\n");
         int rendered = 0;
         for (ResultLine line : RESULT_LINES) {
-            ExplainResult e = graph.explain(sessionId, line.path());
-            if (!e.complete()) {
-                continue;
-            }
-            rendered++;
-            sb.append("- **")
-                    .append(line.labelOverride() != null ? line.labelOverride() : orPath(e.name(), line.path()))
-                    .append(": ")
-                    .append(formatValue(e.value()))
-                    .append("**\n");
-            String derivation = renderDerivation(e.dependencies());
-            if (!derivation.isEmpty()) {
-                sb.append("  - computed from: ").append(derivation).append("\n");
-            }
-            if (includeCitations) {
-                List<Citation> resultCitations = citations.citationsForFact(params, line.path());
-                if (!resultCitations.isEmpty()) {
-                    List<String> formal = new ArrayList<>();
-                    for (Citation c : resultCitations) {
-                        formal.add(c.citation());
-                        citedSourceIds.add(c.sourceId());
-                    }
-                    sb.append("  - based on: ")
-                            .append(String.join("; ", formal))
-                            .append("\n");
-                }
+            ExplainResult e = graph.explain(ctx.sessionId(), line.path());
+            if (e.complete()) {
+                rendered++;
+                appendResult(sb, ctx, line, e, citedSourceIds);
             }
         }
         if (rendered == 0) {
             sb.append("_No results have been computed yet — enter inputs via the planning tools first._\n");
         }
+    }
 
-        if (includeCitations && !citedSourceIds.isEmpty()) {
-            sb.append("\n").append(renderSources(citedSourceIds));
+    private void appendResult(
+            StringBuilder sb, ReportContext ctx, ResultLine line, ExplainResult e, Set<String> citedSourceIds) {
+        sb.append("- **")
+                .append(line.labelOverride() != null ? line.labelOverride() : orPath(e.name(), line.path()))
+                .append(": ")
+                .append(formatValue(e.value()))
+                .append("**\n");
+        String derivation = renderDerivation(e.dependencies());
+        if (!derivation.isEmpty()) {
+            sb.append("  - computed from: ").append(derivation).append("\n");
         }
-
-        return sb.toString();
+        if (!ctx.includeCitations()) {
+            return;
+        }
+        List<Citation> resultCitations = citations.citationsForFact(ctx.params(), line.path());
+        if (!resultCitations.isEmpty()) {
+            resultCitations.forEach(c -> citedSourceIds.add(c.sourceId()));
+            sb.append("  - based on: ")
+                    .append(resultCitations.stream().map(Citation::citation).collect(Collectors.joining("; ")))
+                    .append("\n");
+        }
     }
 
     /**
@@ -390,6 +388,16 @@ public class PlanReportService {
     }
 
     private record ResultLine(String path, String labelOverride) {}
+
+    /** Everything one report rendering needs, gathered once so each section takes a single argument. */
+    private record ReportContext(
+            String sessionId,
+            int taxYear,
+            String generatedAt,
+            List<String> inputPaths,
+            Map<String, String> sourceNotes,
+            List<TaxParameter> params,
+            boolean includeCitations) {}
 
     public record PlanReport(String markdown, String sha256, String generatedAt, int taxYear) {}
 }

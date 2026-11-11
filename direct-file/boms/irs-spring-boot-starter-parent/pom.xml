@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.0-RC1</version>
+        <version>4.1.2</version>
         <relativePath/>
         <!-- lookup parent from repository -->
     </parent>
@@ -17,13 +17,6 @@
     <properties>
         <!-- maven properties-->
         <java.version>25</java.version>
-
-        <!-- Spring Boot 3.4.x ships Mockito 5.14.2 / ByteBuddy 1.15.11, which cannot
-             instrument mocks on JDK 25. Bump to a coherent JDK-25-capable pair
-             (Mockito 5.23.0 is built against ByteBuddy 1.17.7). The byte-buddy.version
-             property also drives byte-buddy-agent. -->
-        <mockito.version>5.23.0</mockito.version>
-        <byte-buddy.version>1.17.7</byte-buddy.version>
 
         <!-- dependency management versions-->
         <amazon-sqs-java-messaging-lib.version>2.1.4</amazon-sqs-java-messaging-lib.version>
@@ -39,15 +32,15 @@
         <testcontainers.version>1.21.3</testcontainers.version>
         <!-- Spring AI 2.0.x is the Spring Boot 4 / Spring Framework 7-aligned line and carries
              the MCP Streamable HTTP transport (protocol=STREAMABLE) that tax-advisor's MCP
-             server uses. 2.0.0 is currently a milestone (M8). -->
-        <spring-ai.version>2.0.0-M8</spring-ai.version>
+             server uses (needs >= 2.0.0-M8; now on the GA line). -->
+        <spring-ai.version>2.0.2</spring-ai.version>
         <logstash.version>9.0</logstash.version>
         <modelmapper.version>3.2.6</modelmapper.version>
         <modelmapper-module-record.version>1.0.0</modelmapper-module-record.version>
         <spotbugs.version>4.9.8</spotbugs.version>
         <!-- springdoc 3.x is the Spring Boot 4 / Spring Framework 7 compatible line
              (2.x targets Boot 3). -->
-        <springdoc.version>3.0.3</springdoc.version>
+        <springdoc.version>3.2.0</springdoc.version>
 
         <pdfbox.version>3.0.7</pdfbox.version>
         <amazon-s3-encryption-client-java.version>3.1.3</amazon-s3-encryption-client-java.version>

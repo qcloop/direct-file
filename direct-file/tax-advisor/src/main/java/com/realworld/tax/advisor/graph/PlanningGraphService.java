@@ -5,18 +5,21 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realworld.tax.advisor.config.TaxAdvisorProperties;
 import com.realworld.tax.advisor.knowledge.TaxKnowledgeService;
+import com.realworld.tax.advisor.knowledge.TaxKnowledgeService.TaxParameter;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +53,16 @@ import gov.irs.directfile.models.FactTypeWithItem;
 public class PlanningGraphService {
     private static final Logger log = LoggerFactory.getLogger(PlanningGraphService.class);
 
-    private static final String DOLLAR_WRAPPER = "gov.irs.factgraph.persisters.DollarWrapper";
-    private static final String INT_WRAPPER = "gov.irs.factgraph.persisters.IntWrapper";
-    private static final String RATIONAL_WRAPPER = "gov.irs.factgraph.persisters.RationalWrapper";
+    /**
+     * Optional dollar inputs initialized to 0 at session creation so the derived income-tax / total-tax
+     * chain is computable for a pure self-employed filer with no other income. Each is overwritten when
+     * the agent supplies a real value (see {@link #zeroDefaultOptionalIncome}).
+     */
+    private static final List<String> INCOME_ZERO_DEFAULTS = List.of(
+            FactPaths.OTHER_TAXABLE_INCOME,
+            FactPaths.NET_CAPITAL_GAINS,
+            FactPaths.SE_SOCIAL_SECURITY_WAGES_FROM_W2,
+            FactPaths.MEDICARE_WAGES_FROM_W2);
 
     private final ApplicationContext applicationContext;
     private final ObjectMapper objectMapper;
@@ -81,9 +91,7 @@ public class PlanningGraphService {
         for (String pattern : properties.factXmlPatterns()) {
             Resource[] matched = applicationContext.getResources(pattern);
             log.info("Pattern {} matched {} fact XML resources", pattern, matched.length);
-            for (Resource r : matched) {
-                all.add(r);
-            }
+            all.addAll(Arrays.asList(matched));
         }
         if (all.isEmpty()) {
             throw new IllegalStateException("No fact XML resources found for patterns " + properties.factXmlPatterns());
@@ -97,85 +105,53 @@ public class PlanningGraphService {
                 properties.factXmlPatterns().size());
     }
 
-    /** Filing statuses recognized for status-scoped parameters (e.g. filing-status thresholds). */
-    private static final Set<String> FILING_STATUSES = Set.of("single", "mfj", "mfs");
-
-    /**
-     * Optional dollar inputs initialized to 0 at session creation so the derived income-tax / total-tax
-     * chain is computable for a pure self-employed filer with no other income. Each is overwritten when
-     * the agent supplies a real value (see createSession).
-     */
-    private static final List<String> INCOME_ZERO_DEFAULTS = List.of(
-            "/planning/otherTaxableIncome",
-            "/planning/netCapitalGains",
-            "/seSocialSecurityWagesFromW2",
-            "/medicareWagesFromW2");
-
     /** Create a session for the given year, defaulting to the {@code single} filing status. */
     public String createSession(int taxYear) {
-        return createSession(taxYear, "single");
+        return newSession(taxYear, FilingStatus.SINGLE);
     }
 
+    /** Create a session for the given year and filing status ({@code single | mfj | mfs}; blank = single). */
     public String createSession(int taxYear, String filingStatus) {
-        String status = filingStatus == null || filingStatus.isBlank()
-                ? "single"
-                : filingStatus.trim().toLowerCase();
-        if (!FILING_STATUSES.contains(status)) {
-            throw new IllegalArgumentException("Unknown filing status '" + filingStatus + "'. Use one of "
-                    + FILING_STATUSES + " (head-of-household / qualifying surviving spouse share the 'single'"
-                    + " thresholds for these provisions).");
-        }
+        return newSession(taxYear, FilingStatus.parse(filingStatus));
+    }
+
+    private String newSession(int taxYear, FilingStatus status) {
         // Resolve the year's tax parameters first — this throws if the year has no published
         // parameters, so we never create a session that silently uses another year's values.
-        List<TaxKnowledgeService.TaxParameter> params = taxKnowledge.taxParametersForYear(taxYear);
-        String id = java.util.UUID.randomUUID().toString();
+        List<TaxParameter> params = taxKnowledge.taxParametersForYear(taxYear);
+        String id = UUID.randomUUID().toString();
         sessions.put(id, new SessionState(taxYear, status, new LinkedHashMap<>(), new LinkedHashMap<>()));
-        // Inject the year-indexed constants so SE-tax and safe-harbor math use the right year's values.
-        // The fact-graph value type drives the persister wrapper and how the string is shaped:
-        // int -> a JSON number; rational -> the "n/d" string; dollar (default) -> the string as-is.
-        for (TaxKnowledgeService.TaxParameter p : params) {
-            // Status-scoped parameters (e.g. the Additional Medicare threshold) are injected only into
-            // a session whose filing status matches; status-agnostic parameters (filingStatus == null)
-            // always inject.
-            if (p.filingStatus() != null
-                    && !status.equalsIgnoreCase(p.filingStatus().trim())) {
-                continue;
-            }
-            String typeCode;
-            Object value;
-            switch (p.type() == null ? "dollar" : p.type().toLowerCase()) {
-                case "int" -> {
-                    typeCode = INT_WRAPPER;
-                    value = Long.parseLong(p.value().trim());
-                }
-                case "rational" -> {
-                    typeCode = RATIONAL_WRAPPER;
-                    // The Rational persister serializes as {"n":<numerator>,"d":<denominator>};
-                    // parameters are authored in the readable "n/d" form, so split here.
-                    String[] nd = p.value().trim().split("/", 2);
-                    if (nd.length != 2) {
-                        throw new IllegalArgumentException(
-                                "Rational parameter " + p.factPath() + " must be 'n/d', got: " + p.value());
-                    }
-                    value = Map.of("n", Integer.parseInt(nd[0].trim()), "d", Integer.parseInt(nd[1].trim()));
-                }
-                default -> {
-                    typeCode = DOLLAR_WRAPPER;
-                    value = p.value();
-                }
-            }
-            writeFact(id, p.factPath(), typeCode, value);
-        }
-        // Zero-default the optional income inputs so the derived income-tax / total-tax chain is
-        // computable from just the Schedule C inputs (the pure-gig case). Each is overwritten when
-        // the agent supplies a real value: otherTaxableIncome via project_total_tax, netCapitalGains
-        // via estimate_qbi_deduction, and the W-2 wage facts via calculate_se_tax /
-        // calculate_additional_medicare. Without these defaults projectedAGI (hence total tax) would
-        // stay incomplete until every optional input was set by hand.
-        for (String zeroDefault : INCOME_ZERO_DEFAULTS) {
-            writeFact(id, zeroDefault, DOLLAR_WRAPPER, "0");
-        }
+        injectYearParameters(id, params, status);
+        zeroDefaultOptionalIncome(id);
         return id;
+    }
+
+    /**
+     * Inject the year-indexed constants so SE-tax and safe-harbor math use the right year's values.
+     * Status-scoped parameters (e.g. the Additional Medicare threshold) are injected only into a
+     * session whose filing status matches; status-agnostic parameters always inject.
+     */
+    private void injectYearParameters(String sessionId, List<TaxParameter> params, FilingStatus status) {
+        for (TaxParameter p : params) {
+            if (status.appliesTo(p.filingStatus())) {
+                PersisterTypes.TypedValue typed = PersisterTypes.forParameter(p.type(), p.value(), p.factPath());
+                writeFact(sessionId, p.factPath(), typed.typeCode(), typed.value());
+            }
+        }
+    }
+
+    /**
+     * Zero-default the optional income inputs so the derived income-tax / total-tax chain is
+     * computable from just the Schedule C inputs (the pure-gig case). Each is overwritten when the
+     * agent supplies a real value: otherTaxableIncome via project_total_tax, netCapitalGains via
+     * estimate_qbi_deduction, and the W-2 wage facts via calculate_se_tax /
+     * calculate_additional_medicare. Without these defaults projectedAGI (hence total tax) would stay
+     * incomplete until every optional input was set by hand.
+     */
+    private void zeroDefaultOptionalIncome(String sessionId) {
+        for (String path : INCOME_ZERO_DEFAULTS) {
+            writeFact(sessionId, path, PersisterTypes.DOLLAR, "0");
+        }
     }
 
     /**
@@ -185,16 +161,15 @@ public class PlanningGraphService {
      * re-injects the rows for its own status. Used by compare_filing_statuses to project identical
      * income across statuses without the agent re-entering anything. Returns the new session id.
      */
-    public String cloneSessionWithFilingStatus(String sourceSessionId, String filingStatus) {
+    public String cloneSessionWithFilingStatus(String sourceSessionId, FilingStatus filingStatus) {
         int year = taxYearOf(sourceSessionId);
-        Set<String> paramPaths = new LinkedHashSet<>();
-        for (TaxKnowledgeService.TaxParameter p : taxKnowledge.taxParametersForYear(year)) {
-            paramPaths.add(p.factPath());
-        }
+        Set<String> paramPaths = taxKnowledge.taxParametersForYear(year).stream()
+                .map(TaxParameter::factPath)
+                .collect(Collectors.toSet());
         SessionState src = require(sourceSessionId);
         // The new session is freshly created and not yet shared with any other thread, so only the
         // source needs locking while we read its facts.
-        String newSid = createSession(year, filingStatus);
+        String newSid = newSession(year, filingStatus);
         SessionState dst = require(newSid);
         synchronized (src) {
             src.facts.forEach((path, fact) -> {
@@ -218,7 +193,7 @@ public class PlanningGraphService {
     }
 
     public String filingStatusOf(String sessionId) {
-        return require(sessionId).filingStatus();
+        return require(sessionId).filingStatus().code();
     }
 
     public Graph graphFor(String sessionId) {
@@ -377,22 +352,21 @@ public class PlanningGraphService {
         }
         ReadResult value = readFact(sessionId, path);
 
-        List<String> depPaths = new ArrayList<>();
-        collectDependencyPaths(fact.derived(), depPaths);
-        collectDependencyPaths(fact.placeholder(), depPaths);
-
-        List<ExplainResult.Dep> deps = new ArrayList<>();
-        for (String dep : depPaths) {
-            ReadResult dv = readFact(sessionId, dep);
-            TaxFact df = digest.getFacts().get(dep);
-            deps.add(new ExplainResult.Dep(
-                    dep,
-                    df == null ? null : df.name(),
-                    df == null ? null : df.description(),
-                    dv.value(),
-                    dv.complete()));
-        }
+        List<ExplainResult.Dep> deps = directDependencies(fact).stream()
+                .map(dependency -> explainDependency(sessionId, dependency))
+                .toList();
         return new ExplainResult(path, fact.name(), fact.description(), value.value(), value.complete(), deps);
+    }
+
+    private ExplainResult.Dep explainDependency(String sessionId, String path) {
+        ReadResult value = readFact(sessionId, path);
+        TaxFact fact = digest.getFacts().get(path);
+        return new ExplainResult.Dep(
+                path,
+                fact == null ? null : fact.name(),
+                fact == null ? null : fact.description(),
+                value.value(),
+                value.complete());
     }
 
     /**
@@ -407,8 +381,7 @@ public class PlanningGraphService {
         if (start == null) {
             return visited;
         }
-        Deque<String> stack = new ArrayDeque<>();
-        collectDirectDependencies(start, stack);
+        Deque<String> stack = new ArrayDeque<>(directDependencies(start));
         while (!stack.isEmpty()) {
             String p = stack.pop();
             if (!visited.add(p)) {
@@ -416,17 +389,18 @@ public class PlanningGraphService {
             }
             TaxFact f = digest.getFacts().get(p);
             if (f != null) {
-                collectDirectDependencies(f, stack);
+                stack.addAll(directDependencies(f));
             }
         }
         return visited;
     }
 
-    private void collectDirectDependencies(TaxFact fact, Deque<String> out) {
+    /** Paths a fact reads directly, from its derivation and then its placeholder, in document order. */
+    private List<String> directDependencies(TaxFact fact) {
         List<String> direct = new ArrayList<>();
         collectDependencyPaths(fact.derived(), direct);
         collectDependencyPaths(fact.placeholder(), direct);
-        out.addAll(direct);
+        return direct;
     }
 
     private void collectDependencyPaths(TaxCompNode node, List<String> out) {
@@ -442,16 +416,6 @@ public class PlanningGraphService {
         for (TaxCompNode child : node.children()) {
             collectDependencyPaths(child, out);
         }
-    }
-
-    public Map<String, String> writableFactCatalog() {
-        Map<String, String> out = new HashMap<>();
-        digest.getFacts().forEach((path, fact) -> {
-            if (fact.writable() != null) {
-                out.put(path, fact.name() == null ? fact.description() : fact.name());
-            }
-        });
-        return out;
     }
 
     /** Coerce Scala types into JSON-friendly Java values for tool responses. */
@@ -497,7 +461,7 @@ public class PlanningGraphService {
 
     private record SessionState(
             int taxYear,
-            String filingStatus,
+            FilingStatus filingStatus,
             LinkedHashMap<String, FactTypeWithItem> facts,
             LinkedHashMap<String, String> sourceNotes) {}
 

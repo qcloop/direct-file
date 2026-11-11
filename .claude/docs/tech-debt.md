@@ -10,8 +10,6 @@ is resolved, delete it (git history keeps the record).
   (`gov.irs.mef.*`, `gov.irs.a2a.mef.*`) absent from this public repo. Their compile failures are
   pre-existing, not regressions. Boot 4 test-slice migration for `status` is also still pending
   (same pattern already applied to `backend`).
-- **spring-ai is on `2.0.0-M8` (a milestone, pre-GA).** Chosen because it's the Spring Boot 4 line
-  and the first with the MCP Streamable HTTP transport. Revisit and pin to `2.0.0` GA when released.
 - **state-api `org.testcontainers:junit-jupiter` is declared but unused** — candidate for removal
   (the Testcontainers BOM is pinned in the parent pom regardless).
 
@@ -54,5 +52,6 @@ is resolved, delete it (git history keeps the record).
   (e.g. `CandidateFact.sourceField` drives `withEvidence()`); giving it a strict schema would
   require coercing those nulls and changing behavior. If a strict schema for it is ever wanted,
   build an output-only DTO that projects `PlanResult` with non-null strings rather than mutating
-  the shared records. Revisit the whole approach at spring-ai 2.0.0 GA (the schema generator and
-  its null-field handling may improve, allowing simpler typed returns).
+  the shared records. The service is now on spring-ai 2.0.2 GA, but this approach has
+  not been re-evaluated against the GA schema generator (its null-field handling may have improved,
+  allowing simpler typed returns).

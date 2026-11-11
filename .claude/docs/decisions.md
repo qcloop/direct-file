@@ -17,6 +17,11 @@ Newest last. Each entry: the decision, the reason, and the alternative rejected.
   per-tech modules (`spring-boot-data-jpa-test`, `spring-boot-webmvc-test`).
 - **Testcontainers BOM imported explicitly** in the parent pom (Boot 4 stopped managing it), pinned
   to the 1.x line because 2.0 dropped the `junit-jupiter` artifact state-api references.
+- **Moved off pre-release Spring versions to GA:** Boot `4.1.0-RC1` → `4.1.2`, spring-ai `2.0.0-M8` →
+  `2.0.2`, springdoc `3.0.3` → `3.2.0` (built against Boot 4.1.2). The parent pom's `mockito.version` /
+  `byte-buddy.version` overrides were dropped: Boot 4.1.2 manages Mockito 5.23.0 + ByteBuddy 1.18.15,
+  and the old ByteBuddy 1.17.7 pin had become a downgrade. *Rejected:* Boot 4.2 / spring-ai 2.1
+  (release candidates only at the time).
 
 ## tax-advisor MCP transport
 

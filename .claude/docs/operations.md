@@ -116,5 +116,5 @@ collector, Prometheus, Grafana.
 - When you change the **parent POM**, the only services you can fully validate here are
   `backend`, `state-api`, `email-service`, and `tax-advisor` (+ the `libs`). Build all of
   them, not just your target, because the parent is shared.
-- `spring-ai 2.0.0-M8` is a milestone resolved from Maven Central; if a clean `~/.m2` can't
-  fetch it, the Spring milestone repo may need to be available.
+- Spring Boot `4.1.2` and `spring-ai 2.0.2` are GA and resolve from Maven Central — no milestone
+  repository is needed.

@@ -85,6 +85,10 @@ Key types:
   planning `tax-plan/*.xml`) once at startup; hands out per-session in-memory `Graph`s; owns
   `writeFact`/`readFact`. Each session = a `UUID` + a `LinkedHashMap<path, FactTypeWithItem>`,
   rebuilt into a `Graph(dictionary, InMemoryPersister.apply(json))` on demand under a session lock.
+- `graph/PersisterTypes`, `graph/FilingStatus`, `graph/FactPaths` — the small vocabulary types the
+  rest of the service shares: persister type codes plus alias resolution / value shaping (the guard
+  behind CLAUDE.md invariant 5), the `single | mfj | mfs` enum, and the fact-path constants. Add a
+  new persister alias, status, or fact path here rather than as a string literal at the call site.
 - `knowledge/TaxKnowledgeService` — loads the `tax-knowledge/` YAML (questions, evidence maps,
   conflict rules, citations, year-indexed parameters). Uses its **own** Jackson 2 YAML mapper.
 - `mcp/PlanningTools` — the `@McpTool`-annotated methods exposed over MCP: `create_session`
@@ -100,6 +104,8 @@ Key types:
   `structuredContent` via `generateOutputSchema = true`; the Spring AI annotation scanner registers
   them (no `MethodToolCallbackProvider`). Filing-status-dependent constants are status-scoped
   `*-tax-parameters.yaml` rows (a `filing_status` field) injected only for the session's status.
+- `mcp/EstimatedTaxSchedule` — the IRC §6654 installment deadlines for a tax year (weekend-shifted),
+  used by `estimate_quarterly_payment`.
 - `config/JacksonConfig` — the explicit Jackson 2 `ObjectMapper` bean (CLAUDE.md invariant 3).
 - `config/TaxAdvisorProperties` — `tax-advisor.*` config (tax-knowledge root, fact XML patterns).
 

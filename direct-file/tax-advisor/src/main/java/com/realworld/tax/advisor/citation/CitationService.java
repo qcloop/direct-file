@@ -1,9 +1,8 @@
 package com.realworld.tax.advisor.citation;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import com.realworld.tax.advisor.graph.PlanningGraphService;
@@ -46,14 +45,12 @@ public class CitationService {
     public List<String> sourceIdsForFact(List<TaxParameter> params, String factPath) {
         Set<String> closure = graph.dependencyClosure(factPath);
         closure.add(factPath);
-        List<String> out = new ArrayList<>();
-        Set<String> seen = new LinkedHashSet<>();
-        for (TaxParameter p : params) {
-            if (closure.contains(p.factPath()) && p.sourceId() != null && seen.add(p.sourceId())) {
-                out.add(p.sourceId());
-            }
-        }
-        return out;
+        return params.stream()
+                .filter(p -> closure.contains(p.factPath()))
+                .map(TaxParameter::sourceId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
     }
 
     /** Resolved citations governing a fact (year overload). */
@@ -68,13 +65,9 @@ public class CitationService {
 
     /** Resolve source_ids to citations, dropping any id not present in the registry. */
     public List<Citation> resolve(Collection<String> sourceIds) {
-        List<Citation> out = new ArrayList<>();
-        for (String id : sourceIds) {
-            Citation c = taxKnowledge.citation(id);
-            if (c != null) {
-                out.add(c);
-            }
-        }
-        return out;
+        return sourceIds.stream()
+                .map(taxKnowledge::citation)
+                .filter(Objects::nonNull)
+                .toList();
     }
 }

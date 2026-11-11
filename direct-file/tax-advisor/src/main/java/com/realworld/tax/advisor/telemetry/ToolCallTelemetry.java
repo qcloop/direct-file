@@ -60,20 +60,24 @@ public class ToolCallTelemetry {
             errorClass = ex.getClass().getSimpleName();
             throw ex;
         } finally {
-            meters.counter("taxadvisor.tool.calls", "tool", tool, "outcome", outcome)
+            record(tool, outcome, errorClass, Duration.ofNanos(System.nanoTime() - startNanos));
+        }
+    }
+
+    /** Emit the PII-free signal for one call: tool + outcome (+ errorClass). No args, no field values. */
+    private void record(String tool, String outcome, String errorClass, Duration elapsed) {
+        boolean failed = !errorClass.isEmpty();
+        meters.counter("taxadvisor.tool.calls", "tool", tool, "outcome", outcome)
+                .increment();
+        if (failed) {
+            meters.counter("taxadvisor.tool.errors", "tool", tool, "errorClass", errorClass)
                     .increment();
-            if (!errorClass.isEmpty()) {
-                meters.counter("taxadvisor.tool.errors", "tool", tool, "errorClass", errorClass)
-                        .increment();
-            }
-            meters.timer("taxadvisor.tool.latency", "tool", tool)
-                    .record(Duration.ofNanos(System.nanoTime() - startNanos));
-            // PII-free structured event: tool + outcome (+ errorClass). No args, no field values.
-            if (errorClass.isEmpty()) {
-                log.info("tool_call tool={} outcome={}", tool, outcome);
-            } else {
-                log.info("tool_call tool={} outcome={} errorClass={}", tool, outcome, errorClass);
-            }
+        }
+        meters.timer("taxadvisor.tool.latency", "tool", tool).record(elapsed);
+        if (failed) {
+            log.info("tool_call tool={} outcome={} errorClass={}", tool, outcome, errorClass);
+        } else {
+            log.info("tool_call tool={} outcome={}", tool, outcome);
         }
     }
 

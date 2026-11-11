@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -32,6 +34,11 @@ public class TaxKnowledgeService {
     private static final Logger log = LoggerFactory.getLogger(TaxKnowledgeService.class);
 
     private static final String STATUS = "status";
+
+    /** Status of a fact the taxpayer has confirmed (the default when a fact carries no status). */
+    private static final String CONFIRMED = "confirmed";
+
+    private static final String PARAMETER_FILE_SUFFIX = "-tax-parameters.yaml";
     private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<>() {};
 
     private final TaxAdvisorProperties properties;
@@ -72,28 +79,67 @@ public class TaxKnowledgeService {
     public PlanResult plan(PlanRequest request) {
         EvaluationContext context = EvaluationContext.from(request);
 
-        List<EvidenceSignal> evidenceSignals = new ArrayList<>();
-        List<CandidateFact> candidateFacts = new ArrayList<>();
+        List<PlannedQuestion> questions = new ArrayList<>();
+        List<SkippedQuestion> skipped = new ArrayList<>();
+        for (Question question : bundle.questions()) {
+            Optional<SkippedQuestion> skip = skipReason(question, request, context);
+            if (skip.isPresent()) {
+                skipped.add(skip.get());
+            } else {
+                questions.add(PlannedQuestion.from(question));
+            }
+        }
+
+        int limit = request.limit() == null || request.limit() < 1 ? questions.size() : request.limit();
+        return new PlanResult(
+                request.taxYear(),
+                request.jurisdiction(),
+                evidenceSignals(context),
+                candidateFacts(context),
+                reviewConflicts(context),
+                questions.stream().limit(limit).toList(),
+                skipped);
+    }
+
+    /** Topic signals raised by each piece of evidence, via the evidence maps for its document type. */
+    private List<EvidenceSignal> evidenceSignals(EvaluationContext context) {
+        List<EvidenceSignal> signals = new ArrayList<>();
         for (EvidenceState evidence : context.evidence()) {
-            for (EvidenceMap map : bundle.evidenceMaps()) {
-                if (!map.documentType().equals(evidence.documentType())) {
-                    continue;
-                }
+            for (EvidenceMap map : evidenceMapsFor(evidence)) {
                 for (Signal signal : map.signals()) {
-                    evidenceSignals.add(new EvidenceSignal(
+                    signals.add(new EvidenceSignal(
                             map.evidenceMapId(),
                             evidence.documentType(),
                             signal.topicId(),
                             signal.confidence(),
                             signal.reason()));
                 }
+            }
+        }
+        return signals;
+    }
+
+    /** Facts each piece of evidence suggests, to be confirmed with the taxpayer rather than assumed. */
+    private List<CandidateFact> candidateFacts(EvaluationContext context) {
+        List<CandidateFact> candidates = new ArrayList<>();
+        for (EvidenceState evidence : context.evidence()) {
+            for (EvidenceMap map : evidenceMapsFor(evidence)) {
                 for (CandidateFact candidate : map.candidateFacts()) {
-                    candidateFacts.add(candidate.withEvidence(map.evidenceMapId(), evidence));
+                    candidates.add(candidate.withEvidence(map.evidenceMapId(), evidence));
                 }
             }
         }
+        return candidates;
+    }
 
-        List<ReviewConflict> conflicts = bundle.conflictRules().stream()
+    private List<EvidenceMap> evidenceMapsFor(EvidenceState evidence) {
+        return bundle.evidenceMaps().stream()
+                .filter(map -> map.documentType().equals(evidence.documentType()))
+                .toList();
+    }
+
+    private List<ReviewConflict> reviewConflicts(EvaluationContext context) {
+        return bundle.conflictRules().stream()
                 .filter(conflict -> conflict.when().matches(context))
                 .map(conflict -> new ReviewConflict(
                         conflict.conflictId(),
@@ -102,34 +148,21 @@ public class TaxKnowledgeService {
                         conflict.resolutionPrompt(),
                         conflict.sourceIds()))
                 .toList();
+    }
 
-        List<PlannedQuestion> questions = new ArrayList<>();
-        List<SkippedQuestion> skipped = new ArrayList<>();
-        for (Question question : bundle.questions()) {
-            if (!request.includeAnswered() && context.hasConfirmedAnswerForAny(question.writes())) {
-                skipped.add(SkippedQuestion.answered(question));
-                continue;
-            }
-            if (!question.asksWhen().matches(context)) {
-                skipped.add(SkippedQuestion.notApplicable(question));
-                continue;
-            }
-            if (question.skipWhen().matchesWhenPresent(context)) {
-                skipped.add(SkippedQuestion.suppressed(question));
-                continue;
-            }
-            questions.add(PlannedQuestion.from(question));
+    /** Why a question should not be asked now, or empty if it should. */
+    private static Optional<SkippedQuestion> skipReason(
+            Question question, PlanRequest request, EvaluationContext context) {
+        if (!request.includeAnswered() && context.hasConfirmedAnswerForAny(question.writes())) {
+            return Optional.of(SkippedQuestion.answered(question));
         }
-
-        int limit = request.limit() == null || request.limit() < 1 ? questions.size() : request.limit();
-        return new PlanResult(
-                request.taxYear(),
-                request.jurisdiction(),
-                evidenceSignals,
-                candidateFacts,
-                conflicts,
-                questions.stream().limit(limit).toList(),
-                skipped);
+        if (!question.asksWhen().matches(context)) {
+            return Optional.of(SkippedQuestion.notApplicable(question));
+        }
+        if (question.skipWhen().matchesWhenPresent(context)) {
+            return Optional.of(SkippedQuestion.suppressed(question));
+        }
+        return Optional.empty();
     }
 
     private Path resolveRoot(String configuredRoot) {
@@ -158,20 +191,10 @@ public class TaxKnowledgeService {
      * year has no parameter files — callers must not silently fall back to another year's values.
      */
     public List<TaxParameter> taxParametersForYear(int taxYear) {
-        Path base = root != null ? root : resolveRoot(properties.taxKnowledgeRoot());
-        Path dir = base.resolve("rules").resolve("federal").resolve(Integer.toString(taxYear));
         // User-facing messages reference the logical location, never the absolute filesystem path
         // (which leaks the host's directory layout to the agent / taxpayer).
         String location = "rules/federal/" + taxYear + "/";
-        List<Path> files;
-        try (Stream<Path> walk = Files.exists(dir) ? Files.walk(dir) : Stream.empty()) {
-            files = walk.filter(Files::isRegularFile)
-                    .filter(p -> p.getFileName().toString().endsWith("-tax-parameters.yaml"))
-                    .sorted()
-                    .toList();
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to scan tax parameters for " + taxYear + " under " + location, e);
-        }
+        List<Path> files = parameterFiles(taxYear, location);
         if (files.isEmpty()) {
             throw new IllegalArgumentException("No published tax parameters for tax year " + taxYear
                     + " in the tax-knowledge base (expected a <topic>-tax-parameters.yaml under " + location
@@ -179,29 +202,39 @@ public class TaxKnowledgeService {
         }
         List<TaxParameter> out = new ArrayList<>();
         for (Path file : files) {
-            try {
-                Map<String, Object> doc = yamlMapper.readValue(file.toFile(), MAP_TYPE);
-                for (Map<String, Object> p : maps(doc.get("parameters"))) {
-                    out.add(new TaxParameter(
-                            asString(p.get("fact_path")),
-                            asString(p.get("type")),
-                            asString(p.get("value")),
-                            asString(p.get("name")),
-                            asString(p.get("source_id")),
-                            asString(p.get("note")),
-                            Boolean.TRUE.equals(p.get("provisional")),
-                            asString(p.get("filing_status"))));
-                }
-            } catch (IOException e) {
-                throw new IllegalStateException(
-                        "Failed to read tax parameters for " + taxYear + " from " + file.getFileName(), e);
-            }
+            out.addAll(readParameters(file, taxYear));
         }
         if (out.isEmpty()) {
             throw new IllegalStateException(
                     "Tax parameter files for " + taxYear + " under " + location + " list no parameters.");
         }
         return out;
+    }
+
+    /** The year's {@code *-tax-parameters.yaml} files in a stable (sorted) order; empty if none exist. */
+    private List<Path> parameterFiles(int taxYear, String location) {
+        Path base = root != null ? root : resolveRoot(properties.taxKnowledgeRoot());
+        Path dir = base.resolve("rules").resolve("federal").resolve(Integer.toString(taxYear));
+        try (Stream<Path> walk = Files.exists(dir) ? Files.walk(dir) : Stream.empty()) {
+            return walk.filter(Files::isRegularFile)
+                    .filter(p -> p.getFileName().toString().endsWith(PARAMETER_FILE_SUFFIX))
+                    .sorted()
+                    .toList();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to scan tax parameters for " + taxYear + " under " + location, e);
+        }
+    }
+
+    private List<TaxParameter> readParameters(Path file, int taxYear) {
+        try {
+            Map<String, Object> doc = yamlMapper.readValue(file.toFile(), MAP_TYPE);
+            return maps(doc.get("parameters")).stream()
+                    .map(TaxParameter::fromYaml)
+                    .toList();
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Failed to read tax parameters for " + taxYear + " from " + file.getFileName(), e);
+        }
     }
 
     /**
@@ -223,7 +256,25 @@ public class TaxKnowledgeService {
             String sourceId,
             String note,
             boolean provisional,
-            String filingStatus) {}
+            String filingStatus) {
+
+        static TaxParameter fromYaml(Map<String, Object> row) {
+            return new TaxParameter(
+                    asString(row.get("fact_path")),
+                    asString(row.get("type")),
+                    asString(row.get("value")),
+                    asString(row.get("name")),
+                    asString(row.get("source_id")),
+                    asString(row.get("note")),
+                    Boolean.TRUE.equals(row.get("provisional")),
+                    asString(row.get("filing_status")));
+        }
+
+        /** The human-readable name, falling back to the fact path for an unnamed parameter. */
+        public String displayName() {
+            return name == null || name.isBlank() ? factPath : name;
+        }
+    }
 
     /**
      * Display names of parameters for {@code taxYear} explicitly marked {@code provisional: true}
@@ -231,13 +282,10 @@ public class TaxKnowledgeService {
      * finalized. Used to keep the planner from presenting unverified constants as authoritative.
      */
     public List<String> provisionalParameterNames(int taxYear) {
-        List<String> names = new ArrayList<>();
-        for (TaxParameter p : taxParametersForYear(taxYear)) {
-            if (p.provisional()) {
-                names.add(p.name() == null || p.name().isBlank() ? p.factPath() : p.name());
-            }
-        }
-        return names;
+        return taxParametersForYear(taxYear).stream()
+                .filter(TaxParameter::provisional)
+                .map(TaxParameter::displayName)
+                .toList();
     }
 
     /**
@@ -265,7 +313,7 @@ public class TaxKnowledgeService {
 
     /** The full citation registry, keyed by {@code source_id}. */
     public Map<String, Citation> citations() {
-        return java.util.Collections.unmodifiableMap(citations);
+        return Collections.unmodifiableMap(citations);
     }
 
     private Map<String, Citation> loadCitations(Path knowledgeRoot) {
@@ -285,15 +333,7 @@ public class TaxKnowledgeService {
                     continue;
                 }
                 String id = String.valueOf(entry.getKey());
-                out.put(
-                        id,
-                        new Citation(
-                                id,
-                                asString(fields.get("authority")),
-                                asString(fields.get("citation")),
-                                asString(fields.get("title")),
-                                asString(fields.get("url")),
-                                collapse(asString(fields.get("plain_language")))));
+                out.put(id, Citation.fromYaml(id, fields));
             }
             return out;
         } catch (IOException e) {
@@ -312,7 +352,18 @@ public class TaxKnowledgeService {
      * {@code title}, an official {@code url}, and a friendly {@code plainLanguage} explanation.
      */
     public record Citation(
-            String sourceId, String authority, String citation, String title, String url, String plainLanguage) {}
+            String sourceId, String authority, String citation, String title, String url, String plainLanguage) {
+
+        static Citation fromYaml(String sourceId, Map<?, ?> fields) {
+            return new Citation(
+                    sourceId,
+                    asString(fields.get("authority")),
+                    asString(fields.get("citation")),
+                    asString(fields.get("title")),
+                    asString(fields.get("url")),
+                    collapse(asString(fields.get("plain_language"))));
+        }
+    }
 
     private List<Question> loadQuestionFiles(Path root) throws IOException {
         List<Question> out = new ArrayList<>();
@@ -601,7 +652,7 @@ public class TaxKnowledgeService {
             return paths.stream()
                     .map(facts::get)
                     .filter(Objects::nonNull)
-                    .anyMatch(fact -> "confirmed".equals(fact.status()));
+                    .anyMatch(fact -> CONFIRMED.equals(fact.status()));
         }
     }
 
@@ -609,10 +660,10 @@ public class TaxKnowledgeService {
         @SuppressWarnings("unchecked")
         static FactState from(Object value) {
             if (value instanceof Map<?, ?> map) {
-                Object status = map.containsKey(STATUS) ? map.get(STATUS) : "confirmed";
+                Object status = map.containsKey(STATUS) ? map.get(STATUS) : CONFIRMED;
                 return new FactState(((Map<String, Object>) map).get("value"), asString(status));
             }
-            return new FactState(value, "confirmed");
+            return new FactState(value, CONFIRMED);
         }
     }
 
