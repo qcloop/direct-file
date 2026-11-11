@@ -57,6 +57,17 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <!--
+            Redis client (Lettuce) for the optional shared session store (RedisSessionStore), enabled
+            by the `redis` profile. With the default in-memory store nothing connects: Lettuce opens
+            its connection lazily, and the Redis health indicator is off outside that profile. This is
+            the plain (non-reactive) starter on purpose — the MCP tools are SYNC and the WebFlux
+            transport already dispatches them off the event loop. It pulls no servlet stack.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!--
             AOP, for the tool-call telemetry aspect (ToolCallTelemetry): a single @Around
             advice on @McpTool methods records a PII-free {tool, outcome, errorClass} signal
             to Micrometer + a structured log, so client-side tool MISUSE is visible without

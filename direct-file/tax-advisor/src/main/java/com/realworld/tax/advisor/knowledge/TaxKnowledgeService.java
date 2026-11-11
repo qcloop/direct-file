@@ -8,15 +8,15 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.realworld.tax.advisor.config.TaxAdvisorProperties;
+import com.realworld.tax.advisor.knowledge.KnowledgeBundle.EvidenceMap;
+import com.realworld.tax.advisor.knowledge.KnowledgeBundle.Question;
+import com.realworld.tax.advisor.knowledge.KnowledgeBundle.Signal;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,19 +33,16 @@ import org.springframework.stereotype.Service;
 public class TaxKnowledgeService {
     private static final Logger log = LoggerFactory.getLogger(TaxKnowledgeService.class);
 
-    private static final String STATUS = "status";
-
-    /** Status of a fact the taxpayer has confirmed (the default when a fact carries no status). */
-    private static final String CONFIRMED = "confirmed";
-
     private static final String PARAMETER_FILE_SUFFIX = "-tax-parameters.yaml";
-    private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<>() {};
 
     private final TaxAdvisorProperties properties;
+
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
     private Path root;
-    private KnowledgeBundle bundle = new KnowledgeBundle(List.of(), List.of(), List.of());
+
+    private KnowledgeBundle bundle = KnowledgeBundle.empty();
+
     private Map<String, Citation> citations = Map.of();
 
     public TaxKnowledgeService(TaxAdvisorProperties properties) {
@@ -60,19 +57,16 @@ public class TaxKnowledgeService {
             return;
         }
 
-        List<Question> questions = loadQuestionFiles(root.resolve("questions"));
-        List<EvidenceMap> evidenceMaps = loadEvidenceFiles(root.resolve("evidence"));
-        List<ConflictRule> conflictRules = loadConflictFiles(root.resolve("conflicts"));
-        this.bundle = new KnowledgeBundle(questions, evidenceMaps, conflictRules);
+        this.bundle = KnowledgeBundle.load(root, yamlMapper);
         this.citations = loadCitations(root);
 
         log.info(
                 "Tax knowledge artifacts loaded from {}: {} questions, {} evidence maps, {} conflict rules, "
                         + "{} citations",
                 root,
-                questions.size(),
-                evidenceMaps.size(),
-                conflictRules.size(),
+                bundle.questions().size(),
+                bundle.evidenceMaps().size(),
+                bundle.conflictRules().size(),
                 citations.size());
     }
 
@@ -227,8 +221,8 @@ public class TaxKnowledgeService {
 
     private List<TaxParameter> readParameters(Path file, int taxYear) {
         try {
-            Map<String, Object> doc = yamlMapper.readValue(file.toFile(), MAP_TYPE);
-            return maps(doc.get("parameters")).stream()
+            Map<String, Object> doc = yamlMapper.readValue(file.toFile(), YamlValues.MAP_TYPE);
+            return YamlValues.maps(doc.get("parameters")).stream()
                     .map(TaxParameter::fromYaml)
                     .toList();
         } catch (IOException e) {
@@ -260,14 +254,14 @@ public class TaxKnowledgeService {
 
         static TaxParameter fromYaml(Map<String, Object> row) {
             return new TaxParameter(
-                    asString(row.get("fact_path")),
-                    asString(row.get("type")),
-                    asString(row.get("value")),
-                    asString(row.get("name")),
-                    asString(row.get("source_id")),
-                    asString(row.get("note")),
+                    YamlValues.asString(row.get("fact_path")),
+                    YamlValues.asString(row.get("type")),
+                    YamlValues.asString(row.get("value")),
+                    YamlValues.asString(row.get("name")),
+                    YamlValues.asString(row.get("source_id")),
+                    YamlValues.asString(row.get("note")),
                     Boolean.TRUE.equals(row.get("provisional")),
-                    asString(row.get("filing_status")));
+                    YamlValues.asString(row.get("filing_status")));
         }
 
         /** The human-readable name, falling back to the fact path for an unnamed parameter. */
@@ -323,7 +317,7 @@ public class TaxKnowledgeService {
             return Map.of();
         }
         try {
-            Map<String, Object> doc = yamlMapper.readValue(file.toFile(), MAP_TYPE);
+            Map<String, Object> doc = yamlMapper.readValue(file.toFile(), YamlValues.MAP_TYPE);
             if (!(doc.get("citations") instanceof Map<?, ?> raw)) {
                 return Map.of();
             }
@@ -357,313 +351,11 @@ public class TaxKnowledgeService {
         static Citation fromYaml(String sourceId, Map<?, ?> fields) {
             return new Citation(
                     sourceId,
-                    asString(fields.get("authority")),
-                    asString(fields.get("citation")),
-                    asString(fields.get("title")),
-                    asString(fields.get("url")),
-                    collapse(asString(fields.get("plain_language"))));
-        }
-    }
-
-    private List<Question> loadQuestionFiles(Path root) throws IOException {
-        List<Question> out = new ArrayList<>();
-        for (Map<String, Object> doc : yamlDocuments(root)) {
-            int taxYear = asInt(doc.get("tax_year"), 0);
-            String jurisdiction = asString(doc.get("jurisdiction"));
-            for (Map<String, Object> item : maps(doc.get("questions"))) {
-                out.add(new Question(
-                        asString(item.get("question_id")),
-                        asString(item.get("topic_id")),
-                        taxYear,
-                        jurisdiction,
-                        asString(item.get("prompt")),
-                        asString(item.get("help_text")),
-                        asString(item.get("why_we_ask")),
-                        strings(item.get("writes")),
-                        ConditionGroup.from(item.get("asks_when")),
-                        ConditionGroup.from(item.get("skip_when")),
-                        asString(item.get("priority")),
-                        strings(item.get("source_ids"))));
-            }
-        }
-        return out;
-    }
-
-    private List<EvidenceMap> loadEvidenceFiles(Path root) throws IOException {
-        List<EvidenceMap> out = new ArrayList<>();
-        for (Map<String, Object> doc : yamlDocuments(root)) {
-            for (Map<String, Object> item : maps(doc.get("evidence_maps"))) {
-                List<Signal> signals = maps(item.get("signals")).stream()
-                        .map(signal -> new Signal(
-                                asString(signal.get("topic_id")),
-                                asString(signal.get("confidence")),
-                                asString(signal.get("reason"))))
-                        .toList();
-                List<CandidateFact> candidateFacts = maps(item.get("candidate_facts")).stream()
-                        .map(candidate -> new CandidateFact(
-                                asString(candidate.get("path")),
-                                candidate.get("value"),
-                                asString(candidate.get("source_field")),
-                                asBoolean(candidate.get("requires_confirmation")),
-                                null,
-                                null))
-                        .toList();
-                out.add(new EvidenceMap(
-                        asString(item.get("evidence_map_id")),
-                        asString(item.get("document_type")),
-                        signals,
-                        candidateFacts,
-                        strings(item.get("conflict_rules"))));
-            }
-        }
-        return out;
-    }
-
-    private List<ConflictRule> loadConflictFiles(Path root) throws IOException {
-        List<ConflictRule> out = new ArrayList<>();
-        for (Map<String, Object> doc : yamlDocuments(root)) {
-            for (Map<String, Object> item : maps(doc.get("conflicts"))) {
-                out.add(new ConflictRule(
-                        asString(item.get("conflict_id")),
-                        asString(item.get("severity")),
-                        ConditionGroup.from(item.get("when")),
-                        asString(item.get("message")),
-                        asString(item.get("resolution_prompt")),
-                        strings(item.get("source_ids"))));
-            }
-        }
-        return out;
-    }
-
-    private List<Map<String, Object>> yamlDocuments(Path root) throws IOException {
-        if (!Files.exists(root)) {
-            return List.of();
-        }
-        try (Stream<Path> files = Files.walk(root)) {
-            List<Path> yamlFiles = files.filter(Files::isRegularFile)
-                    .filter(path -> path.getFileName().toString().endsWith(".yaml"))
-                    .sorted()
-                    .toList();
-
-            List<Map<String, Object>> docs = new ArrayList<>();
-            for (Path file : yamlFiles) {
-                docs.add(yamlMapper.readValue(file.toFile(), MAP_TYPE));
-            }
-            return docs;
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static List<Map<String, Object>> maps(Object value) {
-        if (!(value instanceof List<?> list)) {
-            return List.of();
-        }
-        return list.stream()
-                .filter(Map.class::isInstance)
-                .map(item -> (Map<String, Object>) item)
-                .toList();
-    }
-
-    private static List<String> strings(Object value) {
-        if (!(value instanceof List<?> list)) {
-            return List.of();
-        }
-        return list.stream().map(String::valueOf).toList();
-    }
-
-    private static String asString(Object value) {
-        return value == null ? null : String.valueOf(value);
-    }
-
-    private static int asInt(Object value, int fallback) {
-        if (value instanceof Number number) {
-            return number.intValue();
-        }
-        if (value == null) {
-            return fallback;
-        }
-        try {
-            return Integer.parseInt(String.valueOf(value));
-        } catch (NumberFormatException e) {
-            return fallback;
-        }
-    }
-
-    private static boolean asBoolean(Object value) {
-        if (value instanceof Boolean bool) {
-            return bool;
-        }
-        return value != null && Boolean.parseBoolean(String.valueOf(value));
-    }
-
-    private record KnowledgeBundle(
-            List<Question> questions, List<EvidenceMap> evidenceMaps, List<ConflictRule> conflictRules) {}
-
-    private record Question(
-            String questionId,
-            String topicId,
-            int taxYear,
-            String jurisdiction,
-            String prompt,
-            String helpText,
-            String whyWeAsk,
-            List<String> writes,
-            ConditionGroup asksWhen,
-            ConditionGroup skipWhen,
-            String priority,
-            List<String> sourceIds) {}
-
-    private record EvidenceMap(
-            String evidenceMapId,
-            String documentType,
-            List<Signal> signals,
-            List<CandidateFact> candidateFacts,
-            List<String> conflictRules) {}
-
-    private record Signal(String topicId, String confidence, String reason) {}
-
-    private record ConflictRule(
-            String conflictId,
-            String severity,
-            ConditionGroup when,
-            String message,
-            String resolutionPrompt,
-            List<String> sourceIds) {}
-
-    private record ConditionGroup(List<Condition> all, List<Condition> any) {
-        static ConditionGroup from(Object value) {
-            if (!(value instanceof Map<?, ?> map)) {
-                return new ConditionGroup(List.of(), List.of());
-            }
-            return new ConditionGroup(toConditions(map.get("all")), toConditions(map.get("any")));
-        }
-
-        boolean matches(EvaluationContext context) {
-            return all.stream().allMatch(condition -> condition.matches(context))
-                    && (any.isEmpty() || any.stream().anyMatch(condition -> condition.matches(context)));
-        }
-
-        boolean matchesWhenPresent(EvaluationContext context) {
-            return !(all.isEmpty() && any.isEmpty()) && matches(context);
-        }
-
-        @SuppressWarnings("unchecked")
-        private static List<Condition> toConditions(Object value) {
-            if (!(value instanceof List<?> list)) {
-                return List.of();
-            }
-            return list.stream()
-                    .filter(Map.class::isInstance)
-                    .map(item -> Condition.from((Map<String, Object>) item))
-                    .toList();
-        }
-    }
-
-    private record Condition(
-            String fact,
-            Object equals,
-            String requiredStatus,
-            String evidence,
-            Boolean exists,
-            String profile,
-            Object contains,
-            Map<String, Object> attributes) {
-        static Condition from(Map<String, Object> map) {
-            Map<String, Object> attributes = new LinkedHashMap<>(map);
-            attributes
-                    .keySet()
-                    .removeAll(Set.of("fact", "equals", STATUS, "evidence", "exists", "profile", "contains"));
-            return new Condition(
-                    asString(map.get("fact")),
-                    map.get("equals"),
-                    asString(map.get(STATUS)),
-                    asString(map.get("evidence")),
-                    map.containsKey("exists") ? asBoolean(map.get("exists")) : null,
-                    asString(map.get("profile")),
-                    map.get("contains"),
-                    attributes);
-        }
-
-        boolean matches(EvaluationContext context) {
-            if (fact != null && !matchesFact(context)) {
-                return false;
-            }
-            if (evidence != null && !matchesEvidence(context)) {
-                return false;
-            }
-            if (profile != null && !matchesProfile(context)) {
-                return false;
-            }
-            return fact != null || evidence != null || profile != null;
-        }
-
-        private boolean matchesFact(EvaluationContext context) {
-            FactState state = context.facts().get(fact);
-            if (state == null) {
-                return false;
-            }
-            if (requiredStatus != null && !requiredStatus.equals(state.status())) {
-                return false;
-            }
-            return equals == null || Objects.equals(normalize(equals), normalize(state.value()));
-        }
-
-        private boolean matchesEvidence(EvaluationContext context) {
-            boolean present = context.evidence().stream()
-                    .filter(state -> evidence.equals(state.documentType()))
-                    .anyMatch(state -> attributes.entrySet().stream()
-                            .allMatch(attribute -> Objects.equals(
-                                    normalize(attribute.getValue()),
-                                    normalize(state.attributes().get(attribute.getKey())))));
-            return exists == null ? present : present == exists;
-        }
-
-        private boolean matchesProfile(EvaluationContext context) {
-            Object value = context.profile().get(profile);
-            if (contains == null) {
-                return value != null;
-            }
-            if (value instanceof List<?> list) {
-                return list.stream().anyMatch(item -> Objects.equals(normalize(item), normalize(contains)));
-            }
-            return Objects.equals(normalize(value), normalize(contains));
-        }
-
-        private static Object normalize(Object value) {
-            if (value == null) {
-                return null;
-            }
-            if (value instanceof Number number) {
-                return number.toString();
-            }
-            return value;
-        }
-    }
-
-    private record EvaluationContext(
-            Map<String, FactState> facts, List<EvidenceState> evidence, Map<String, Object> profile) {
-        static EvaluationContext from(PlanRequest request) {
-            Map<String, FactState> facts = new LinkedHashMap<>();
-            request.facts().forEach((path, value) -> facts.put(path, FactState.from(value)));
-            return new EvaluationContext(facts, request.evidence(), request.profile());
-        }
-
-        boolean hasConfirmedAnswerForAny(List<String> paths) {
-            return paths.stream()
-                    .map(facts::get)
-                    .filter(Objects::nonNull)
-                    .anyMatch(fact -> CONFIRMED.equals(fact.status()));
-        }
-    }
-
-    private record FactState(Object value, String status) {
-        @SuppressWarnings("unchecked")
-        static FactState from(Object value) {
-            if (value instanceof Map<?, ?> map) {
-                Object status = map.containsKey(STATUS) ? map.get(STATUS) : CONFIRMED;
-                return new FactState(((Map<String, Object>) map).get("value"), asString(status));
-            }
-            return new FactState(value, CONFIRMED);
+                    YamlValues.asString(fields.get("authority")),
+                    YamlValues.asString(fields.get("citation")),
+                    YamlValues.asString(fields.get("title")),
+                    YamlValues.asString(fields.get("url")),
+                    collapse(YamlValues.asString(fields.get("plain_language"))));
         }
     }
 

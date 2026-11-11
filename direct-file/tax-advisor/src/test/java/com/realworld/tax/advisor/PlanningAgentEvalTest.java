@@ -7,7 +7,9 @@ import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.realworld.tax.advisor.mcp.PlanningTools;
+import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
+import com.realworld.tax.advisor.mcp.SessionTools;
+import com.realworld.tax.advisor.mcp.TaxProjectionTools;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PlanningAgentEvalTest {
 
     @Autowired
-    PlanningTools tools;
+    SessionTools sessionTools;
+
+    @Autowired
+    SelfEmploymentTools selfEmploymentTools;
+
+    @Autowired
+    TaxProjectionTools taxProjectionTools;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -52,7 +60,8 @@ class PlanningAgentEvalTest {
 
     private void runScenario(JsonNode scenario) {
         String name = scenario.get("name").asText();
-        String sessionId = tools.createSession(
+        String sessionId = sessionTools
+                .createSession(
                         scenario.get("taxYear").asText(),
                         scenario.get("filingStatus").asText())
                 .sessionId();
@@ -86,7 +95,7 @@ class PlanningAgentEvalTest {
     private Object invoke(String sessionId, String tool, JsonNode a) {
         return switch (tool) {
             case "calculate_se_tax" ->
-                tools.calculateSeTax(
+                selfEmploymentTools.calculateSeTax(
                         sessionId,
                         txt(a, "grossReceipts"),
                         txt(a, "businessMiles"),
@@ -94,10 +103,11 @@ class PlanningAgentEvalTest {
                         txt(a, "suppliesAndOther"),
                         txt(a, "socialSecurityWagesFromW2"));
             case "calculate_additional_medicare" ->
-                tools.calculateAdditionalMedicare(sessionId, txt(a, "medicareWagesFromW2"));
-            case "estimate_qbi_deduction" -> tools.estimateQbiDeduction(sessionId, txt(a, "netCapitalGains"));
+                taxProjectionTools.calculateAdditionalMedicare(sessionId, txt(a, "medicareWagesFromW2"));
+            case "estimate_qbi_deduction" ->
+                taxProjectionTools.estimateQbiDeduction(sessionId, txt(a, "netCapitalGains"));
             case "project_total_tax" ->
-                tools.projectTotalTax(sessionId, txt(a, "otherOrdinaryIncome"), txt(a, "netCapitalGains"));
+                taxProjectionTools.projectTotalTax(sessionId, txt(a, "otherOrdinaryIncome"), txt(a, "netCapitalGains"));
             default -> throw new IllegalArgumentException("eval dispatch has no case for tool: " + tool);
         };
     }

@@ -1,6 +1,8 @@
 package com.realworld.tax.advisor;
 
-import com.realworld.tax.advisor.mcp.PlanningTools;
+import com.realworld.tax.advisor.mcp.QuarterlyPaymentTools;
+import com.realworld.tax.advisor.mcp.SessionTools;
+import com.realworld.tax.advisor.mcp.TaxProjectionTools;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,16 +19,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ToolAffordanceTest {
 
     @Autowired
-    PlanningTools tools;
+    SessionTools sessionTools;
+
+    @Autowired
+    TaxProjectionTools taxProjectionTools;
+
+    @Autowired
+    QuarterlyPaymentTools quarterlyPaymentTools;
 
     @Test
     void quarterlyAsksForWhatIsMissingAndPointsAtTheIncomeProjection() {
-        String s = tools.createSession("2025", "single").sessionId();
-        var q = tools.estimateQuarterlyPayment(s, "2025-08-20");
+        String s = sessionTools.createSession("2025", "single").sessionId();
+        var q = quarterlyPaymentTools.estimateQuarterlyPayment(s, "2025-08-20");
 
         assertThat(q.status()).isEqualTo("needs_facts");
         assertThat(q.missingFacts())
-                .extracting(PlanningTools.MissingFact::path)
+                .extracting(QuarterlyPaymentTools.MissingFact::path)
                 .contains(
                         "/planning/priorYearTotalTax",
                         "/planning/priorYearAGI",
@@ -41,17 +49,19 @@ class ToolAffordanceTest {
 
     @Test
     void compareFilingStatusesAsksForIncomeFirst() {
-        String s = tools.createSession("2025", "single").sessionId();
-        var c = tools.compareFilingStatuses(s);
+        String s = sessionTools.createSession("2025", "single").sessionId();
+        var c = taxProjectionTools.compareFilingStatuses(s);
         assertThat(c.status()).isEqualTo("needs_facts");
         assertThat(c.note()).contains("calculate_se_tax", "project_net_profit");
     }
 
     @Test
     void totalTaxAndQbiNoteThatIncomeMustBeSetFirst() {
-        String s = tools.createSession("2025", "single").sessionId();
+        String s = sessionTools.createSession("2025", "single").sessionId();
         // No SE inputs yet — both tools should say so rather than return a misleading zero silently.
-        assertThat(tools.projectTotalTax(s, null, null).note()).contains("calculate_se_tax", "project_net_profit");
-        assertThat(tools.estimateQbiDeduction(s, null).note()).contains("calculate_se_tax", "project_net_profit");
+        assertThat(taxProjectionTools.projectTotalTax(s, null, null).note())
+                .contains("calculate_se_tax", "project_net_profit");
+        assertThat(taxProjectionTools.estimateQbiDeduction(s, null).note())
+                .contains("calculate_se_tax", "project_net_profit");
     }
 }

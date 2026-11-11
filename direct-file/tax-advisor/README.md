@@ -12,10 +12,20 @@ conversational tax-planning experience.
 src/main/java/com/realworld/tax/advisor/
   TaxAdvisorApplication.java               # Spring Boot main
   config/TaxAdvisorProperties.java         # @ConfigurationProperties
-  config/McpServerConfig.java               # registers @Tool methods with Spring AI's MCP server
+  config/JacksonConfig.java                 # explicit Jackson 2 ObjectMapper bean (Boot 4 defaults to Jackson 3)
   graph/PlanningGraphService.java           # loads combined dictionary, manages sessions
-  knowledge/TaxKnowledgeService.java        # loads tax-knowledge artifacts, evaluates planning gates
-  mcp/PlanningTools.java                    # @Tool-annotated methods exposed via MCP
+  graph/PersisterTypes.java                 # persister type codes, alias resolution, value shaping
+  graph/FilingStatus.java, FactPaths.java   # single | mfj | mfs enum; fact-path constants
+  knowledge/TaxKnowledgeService.java        # tax parameters, citations, interview planning
+  knowledge/KnowledgeBundle.java            # question / evidence-map / conflict artifacts + their loader
+  knowledge/ConditionGroup.java             # asks_when / skip_when / when rule evaluation
+  mcp/SessionTools.java                     # create_session, get_fact, set_fact
+  mcp/SelfEmploymentTools.java              # calculate_se_tax, project_net_profit
+  mcp/TaxProjectionTools.java               # Additional Medicare, QBI, total tax, filing-status comparison
+  mcp/QuarterlyPaymentTools.java            # estimate_quarterly_payment
+  mcp/ExplanationTools.java                 # explain, cite, export_plan
+  mcp/InterviewTools.java                   # plan_questions
+  mcp/ToolSupport.java                      # what the tool classes share (fact access, result conventions)
 
 src/main/resources/
   application.yaml                          # Streamable HTTP transport (default profile)
@@ -30,7 +40,8 @@ The MCP plumbing — JSON-RPC framing, capabilities negotiation, tool discovery,
 JSON Schema generation from method signatures, Streamable HTTP / STDIO transports —
 is provided by `spring-ai-starter-mcp-server-webflux` (reactive Streamable HTTP,
 which transitively carries the core mcp-server + STDIO support). Tools are plain
-`@Tool`-annotated Java methods on the `PlanningTools` Spring bean.
+`@McpTool`-annotated Java methods on the Spring beans in the `mcp` package, grouped
+by topic; Spring AI's annotation scanner registers every one it finds.
 
 The planning fact module declaratively encodes:
 
@@ -65,7 +76,7 @@ and the next applicable questions. It does not write facts into a return.
 
 Spring AI exposes the following tools at the MCP `tools/list` endpoint. Names
 match the wire format; argument shapes correspond to the Java parameter names
-on `PlanningTools` (camelCase, not snake_case).
+of the tool methods (camelCase, not snake_case).
 
 | Tool                          | Purpose                                                |
 | ----------------------------- | ------------------------------------------------------ |
@@ -262,7 +273,5 @@ scaffold):
 - One-level `explain` only — recursive walker is a follow-up.
 - `plan_questions` currently evaluates a small declarative condition subset:
   fact equality, evidence presence/attributes, and profile membership.
-- TY2025 quarterly deadlines hardcoded inline in `PlanningTools`. Move to a
-  year-keyed constant.
 - No auth on the MCP endpoints. In production these must sit behind the
   same auth boundary as the rest of Direct File.

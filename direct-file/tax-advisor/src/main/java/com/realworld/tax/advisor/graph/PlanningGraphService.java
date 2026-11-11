@@ -12,8 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,13 +39,17 @@ import gov.irs.directfile.models.FactTypeWithItem;
 
 /**
  * Loads the combined fact dictionary (production tax/ XMLs + planning tax-plan/ XMLs)
- * once at startup, then hands out per-session {@link Graph} instances backed by an
- * in-memory persister.
+ * once at startup, then answers reads and writes against per-session fact state.
  *
- * <p>Each planning conversation gets its own session id and its own persister state.
- * Nothing is written to durable storage in this MVP — planning data lives only in
- * memory for the duration of the conversation. That keeps the FTI surface tiny and
- * lets the agent operate freely on what-if scenarios.
+ * <p>Each planning conversation gets its own session id and its own state — a
+ * {@link SessionSnapshot} kept in a {@link SessionStore}. The {@link Graph} is not kept: it is
+ * rebuilt from the session's facts for every read and every write validation, which is what lets
+ * the state live outside this JVM.
+ *
+ * <p>By default the store is in-memory, so nothing is written to durable storage and planning
+ * data lives only for the life of the process — that keeps the FTI surface tiny. With the Redis
+ * store switched on, sessions are shared across instances and survive restarts, bounded by an
+ * idle timeout; the service itself holds no session state either way.
  */
 @Service
 public class PlanningGraphService {
@@ -58,6 +60,13 @@ public class PlanningGraphService {
      * chain is computable for a pure self-employed filer with no other income. Each is overwritten when
      * the agent supplies a real value (see {@link #zeroDefaultOptionalIncome}).
      */
+    /**
+     * How many times an update is retried when another writer (possibly another instance) changes the
+     * same session between the read and the compare-and-set. Tool calls on one session are normally
+     * sequential, so contention is rare and a handful of attempts is ample.
+     */
+    private static final int MAX_UPDATE_ATTEMPTS = 5;
+
     private static final List<String> INCOME_ZERO_DEFAULTS = List.of(
             FactPaths.OTHER_TAXABLE_INCOME,
             FactPaths.NET_CAPITAL_GAINS,
@@ -72,13 +81,15 @@ public class PlanningGraphService {
     private FactDictionary dictionary;
     private TaxDictionaryDigest digest;
 
-    private final Map<String, SessionState> sessions = new ConcurrentHashMap<>();
+    private final SessionStore sessions;
 
     public PlanningGraphService(
             ApplicationContext applicationContext,
             ObjectMapper objectMapper,
             TaxAdvisorProperties properties,
-            TaxKnowledgeService taxKnowledge) {
+            TaxKnowledgeService taxKnowledge,
+            SessionStore sessions) {
+        this.sessions = sessions;
         this.applicationContext = applicationContext;
         this.objectMapper = objectMapper;
         this.properties = properties;
@@ -106,36 +117,48 @@ public class PlanningGraphService {
     }
 
     /** Create a session for the given year, defaulting to the {@code single} filing status. */
-    public String createSession(int taxYear) {
+    public SessionId createSession(int taxYear) {
         return newSession(taxYear, FilingStatus.SINGLE);
     }
 
     /** Create a session for the given year and filing status ({@code single | mfj | mfs}; blank = single). */
-    public String createSession(int taxYear, String filingStatus) {
+    public SessionId createSession(int taxYear, String filingStatus) {
         return newSession(taxYear, FilingStatus.parse(filingStatus));
     }
 
-    private String newSession(int taxYear, FilingStatus status) {
-        // Resolve the year's tax parameters first — this throws if the year has no published
-        // parameters, so we never create a session that silently uses another year's values.
-        List<TaxParameter> params = taxKnowledge.taxParametersForYear(taxYear);
-        String id = UUID.randomUUID().toString();
-        sessions.put(id, new SessionState(taxYear, status, new LinkedHashMap<>(), new LinkedHashMap<>()));
-        injectYearParameters(id, params, status);
-        zeroDefaultOptionalIncome(id);
+    private SessionId newSession(int taxYear, FilingStatus status) {
+        SessionId id = SessionId.random();
+        sessions.create(id, freshSnapshot(id, taxYear, status));
         return id;
     }
 
     /**
-     * Inject the year-indexed constants so SE-tax and safe-harbor math use the right year's values.
-     * Status-scoped parameters (e.g. the Additional Medicare threshold) are injected only into a
-     * session whose filing status matches; status-agnostic parameters always inject.
+     * The state a session starts in: the year's constants for its filing status plus the zero-defaulted
+     * optional income inputs. Checked against the fact graph before it is ever stored, so a malformed
+     * parameter fails the creation instead of leaving a broken session behind.
      */
-    private void injectYearParameters(String sessionId, List<TaxParameter> params, FilingStatus status) {
+    private SessionSnapshot freshSnapshot(SessionId id, int taxYear, FilingStatus status) {
+        // Resolve the year's tax parameters first — this throws if the year has no published
+        // parameters, so we never create a session that silently uses another year's values.
+        List<TaxParameter> params = taxKnowledge.taxParametersForYear(taxYear);
+        Map<String, FactTypeWithItem> facts = new LinkedHashMap<>();
+        addYearParameters(facts, params, status);
+        addZeroDefaultedOptionalIncome(facts);
+        buildGraph(id, facts).save();
+        return new SessionSnapshot(taxYear, status, facts, Map.of());
+    }
+
+    /**
+     * The year-indexed constants, so SE-tax and safe-harbor math use the right year's values.
+     * Status-scoped parameters (e.g. the Additional Medicare threshold) are included only for a
+     * session whose filing status matches; status-agnostic parameters always are.
+     */
+    private void addYearParameters(
+            Map<String, FactTypeWithItem> facts, List<TaxParameter> params, FilingStatus status) {
         for (TaxParameter p : params) {
             if (status.appliesTo(p.filingStatus())) {
                 PersisterTypes.TypedValue typed = PersisterTypes.forParameter(p.type(), p.value(), p.factPath());
-                writeFact(sessionId, p.factPath(), typed.typeCode(), typed.value());
+                facts.put(p.factPath(), fact(typed.typeCode(), typed.value()));
             }
         }
     }
@@ -148,10 +171,14 @@ public class PlanningGraphService {
      * calculate_additional_medicare. Without these defaults projectedAGI (hence total tax) would stay
      * incomplete until every optional input was set by hand.
      */
-    private void zeroDefaultOptionalIncome(String sessionId) {
+    private void addZeroDefaultedOptionalIncome(Map<String, FactTypeWithItem> facts) {
         for (String path : INCOME_ZERO_DEFAULTS) {
-            writeFact(sessionId, path, PersisterTypes.DOLLAR, "0");
+            facts.put(path, fact(PersisterTypes.DOLLAR, "0"));
         }
+    }
+
+    private FactTypeWithItem fact(String typeCode, Object rawValue) {
+        return new FactTypeWithItem(typeCode, objectMapper.valueToTree(rawValue));
     }
 
     /**
@@ -161,69 +188,61 @@ public class PlanningGraphService {
      * re-injects the rows for its own status. Used by compare_filing_statuses to project identical
      * income across statuses without the agent re-entering anything. Returns the new session id.
      */
-    public String cloneSessionWithFilingStatus(String sourceSessionId, FilingStatus filingStatus) {
-        int year = taxYearOf(sourceSessionId);
-        Set<String> paramPaths = taxKnowledge.taxParametersForYear(year).stream()
+    public SessionId cloneSessionWithFilingStatus(SessionId sourceSessionId, FilingStatus filingStatus) {
+        SessionSnapshot source = require(sourceSessionId).snapshot();
+        Set<String> paramPaths = taxKnowledge.taxParametersForYear(source.taxYear()).stream()
                 .map(TaxParameter::factPath)
                 .collect(Collectors.toSet());
-        SessionState src = require(sourceSessionId);
-        // The new session is freshly created and not yet shared with any other thread, so only the
-        // source needs locking while we read its facts.
-        String newSid = newSession(year, filingStatus);
-        SessionState dst = require(newSid);
-        synchronized (src) {
-            src.facts.forEach((path, fact) -> {
-                // FactTypeWithItem is effectively immutable (a typeCode + a JsonNode we never mutate),
-                // so sharing the reference between sessions is safe.
-                if (!paramPaths.contains(path)) {
-                    dst.facts.put(path, fact);
-                }
-            });
-        }
-        return newSid;
-    }
 
-    /** Discard an in-memory session — e.g. the throwaway sessions a filing-status comparison spins up. */
-    public void discardSession(String sessionId) {
-        sessions.remove(sessionId);
-    }
-
-    public int taxYearOf(String sessionId) {
-        return require(sessionId).taxYear();
-    }
-
-    public String filingStatusOf(String sessionId) {
-        return require(sessionId).filingStatus().code();
-    }
-
-    public Graph graphFor(String sessionId) {
-        SessionState state = require(sessionId);
-        // Serialize under the session lock: building the graph iterates the facts map, and a
-        // concurrent writeFact mutating it would corrupt serialization. Holding the lock here (and in
-        // writeFact) is what prevents the transient "failed to build graph" faults under concurrent
-        // tool calls on the same session.
-        synchronized (state) {
-            try {
-                String json = objectMapper.writeValueAsString(state.facts);
-                return new Graph(dictionary, InMemoryPersister.apply(json));
-            } catch (Exception e) {
-                // Log the underlying cause (and fact paths, not values) so build failures are
-                // diagnosable; the cause was previously swallowed behind the generic message.
-                log.error(
-                        "Failed to build fact graph for session {} (fact paths: {})",
-                        sessionId,
-                        state.facts.keySet(),
-                        e);
-                // Distinct from an expired/unknown session (which require() reports): the session
-                // exists, but its current facts could not be assembled into a graph — usually the
-                // most recent write was malformed for its declared type.
-                throw new IllegalStateException(
-                        "Internal error building the fact graph for session " + sessionId
-                                + " — the session still exists (this is not an expiry). The most recent fact write"
-                                + " may be malformed for its type; re-check the last set_fact, or recreate the"
-                                + " session if this persists.",
-                        e);
+        SessionId id = SessionId.random();
+        SessionSnapshot fresh = freshSnapshot(id, source.taxYear(), filingStatus);
+        Map<String, FactTypeWithItem> facts = new LinkedHashMap<>(fresh.facts());
+        // FactTypeWithItem is effectively immutable (a typeCode + a JsonNode we never mutate), so
+        // sharing the reference between sessions is safe.
+        source.facts().forEach((path, fact) -> {
+            if (!paramPaths.contains(path)) {
+                facts.put(path, fact);
             }
+        });
+        sessions.create(id, new SessionSnapshot(source.taxYear(), filingStatus, facts, Map.of()));
+        return id;
+    }
+
+    /** Discard a session — e.g. the throwaway sessions a filing-status comparison spins up. */
+    public void discardSession(SessionId sessionId) {
+        sessions.delete(sessionId);
+    }
+
+    public int taxYearOf(SessionId sessionId) {
+        return require(sessionId).snapshot().taxYear();
+    }
+
+    public String filingStatusOf(SessionId sessionId) {
+        return require(sessionId).snapshot().filingStatus().code();
+    }
+
+    public Graph graphFor(SessionId sessionId) {
+        return buildGraph(sessionId, require(sessionId).snapshot().facts());
+    }
+
+    /** Assemble a fact graph over {@code facts}. The graph is a throwaway calculator; the facts are the state. */
+    private Graph buildGraph(SessionId sessionId, Map<String, FactTypeWithItem> facts) {
+        try {
+            String json = objectMapper.writeValueAsString(facts);
+            return new Graph(dictionary, InMemoryPersister.apply(json));
+        } catch (Exception e) {
+            // Log the underlying cause (and fact paths, not values) so build failures are
+            // diagnosable; the cause was previously swallowed behind the generic message.
+            log.error("Failed to build fact graph for session {} (fact paths: {})", sessionId, facts.keySet(), e);
+            // Distinct from an expired/unknown session (which require() reports): the session
+            // exists, but these facts could not be assembled into a graph — usually the most
+            // recent write was malformed for its declared type.
+            throw new IllegalStateException(
+                    "Internal error building the fact graph for session " + sessionId
+                            + " — the session still exists (this is not an expiry). The most recent fact write"
+                            + " may be malformed for its type; re-check the last set_fact, or recreate the"
+                            + " session if this persists.",
+                    e);
         }
     }
 
@@ -231,35 +250,27 @@ public class PlanningGraphService {
      * Write a fact to a session. {@code typeCode} is the persister type tag
      * (e.g. "gov.irs.factgraph.persisters.DollarWrapper",
      * "gov.irs.factgraph.persisters.BooleanWrapper"). {@code rawValue} is shaped to match.
+     *
+     * <p>The write is atomic. The new state is assembled into a graph <em>before</em> anything is
+     * stored, so a write the graph cannot accept (e.g. an invalid persister typeCode, which makes the
+     * fact-graph's upickle abort) throws with the session untouched — one malformed set_fact cannot
+     * poison a session. It is then stored with compare-and-set, so a concurrent writer on the same
+     * session, in this instance or another, is never silently overwritten.
      */
-    public WriteResult writeFact(String sessionId, String path, String typeCode, Object rawValue) {
-        SessionState state = require(sessionId);
-        // The put and the subsequent graph build/save must be atomic w.r.t. other writers on this
-        // session; graphFor re-acquires the same (reentrant) lock.
-        synchronized (state) {
-            // Snapshot the prior mapping so a write that the graph can't assemble (e.g. an invalid
-            // persister typeCode, which makes the fact-graph's upickle abort) can be rolled back.
-            // Without this, the bad entry lingers in state.facts and every later graphFor() for this
-            // session fails too — one malformed set_fact would poison the whole session.
-            FactTypeWithItem previous =
-                    state.facts.put(path, new FactTypeWithItem(typeCode, objectMapper.valueToTree(rawValue)));
-            try {
-                Graph g = graphFor(sessionId);
-                var saveResult = g.save();
-                boolean ok = (boolean) saveResult._1();
+    public WriteResult writeFact(SessionId sessionId, String path, String typeCode, Object rawValue) {
+        FactTypeWithItem fact = fact(typeCode, rawValue);
+        for (int attempt = 0; attempt < MAX_UPDATE_ATTEMPTS; attempt++) {
+            SessionStore.Stored current = require(sessionId);
+            SessionSnapshot updated = current.snapshot().withFact(path, fact);
+            boolean ok = (boolean) buildGraph(sessionId, updated.facts()).save()._1();
+            if (sessions.replace(sessionId, current, updated)) {
                 return new WriteResult(ok, ok ? List.of() : List.of("Save reported limit violation for " + path));
-            } catch (RuntimeException e) {
-                if (previous == null) {
-                    state.facts.remove(path);
-                } else {
-                    state.facts.put(path, previous);
-                }
-                throw e;
             }
         }
+        throw contended(sessionId);
     }
 
-    public ReadResult readFact(String sessionId, String path) {
+    public ReadResult readFact(SessionId sessionId, String path) {
         Graph g = graphFor(sessionId);
         try {
             Result<Object> r = g.get(path);
@@ -283,7 +294,7 @@ public class PlanningGraphService {
      * get a clean number instead of an engine object. Returns {@code null} if the fact is not
      * computable. Note: the report deliberately still shows rationals as "n/d" via {@code readFact}.
      */
-    public BigDecimal readDecimal(String sessionId, String path) {
+    public BigDecimal readDecimal(SessionId sessionId, String path) {
         return toDecimal(readFact(sessionId, path).value());
     }
 
@@ -308,12 +319,9 @@ public class PlanningGraphService {
         return new BigDecimal(s);
     }
 
-    public Map<String, Object> sessionFacts(String sessionId) {
-        SessionState state = require(sessionId);
+    public Map<String, Object> sessionFacts(SessionId sessionId) {
         Map<String, Object> out = new LinkedHashMap<>();
-        synchronized (state) {
-            state.facts.forEach((path, fact) -> out.put(path, scalarizePersistedItem(fact)));
-        }
+        require(sessionId).snapshot().facts().forEach((path, fact) -> out.put(path, scalarizePersistedItem(fact)));
         return out;
     }
 
@@ -322,22 +330,22 @@ public class PlanningGraphService {
      * metadata only — it is never written into the fact graph and never verified; it is surfaced
      * in the export report as self-reported provenance. Blank notes are ignored.
      */
-    public void setSourceNote(String sessionId, String path, String note) {
+    public void setSourceNote(SessionId sessionId, String path, String note) {
         if (note == null || note.isBlank()) {
             return;
         }
-        SessionState state = require(sessionId);
-        synchronized (state) {
-            state.sourceNotes().put(path, note.trim());
+        for (int attempt = 0; attempt < MAX_UPDATE_ATTEMPTS; attempt++) {
+            SessionStore.Stored current = require(sessionId);
+            if (sessions.replace(sessionId, current, current.snapshot().withSourceNote(path, note.trim()))) {
+                return;
+            }
         }
+        throw contended(sessionId);
     }
 
     /** Taxpayer-stated provenance notes by fact path (see {@link #setSourceNote}). */
-    public Map<String, String> sourceNotes(String sessionId) {
-        SessionState state = require(sessionId);
-        synchronized (state) {
-            return new LinkedHashMap<>(state.sourceNotes());
-        }
+    public Map<String, String> sourceNotes(SessionId sessionId) {
+        return new LinkedHashMap<>(require(sessionId).snapshot().sourceNotes());
     }
 
     /**
@@ -345,7 +353,7 @@ public class PlanningGraphService {
      * current resolved values. A full recursive walker is a trivial follow-up;
      * one level is already enough to power useful "why is this what it is?" answers.
      */
-    public ExplainResult explain(String sessionId, String path) {
+    public ExplainResult explain(SessionId sessionId, String path) {
         TaxFact fact = digest.getFacts().get(path);
         if (fact == null) {
             return new ExplainResult(path, null, null, null, false, List.of());
@@ -358,7 +366,7 @@ public class PlanningGraphService {
         return new ExplainResult(path, fact.name(), fact.description(), value.value(), value.complete(), deps);
     }
 
-    private ExplainResult.Dep explainDependency(String sessionId, String path) {
+    private ExplainResult.Dep explainDependency(SessionId sessionId, String path) {
         ReadResult value = readFact(sessionId, path);
         TaxFact fact = digest.getFacts().get(path);
         return new ExplainResult.Dep(
@@ -449,21 +457,18 @@ public class PlanningGraphService {
         return objectMapper.convertValue(item, Object.class);
     }
 
-    private SessionState require(String id) {
-        SessionState s = sessions.get(id);
-        if (s == null) {
-            throw new IllegalArgumentException("Unknown or expired planning session: " + id
-                    + ". Sessions are held in memory and are lost when the service restarts; "
-                    + "call create_session to start a new one, then re-enter the facts.");
-        }
-        return s;
+    private SessionStore.Stored require(SessionId id) {
+        return sessions.find(id)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown or expired planning session: " + id
+                        + ". Sessions expire when idle and may not survive a service restart; "
+                        + "call create_session to start a new one, then re-enter the facts."));
     }
 
-    private record SessionState(
-            int taxYear,
-            FilingStatus filingStatus,
-            LinkedHashMap<String, FactTypeWithItem> facts,
-            LinkedHashMap<String, String> sourceNotes) {}
+    private static IllegalStateException contended(SessionId id) {
+        return new IllegalStateException("Planning session " + id + " is being changed by another request and this"
+                + " update could not be applied after " + MAX_UPDATE_ATTEMPTS + " attempts. Nothing was written;"
+                + " retry the call.");
+    }
 
     public record WriteResult(boolean ok, List<String> violations) {}
 

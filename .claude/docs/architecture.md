@@ -85,13 +85,25 @@ Key types:
   planning `tax-plan/*.xml`) once at startup; hands out per-session in-memory `Graph`s; owns
   `writeFact`/`readFact`. Each session = a `UUID` + a `LinkedHashMap<path, FactTypeWithItem>`,
   rebuilt into a `Graph(dictionary, InMemoryPersister.apply(json))` on demand under a session lock.
-- `graph/PersisterTypes`, `graph/FilingStatus`, `graph/FactPaths` — the small vocabulary types the
-  rest of the service shares: persister type codes plus alias resolution / value shaping (the guard
-  behind CLAUDE.md invariant 5), the `single | mfj | mfs` enum, and the fact-path constants. Add a
+- `graph/SessionId`, `graph/PersisterTypes`, `graph/FilingStatus`, `graph/FactPaths` — the small vocabulary
+  types the rest of the service shares: the typed session identifier, persister type codes plus alias
+  resolution / value shaping (the guard behind CLAUDE.md invariant 5), the `single | mfj | mfs` enum,
+  and the fact-path constants. `SessionId` stops at the MCP boundary: tool parameters and result
+  records keep the id as a `String` (a record would publish as a JSON object and break the wire
+  contract), and each tool converts with `SessionId.of(...)` on its first line. Add a
   new persister alias, status, or fact path here rather than as a string literal at the call site.
 - `knowledge/TaxKnowledgeService` — loads the `tax-knowledge/` YAML (questions, evidence maps,
   conflict rules, citations, year-indexed parameters). Uses its **own** Jackson 2 YAML mapper.
-- `mcp/PlanningTools` — the `@McpTool`-annotated methods exposed over MCP: `create_session`
+- `knowledge/KnowledgeBundle`, `ConditionGroup`, `EvaluationContext`, `YamlValues` — the interview-planning
+  model split out of `TaxKnowledgeService`: the YAML-authored questions / evidence maps / conflict rules
+  and their loader, the `asks_when` / `skip_when` / `when` rule evaluation, and lenient YAML accessors.
+  The service itself keeps tax parameters, citations, and `plan`.
+- `mcp/*Tools` — the `@McpTool`-annotated methods exposed over MCP, one Spring bean per topic:
+  `SessionTools` (create/get/set), `SelfEmploymentTools` (SE tax, net-profit projection),
+  `TaxProjectionTools` (Additional Medicare, QBI, total tax, status comparison), `QuarterlyPaymentTools`,
+  `ExplanationTools` (explain, cite, export) and `InterviewTools` (plan_questions). `ToolSupport` holds
+  what they share. Add a tool to the class for its topic; the README drift gate scans the whole
+  package, so a new class is covered automatically. The tools are: `create_session`
   (takes a `filing_status`: single/mfj/mfs, driving filing-status thresholds), `get_fact`,
   `set_fact`, `explain`, `cite`, `calculate_se_tax`, `calculate_additional_medicare` (Form 8959
   0.9% surtax), `estimate_qbi_deduction` (Form 8995 / §199A 20% deduction, simple method),

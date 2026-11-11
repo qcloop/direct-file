@@ -1,7 +1,11 @@
 package com.realworld.tax.advisor.report;
 
 import com.realworld.tax.advisor.graph.PlanningGraphService;
-import com.realworld.tax.advisor.mcp.PlanningTools;
+import com.realworld.tax.advisor.graph.SessionId;
+import com.realworld.tax.advisor.mcp.ExplanationTools;
+import com.realworld.tax.advisor.mcp.QuarterlyPaymentTools;
+import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
+import com.realworld.tax.advisor.mcp.SessionTools;
 import com.realworld.tax.advisor.report.PlanReportService.PlanReport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,29 +26,38 @@ class PlanReportTest {
     PlanningGraphService graph;
 
     @Autowired
-    PlanningTools tools;
+    SessionTools sessionTools;
+
+    @Autowired
+    SelfEmploymentTools selfEmploymentTools;
+
+    @Autowired
+    QuarterlyPaymentTools quarterlyPaymentTools;
+
+    @Autowired
+    ExplanationTools explanationTools;
 
     @Autowired
     PlanReportService reportService;
 
     /** A gig-worker session whose SE-tax and quarterly figures are all computed before export. */
     private String seededSession() {
-        String sid = tools.createSession("2025", null).sessionId();
-        tools.calculateSeTax(sid, "40000", "10000", "3000", "1000", "0");
-        tools.setFact(sid, "/planning/priorYearTotalTax", "dollar", null, "3800", "2024 Form 1040, line 24");
-        tools.setFact(sid, "/planning/priorYearAGI", "dollar", null, "58000", null);
+        String sid = sessionTools.createSession("2025", null).sessionId();
+        selfEmploymentTools.calculateSeTax(sid, "40000", "10000", "3000", "1000", "0");
+        sessionTools.setFact(sid, "/planning/priorYearTotalTax", "dollar", null, "3800", "2024 Form 1040, line 24");
+        sessionTools.setFact(sid, "/planning/priorYearAGI", "dollar", null, "58000", null);
         // projectedCurrentYearTax is derived (income + SE + Additional Medicare) from the calculate_se_tax
         // inputs above — no longer an agent-entered fact.
-        tools.setFact(sid, "/planning/ytdWithholding", "dollar", null, "400", null);
-        tools.setFact(sid, "/planning/ytdEstimatedPaymentsMade", "dollar", null, "1800", null);
+        sessionTools.setFact(sid, "/planning/ytdWithholding", "dollar", null, "400", null);
+        sessionTools.setFact(sid, "/planning/ytdEstimatedPaymentsMade", "dollar", null, "1800", null);
         // Populates /planning/remainingQuarters so the suggested-payment result row renders.
-        tools.estimateQuarterlyPayment(sid, "2025-08-20");
+        quarterlyPaymentTools.estimateQuarterlyPayment(sid, "2025-08-20");
         return sid;
     }
 
     @Test
     void reportCarriesTheThreeSectionsWithProvenanceAndDisclaimer() {
-        PlanReport report = reportService.generate(seededSession());
+        PlanReport report = reportService.generate(SessionId.of(seededSession()));
         String md = report.markdown();
 
         assertThat(report.taxYear()).isEqualTo(2025);
@@ -81,9 +94,9 @@ class PlanReportTest {
 
     @Test
     void flagsProvisionalParametersInTheReportForADraftYear() {
-        String sid = tools.createSession("2026", null).sessionId();
-        tools.calculateSeTax(sid, "40000", "10000", "0", "0", "0");
-        String md = reportService.generate(sid).markdown();
+        String sid = sessionTools.createSession("2026", null).sessionId();
+        selfEmploymentTools.calculateSeTax(sid, "40000", "10000", "0", "0", "0");
+        String md = reportService.generate(SessionId.of(sid)).markdown();
 
         // 2026's draft constants surface as a banner and are marked in the parameter table.
         assertThat(md).contains("Provisional values for 2026");
@@ -93,8 +106,8 @@ class PlanReportTest {
     @Test
     void citationsCanBeOmittedAndLeaveTheRawSourceIds() {
         String sid = seededSession();
-        String without = reportService.generate(sid, false).markdown();
-        String with = reportService.generate(sid, true).markdown();
+        String without = reportService.generate(SessionId.of(sid), false).markdown();
+        String with = reportService.generate(SessionId.of(sid), true).markdown();
 
         // Off: no citation prose, raw source ids retained in the parameter table.
         assertThat(without).doesNotContain("## Sources & plain-language");
@@ -112,7 +125,7 @@ class PlanReportTest {
 
         // Self-employment tax flows from the Schedule SE rates and the SSA wage base, so those are
         // the authorities the cite tool surfaces — derived from the computation, not hand-mapped.
-        var seTax = tools.cite(sid, "/seTax");
+        var seTax = explanationTools.cite(sid, "/seTax");
         assertThat(seTax.status()).isEqualTo("ok");
         assertThat(seTax.authorities()).isNotEmpty();
         assertThat(seTax.authorities()).anySatisfy(a -> {
@@ -122,14 +135,14 @@ class PlanReportTest {
         });
 
         // The safe-harbor target is governed by IRC § 6654.
-        var safeHarbor = tools.cite(sid, "/planning/safeHarborTarget");
+        var safeHarbor = explanationTools.cite(sid, "/planning/safeHarborTarget");
         assertThat(safeHarbor.authorities())
                 .anySatisfy(a -> assertThat(a.citation()).contains("§ 6654"));
     }
 
     @Test
     void hashIsTamperEvidentOverTheDocumentedBody() {
-        PlanReport report = reportService.generate(seededSession());
+        PlanReport report = reportService.generate(SessionId.of(seededSession()));
         String md = report.markdown();
 
         // Seal is present and well-formed.
@@ -150,7 +163,7 @@ class PlanReportTest {
 
     @Test
     void exportPlanToolReturnsTheArtifactWithoutPersisting() {
-        PlanningTools.ExportPlanResult out = tools.exportPlan(seededSession(), null);
+        ExplanationTools.ExportPlanResult out = explanationTools.exportPlan(seededSession(), null);
 
         assertThat(out.status()).isEqualTo("ok");
         assertThat(out.taxYear()).isEqualTo(2025);

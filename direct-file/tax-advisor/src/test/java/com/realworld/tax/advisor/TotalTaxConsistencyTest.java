@@ -2,7 +2,10 @@ package com.realworld.tax.advisor;
 
 import java.math.BigDecimal;
 
-import com.realworld.tax.advisor.mcp.PlanningTools;
+import com.realworld.tax.advisor.mcp.QuarterlyPaymentTools;
+import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
+import com.realworld.tax.advisor.mcp.SessionTools;
+import com.realworld.tax.advisor.mcp.TaxProjectionTools;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,15 +25,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TotalTaxConsistencyTest {
 
     @Autowired
-    PlanningTools tools;
+    SessionTools sessionTools;
+
+    @Autowired
+    SelfEmploymentTools selfEmploymentTools;
+
+    @Autowired
+    TaxProjectionTools taxProjectionTools;
+
+    @Autowired
+    QuarterlyPaymentTools quarterlyPaymentTools;
 
     @Test
     void derivedTotalTaxEqualsItsPartsAndQbiIsCapped() {
-        String sid = tools.createSession("2026", "single").sessionId();
+        String sid = sessionTools.createSession("2026", "single").sessionId();
         // Six months of year-to-date figures, annualized straight-line (factor 12/6 = 2).
-        tools.projectNetProfit(sid, "2026-06-30", "18360", "6700", "450", null, null);
+        selfEmploymentTools.projectNetProfit(sid, "2026-06-30", "18360", "6700", "450", null, null);
 
-        var t = tools.projectTotalTax(sid, null, null);
+        var t = taxProjectionTools.projectTotalTax(sid, null, null);
 
         BigDecimal netProfit = (BigDecimal) t.netProfit();
         BigDecimal agi = (BigDecimal) t.adjustedGrossIncome();
@@ -55,12 +67,12 @@ class TotalTaxConsistencyTest {
         assertThat(qbiDeduction).isLessThan(new BigDecimal("4852"));
 
         // The balance due is total minus payments already made — derived, not independently guessed.
-        tools.setFact(sid, "/planning/priorYearTotalTax", "dollar", null, "780", null);
-        tools.setFact(sid, "/planning/priorYearAGI", "dollar", null, "11900", null);
-        tools.setFact(sid, "/planning/ytdWithholding", "dollar", null, "0", null);
-        tools.setFact(sid, "/planning/ytdEstimatedPaymentsMade", "dollar", null, "200", null);
+        sessionTools.setFact(sid, "/planning/priorYearTotalTax", "dollar", null, "780", null);
+        sessionTools.setFact(sid, "/planning/priorYearAGI", "dollar", null, "11900", null);
+        sessionTools.setFact(sid, "/planning/ytdWithholding", "dollar", null, "0", null);
+        sessionTools.setFact(sid, "/planning/ytdEstimatedPaymentsMade", "dollar", null, "200", null);
 
-        var q = tools.estimateQuarterlyPayment(sid, "2026-06-08");
+        var q = quarterlyPaymentTools.estimateQuarterlyPayment(sid, "2026-06-08");
         assertThat(q.status()).isEqualTo("ok");
         assertThat((BigDecimal) q.projectedBalanceDueAtFiling())
                 .isEqualByComparingTo(total.subtract(new BigDecimal("200")));

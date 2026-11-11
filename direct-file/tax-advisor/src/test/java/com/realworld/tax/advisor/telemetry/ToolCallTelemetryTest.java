@@ -1,6 +1,8 @@
 package com.realworld.tax.advisor.telemetry;
 
-import com.realworld.tax.advisor.mcp.PlanningTools;
+import com.realworld.tax.advisor.mcp.QuarterlyPaymentTools;
+import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
+import com.realworld.tax.advisor.mcp.SessionTools;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -19,7 +21,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ToolCallTelemetryTest {
 
     @Autowired
-    PlanningTools tools;
+    SessionTools sessionTools;
+
+    @Autowired
+    SelfEmploymentTools selfEmploymentTools;
+
+    @Autowired
+    QuarterlyPaymentTools quarterlyPaymentTools;
 
     @Autowired
     MeterRegistry meters;
@@ -47,16 +55,19 @@ class ToolCallTelemetryTest {
         double needsBefore = calls("estimate_quarterly_payment", "needs_facts");
         double errBefore = errors("get_fact", "IllegalArgumentException");
 
-        String s = tools.createSession("2025", "single").sessionId();
-        tools.calculateSeTax(s, "60000", null, null, null, null); // -> ok
+        String s = sessionTools.createSession("2025", "single").sessionId();
+        selfEmploymentTools.calculateSeTax(s, "60000", null, null, null, null); // -> ok
 
         // Quarterly on a fresh session has no prior-year facts -> needs_facts (a real misuse signal).
-        String fresh = tools.createSession("2025", "single").sessionId();
-        assertThat(tools.estimateQuarterlyPayment(fresh, "2025-08-20").status()).isEqualTo("needs_facts");
+        String fresh = sessionTools.createSession("2025", "single").sessionId();
+        assertThat(quarterlyPaymentTools
+                        .estimateQuarterlyPayment(fresh, "2025-08-20")
+                        .status())
+                .isEqualTo("needs_facts");
 
         // Unknown session -> the tool throws; the aspect records outcome=error + the exception class.
         try {
-            tools.getFact("no-such-session", "/seTax");
+            sessionTools.getFact("no-such-session", "/seTax");
         } catch (RuntimeException ignored) {
             // expected
         }
@@ -69,7 +80,7 @@ class ToolCallTelemetryTest {
     @Test
     void carriesNoValueBearingTags() {
         // Drive at least one call so the meter exists.
-        tools.createSession("2025", "single");
+        sessionTools.createSession("2025", "single");
 
         // Privacy guard: the only tags on the call counters are the static {tool, outcome} — never a
         // dollar amount, fact path, or session id. If a future change tags a meter with a value, this fails.

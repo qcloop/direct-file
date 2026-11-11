@@ -3,7 +3,10 @@ package com.realworld.tax.advisor;
 import java.math.BigDecimal;
 
 import com.realworld.tax.advisor.graph.PlanningGraphService;
-import com.realworld.tax.advisor.mcp.PlanningTools;
+import com.realworld.tax.advisor.graph.SessionId;
+import com.realworld.tax.advisor.mcp.QuarterlyPaymentTools;
+import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
+import com.realworld.tax.advisor.mcp.SessionTools;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,14 +32,20 @@ class QuarterlyEstimateIntegrationTest {
     PlanningGraphService graph;
 
     @Autowired
-    PlanningTools tools;
+    SessionTools sessionTools;
+
+    @Autowired
+    SelfEmploymentTools selfEmploymentTools;
+
+    @Autowired
+    QuarterlyPaymentTools quarterlyPaymentTools;
 
     @Test
     void quarterlyEstimateFlow() {
-        String sid = tools.createSession("2025", null).sessionId();
+        String sid = sessionTools.createSession("2025", null).sessionId();
 
         // 1) Without any facts populated, the tool should ask for what's missing.
-        var before = tools.estimateQuarterlyPayment(sid, "2025-08-20");
+        var before = quarterlyPaymentTools.estimateQuarterlyPayment(sid, "2025-08-20");
         assertThat(before.status()).isEqualTo("needs_facts");
         assertThat(before.missingFacts()).isNotEmpty();
 
@@ -46,12 +55,12 @@ class QuarterlyEstimateIntegrationTest {
         // projectedCurrentYearTax is now DERIVED (was an agent-entered guess). Populate the Schedule C
         // inputs so it computes: ~$32K net profit -> total tax (income + SE) comfortably above the
         // $4,222 the 90% leg would need to beat the $3,800 prior-year leg, so the prior-year leg governs.
-        tools.calculateSeTax(sid, "32000", null, null, null, null);
+        selfEmploymentTools.calculateSeTax(sid, "32000", null, null, null, null);
         writeDollar(sid, "/planning/ytdWithholding", 400);
         writeDollar(sid, "/planning/ytdEstimatedPaymentsMade", 1800); // Q1 + Q2 already paid
 
         // 3) Run again — now we should get a real recommendation.
-        var after = tools.estimateQuarterlyPayment(sid, "2025-08-20");
+        var after = quarterlyPaymentTools.estimateQuarterlyPayment(sid, "2025-08-20");
         assertThat(after.status()).isEqualTo("ok");
         assertThat(after.nextDeadline()).isEqualTo("2025-09-15");
         assertThat(after.quarter()).isEqualTo("Q3");
@@ -72,13 +81,13 @@ class QuarterlyEstimateIntegrationTest {
      */
     @Test
     void highIncomeSafeHarborMultipliesPriorYearTaxBy110Percent() {
-        String sid = graph.createSession(2025);
+        SessionId sid = graph.createSession(2025);
 
-        writeDollar(sid, "/planning/priorYearTotalTax", 20000);
-        writeDollar(sid, "/planning/priorYearAGI", 200000); // over the $150K high-income threshold
+        writeDollar(sid.value(), "/planning/priorYearTotalTax", 20000);
+        writeDollar(sid.value(), "/planning/priorYearAGI", 200000); // over the $150K high-income threshold
         // Derived current-year tax: ~$130K net profit yields total tax well above $24,445, so the 90%
         // current-year leg (>= ~$28K) exceeds the 110% prior-year leg ($22,000) and the prior-year leg wins.
-        tools.calculateSeTax(sid, "130000", null, null, null, null);
+        selfEmploymentTools.calculateSeTax(sid.value(), "130000", null, null, null, null);
 
         // High-income tier engaged.
         assertThat(graph.readFact(sid, "/planning/highIncomeSafeHarborApplies").value())
@@ -94,6 +103,6 @@ class QuarterlyEstimateIntegrationTest {
     }
 
     private void writeDollar(String sid, String path, int dollars) {
-        tools.setFact(sid, path, "dollar", null, Integer.toString(dollars), null);
+        sessionTools.setFact(sid, path, "dollar", null, Integer.toString(dollars), null);
     }
 }

@@ -3,7 +3,9 @@ package com.realworld.tax.advisor;
 import java.math.BigDecimal;
 
 import com.realworld.tax.advisor.graph.PlanningGraphService;
-import com.realworld.tax.advisor.mcp.PlanningTools;
+import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
+import com.realworld.tax.advisor.mcp.SessionTools;
+import com.realworld.tax.advisor.mcp.TaxProjectionTools;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,15 +25,21 @@ class AdditionalMedicareTaxTest {
     PlanningGraphService graph;
 
     @Autowired
-    PlanningTools tools;
+    SessionTools sessionTools;
+
+    @Autowired
+    SelfEmploymentTools selfEmploymentTools;
+
+    @Autowired
+    TaxProjectionTools taxProjectionTools;
 
     @Test
     void singleFilerSeOnlyOverTheTwoHundredKThreshold() {
-        String sid = tools.createSession("2025", "single").sessionId();
+        String sid = sessionTools.createSession("2025", "single").sessionId();
         // Net profit $300,000, no expenses -> net earnings = 300,000 x 92.35% = $277,050.
-        tools.calculateSeTax(sid, "300000", null, null, null, null);
+        selfEmploymentTools.calculateSeTax(sid, "300000", null, null, null, null);
 
-        var r = tools.calculateAdditionalMedicare(sid, "0");
+        var r = taxProjectionTools.calculateAdditionalMedicare(sid, "0");
 
         assertThat((BigDecimal) r.additionalMedicareThreshold()).isEqualByComparingTo("200000");
         // SE earnings over the threshold = 277,050 - 200,000 = 77,050; x 0.9% = $693.45 -> $693.
@@ -43,13 +51,13 @@ class AdditionalMedicareTaxTest {
 
     @Test
     void mfjW2WagesReduceTheThresholdRemainingForSeIncome() {
-        String sid = tools.createSession("2025", "mfj").sessionId();
+        String sid = sessionTools.createSession("2025", "mfj").sessionId();
         // Net profit $200,000 -> net earnings = 200,000 x 92.35% = $184,700.
-        tools.calculateSeTax(sid, "200000", null, null, null, null);
+        selfEmploymentTools.calculateSeTax(sid, "200000", null, null, null, null);
 
         // $100,000 W-2 Medicare wages. MFJ threshold $250,000; wages counted first leave $150,000
         // of threshold for SE income. SE over remaining = 184,700 - 150,000 = 34,700; x 0.9% = $312.30 -> $312.
-        var r = tools.calculateAdditionalMedicare(sid, "100000");
+        var r = taxProjectionTools.calculateAdditionalMedicare(sid, "100000");
 
         assertThat((BigDecimal) r.additionalMedicareThreshold()).isEqualByComparingTo("250000");
         assertThat((BigDecimal) r.seIncomeOverThreshold()).isEqualByComparingTo("34700");
@@ -61,11 +69,11 @@ class AdditionalMedicareTaxTest {
 
     @Test
     void wagePortionAppliesWhenW2WagesAloneExceedTheThreshold() {
-        String sid = tools.createSession("2025", "single").sessionId();
-        tools.calculateSeTax(sid, "0", null, null, null, null); // no SE income
+        String sid = sessionTools.createSession("2025", "single").sessionId();
+        selfEmploymentTools.calculateSeTax(sid, "0", null, null, null, null); // no SE income
 
         // $220,000 Medicare wages, single threshold $200,000: wage portion = 20,000 x 0.9% = $180.
-        var r = tools.calculateAdditionalMedicare(sid, "220000");
+        var r = taxProjectionTools.calculateAdditionalMedicare(sid, "220000");
 
         assertThat((BigDecimal) r.additionalMedicareTaxOnWages()).isEqualByComparingTo("180");
         assertThat((BigDecimal) r.additionalMedicareTaxOnSe()).isEqualByComparingTo("0");

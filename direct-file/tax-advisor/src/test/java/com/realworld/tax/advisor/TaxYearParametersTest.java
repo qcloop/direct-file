@@ -3,6 +3,7 @@ package com.realworld.tax.advisor;
 import java.math.BigDecimal;
 
 import com.realworld.tax.advisor.graph.PlanningGraphService;
+import com.realworld.tax.advisor.graph.SessionId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,8 +25,8 @@ class TaxYearParametersTest {
 
     @Test
     void injectsYearIndexedConstantsMatchingTheTaxYear() {
-        String s2024 = graph.createSession(2024);
-        String s2025 = graph.createSession(2025);
+        SessionId s2024 = graph.createSession(2024);
+        SessionId s2025 = graph.createSession(2025);
 
         // standardMileageRate is a Rational (exact, can carry a half-cent), read as a decimal.
         assertThat(graph.readDecimal(s2024, "/standardMileageRate")).isEqualByComparingTo("0.67");
@@ -60,7 +61,7 @@ class TaxYearParametersTest {
         // Bug 2: planning the year you are actually in must work. The 2026 set is draft (its mileage
         // rate and wage base are provisional pending the official announcements) but present, so a
         // 2026 session is created and the constants are injected.
-        String s2026 = graph.createSession(2026);
+        SessionId s2026 = graph.createSession(2026);
 
         assertThat(graph.readDecimal(s2026, "/standardMileageRate")).isEqualByComparingTo("0.725");
         assertThat(graph.readFact(s2026, "/socialSecurityWageBase").complete()).isTrue();

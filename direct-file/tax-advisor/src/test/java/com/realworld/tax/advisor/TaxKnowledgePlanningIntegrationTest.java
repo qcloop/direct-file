@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.realworld.tax.advisor.graph.PlanningGraphService;
+import com.realworld.tax.advisor.graph.SessionId;
 import com.realworld.tax.advisor.knowledge.TaxKnowledgeService;
-import com.realworld.tax.advisor.mcp.PlanningTools;
+import com.realworld.tax.advisor.mcp.InterviewTools;
+import com.realworld.tax.advisor.mcp.SessionTools;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,14 +18,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TaxKnowledgePlanningIntegrationTest {
 
     @Autowired
-    PlanningTools tools;
+    SessionTools sessionTools;
+
+    @Autowired
+    InterviewTools interviewTools;
 
     @Autowired
     PlanningGraphService graph;
 
     @Test
     void documentEvidenceProducesCandidateFactsAndConflictReviewItems() {
-        Object result = tools.planQuestions(
+        Object result = interviewTools.planQuestions(
                 null,
                 null,
                 null,
@@ -55,7 +60,7 @@ class TaxKnowledgePlanningIntegrationTest {
 
     @Test
     void priorAnswersGateDetailQuestions() {
-        Object result = tools.planQuestions(
+        Object result = interviewTools.planQuestions(
                 null,
                 null,
                 null,
@@ -79,7 +84,7 @@ class TaxKnowledgePlanningIntegrationTest {
     void sessionFactsAreTreatedAsConfirmedAnswers() {
         String sessionId = setFactSessionWithSelfEmploymentAnswer(false);
 
-        Object result = tools.planQuestions(
+        Object result = interviewTools.planQuestions(
                 sessionId, null, null, null, null, Map.of("prior_year_topics", List.of("self_employment")), null, null);
 
         TaxKnowledgeService.PlanResult plan = (TaxKnowledgeService.PlanResult) result;
@@ -96,7 +101,7 @@ class TaxKnowledgePlanningIntegrationTest {
     void gigDriver1099kDrivesSeSignalThenUnlocksGigDetailQuestions() {
         // A delivery driver's platform issues a Form 1099-K: it should signal self-employment and
         // pre-fill candidate facts to confirm (not silently assume them).
-        var withDoc = tools.planQuestions(
+        var withDoc = interviewTools.planQuestions(
                 null,
                 2025,
                 null,
@@ -119,7 +124,7 @@ class TaxKnowledgePlanningIntegrationTest {
                 });
 
         // Once gig income is confirmed, the gig detail questions (fees, supplies, quarterly anchor) unlock.
-        var confirmed = tools.planQuestions(
+        var confirmed = interviewTools.planQuestions(
                 null,
                 2025,
                 null,
@@ -137,7 +142,7 @@ class TaxKnowledgePlanningIntegrationTest {
                         "uses_vehicle_for_business");
 
         // Denying gig income while a 1099-K is present raises a review conflict.
-        var denied = tools.planQuestions(
+        var denied = interviewTools.planQuestions(
                 null,
                 2025,
                 null,
@@ -152,9 +157,14 @@ class TaxKnowledgePlanningIntegrationTest {
     }
 
     private String setFactSessionWithSelfEmploymentAnswer(boolean hasSelfEmployment) {
-        String sessionId = graph.createSession(2025);
-        tools.setFact(
-                sessionId, "/hasSelfEmploymentIncome", "boolean", null, Boolean.toString(hasSelfEmployment), null);
-        return sessionId;
+        SessionId sessionId = graph.createSession(2025);
+        sessionTools.setFact(
+                sessionId.value(),
+                "/hasSelfEmploymentIncome",
+                "boolean",
+                null,
+                Boolean.toString(hasSelfEmployment),
+                null);
+        return sessionId.value();
     }
 }

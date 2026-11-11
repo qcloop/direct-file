@@ -1,7 +1,8 @@
 package com.realworld.tax.advisor;
 
 import com.realworld.tax.advisor.graph.PlanningGraphService;
-import com.realworld.tax.advisor.mcp.PlanningTools;
+import com.realworld.tax.advisor.graph.SessionId;
+import com.realworld.tax.advisor.mcp.SessionTools;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,14 +23,14 @@ class FactWriteValidationTest {
     PlanningGraphService graph;
 
     @Autowired
-    PlanningTools tools;
+    SessionTools sessionTools;
 
     @Test
     void setFactRejectsAnInventedPersisterTypeCodeWithAnActionableMessage() {
-        String sid = graph.createSession(2025);
+        SessionId sid = graph.createSession(2025);
 
-        assertThatThrownBy(() -> tools.setFact(
-                        sid,
+        assertThatThrownBy(() -> sessionTools.setFact(
+                        sid.value(),
                         "/planning/priorYearTotalTax",
                         null,
                         "us.gov.irs.df.plan.FilingStatusPersister",
@@ -40,15 +41,15 @@ class FactWriteValidationTest {
                 .hasMessageContaining("enum");
 
         // The rejected write never touched the graph, so the session is still usable.
-        tools.setFact(sid, "/planning/priorYearTotalTax", "dollar", null, "3800", null);
+        sessionTools.setFact(sid.value(), "/planning/priorYearTotalTax", "dollar", null, "3800", null);
         assertThat((Object) graph.readFact(sid, "/planning/priorYearTotalTax").value())
                 .isNotNull();
     }
 
     @Test
     void aWriteThatFailsGraphAssemblyIsRolledBackAndDoesNotPoisonTheSession() {
-        String sid = graph.createSession(2025);
-        tools.setFact(sid, "/planning/priorYearTotalTax", "dollar", null, "3800", null);
+        SessionId sid = graph.createSession(2025);
+        sessionTools.setFact(sid.value(), "/planning/priorYearTotalTax", "dollar", null, "3800", null);
 
         // A typeCode under the persisters package passes the set_fact guard but is not a real
         // persister, so the fact graph's upickle aborts when it assembles the session.
@@ -62,7 +63,7 @@ class FactWriteValidationTest {
                 .isNotNull();
 
         // And the session still accepts new well-formed writes.
-        tools.setFact(sid, "/planning/priorYearAGI", "dollar", null, "58000", null);
+        sessionTools.setFact(sid.value(), "/planning/priorYearAGI", "dollar", null, "58000", null);
         assertThat((Object) graph.readFact(sid, "/planning/priorYearAGI").value())
                 .isNotNull();
     }

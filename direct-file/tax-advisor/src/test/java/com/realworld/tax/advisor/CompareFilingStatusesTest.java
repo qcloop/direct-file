@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.realworld.tax.advisor.mcp.PlanningTools;
-import com.realworld.tax.advisor.mcp.PlanningTools.FilingStatusProjection;
+import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
+import com.realworld.tax.advisor.mcp.SessionTools;
+import com.realworld.tax.advisor.mcp.TaxProjectionTools;
+import com.realworld.tax.advisor.mcp.TaxProjectionTools.FilingStatusProjection;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,12 +24,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CompareFilingStatusesTest {
 
     @Autowired
-    PlanningTools tools;
+    SessionTools sessionTools;
+
+    @Autowired
+    SelfEmploymentTools selfEmploymentTools;
+
+    @Autowired
+    TaxProjectionTools taxProjectionTools;
 
     @Test
     void needsIncomeBeforeComparing() {
-        String s = tools.createSession("2026", "single").sessionId();
-        var r = tools.compareFilingStatuses(s);
+        String s = sessionTools.createSession("2026", "single").sessionId();
+        var r = taxProjectionTools.compareFilingStatuses(s);
         assertThat(r.status()).isEqualTo("needs_facts");
         assertThat(r.projections()).isEmpty();
     }
@@ -35,10 +43,10 @@ class CompareFilingStatusesTest {
     @Test
     void seTaxIsConstantWhileIncomeTaxFallsWithTheHigherStandardDeduction() {
         // Transcript scenario: delivery driver, ~6 months of data, $16,785 gross, 8,700 miles, TY2026.
-        String s = tools.createSession("2026", "single").sessionId();
-        tools.projectNetProfit(s, "2026-06-30", "16785", "8700", null, null, null);
+        String s = sessionTools.createSession("2026", "single").sessionId();
+        selfEmploymentTools.projectNetProfit(s, "2026-06-30", "16785", "8700", null, null, null);
 
-        var r = tools.compareFilingStatuses(s);
+        var r = taxProjectionTools.compareFilingStatuses(s);
         assertThat(r.status()).isEqualTo("ok");
         assertThat(r.projections())
                 .extracting(FilingStatusProjection::filingStatus)

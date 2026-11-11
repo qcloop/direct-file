@@ -20,6 +20,7 @@ import com.realworld.tax.advisor.citation.CitationService;
 import com.realworld.tax.advisor.graph.FactPaths;
 import com.realworld.tax.advisor.graph.PlanningGraphService;
 import com.realworld.tax.advisor.graph.PlanningGraphService.ExplainResult;
+import com.realworld.tax.advisor.graph.SessionId;
 import com.realworld.tax.advisor.knowledge.TaxKnowledgeService;
 import com.realworld.tax.advisor.knowledge.TaxKnowledgeService.Citation;
 import com.realworld.tax.advisor.knowledge.TaxKnowledgeService.TaxParameter;
@@ -89,7 +90,7 @@ public class PlanReportService {
     }
 
     /** Build the sealed report with legal citations and plain-language explanations included. */
-    public PlanReport generate(String sessionId) {
+    public PlanReport generate(SessionId sessionId) {
         return generate(sessionId, true);
     }
 
@@ -99,7 +100,7 @@ public class PlanReportService {
      * plain-language "Sources" section is appended. Throws {@link IllegalArgumentException} if the
      * session is unknown/expired (surfaced verbatim to the agent so it can re-create the session).
      */
-    public PlanReport generate(String sessionId, boolean includeCitations) {
+    public PlanReport generate(SessionId sessionId, boolean includeCitations) {
         int taxYear = graph.taxYearOf(sessionId);
         List<TaxParameter> params = taxKnowledge.taxParametersForYear(taxYear);
         Set<String> paramPaths = params.stream().map(TaxParameter::factPath).collect(Collectors.toSet());
@@ -391,7 +392,7 @@ public class PlanReportService {
 
     /** Everything one report rendering needs, gathered once so each section takes a single argument. */
     private record ReportContext(
-            String sessionId,
+            SessionId sessionId,
             int taxYear,
             String generatedAt,
             List<String> inputPaths,

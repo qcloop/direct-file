@@ -3,6 +3,15 @@ spring:
     name: tax-advisor
   main:
     banner-mode: off
+  data:
+    redis:
+      # Same endpoint the client web app uses for its conversational state. Only contacted when the
+      # `redis` profile is active. For AWS (ElastiCache / MemoryDB) set REDIS_URL to the cluster's
+      # endpoint with the TLS scheme and credentials, e.g. rediss://user:token@host:6379.
+      url: ${REDIS_URL:redis://localhost:6379}
+      # This service uses StringRedisTemplate directly; it declares no Spring Data repositories.
+      repositories:
+        enabled: false
   ai:
     mcp:
       server:
@@ -69,9 +78,25 @@ management:
     web:
       exposure:
         include: health,metrics
+  # The Redis client is on the classpath for the optional shared session store. With the default
+  # in-memory store there is no Redis to check, so its health indicator must not drag
+  # /actuator/health DOWN; the `redis` profile turns it back on.
+  health:
+    redis:
+      enabled: false
 
 tax-advisor:
   tax-knowledge-root: ${DF_TAX_KNOWLEDGE_ROOT:../tax-knowledge}
+  # Where planning sessions live between tool calls. `memory` (default): this JVM only, nothing is
+  # persisted, sessions are lost on restart and invisible to other instances. `redis`: shared through
+  # spring.data.redis.url so any instance can serve any session — activate the `redis` profile
+  # (application-redis.yaml) rather than setting this by hand, so the health check follows along.
+  session-store:
+    type: memory
+    # Redis store only: a session untouched this long expires (sliding — each use renews it).
+    idle-timeout: 60m
+    # Redis store only: namespaces this service's keys inside a Redis shared with other apps.
+    key-prefix: "tax-advisor:session:"
   fact-xml-patterns:
     - classpath*:/tax/*.xml
     - classpath*:/tax-plan/*.xml
