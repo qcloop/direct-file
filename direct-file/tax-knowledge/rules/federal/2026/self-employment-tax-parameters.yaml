@@ -1,146 +1,220 @@
-parameter_set_id: self_employment_tax_parameters_ty2026
+parameter_set_id: "self_employment_tax_parameters_ty2026"
 tax_year: 2026
-jurisdiction: federal
-status: draft
+jurisdiction: "federal"
+status: "draft"
 source_ids:
-  - irs_instruction_1040_schedule_c_2026
-  - irs_instruction_1040_schedule_se_2026
-  - irs_form_1040_es_2026
-  - ssa_cola_announcement_2026
-  - irs_form_8959_2026
-  - irc_1401b2
-  - irs_form_8995_2026
-  - irc_199a
-description: >
-  Federal self-employment tax constants for tax year 2026. STATUS IS DRAFT: the statutory values
-  here (FICA component rates, the $400 SE filing threshold, the $150,000 high-income safe-harbor
-  AGI threshold) are year-invariant and confident, but the two year-indexed figures —
-  standardMileageRate and socialSecurityWageBase — are PROVISIONAL and must be confirmed against
-  the official 2026 IRS and SSA announcements before this set is promoted to published. The values
-  below let 2026 planning sessions run, but treat the mileage rate and wage base as estimates until
-  verified. See the per-parameter notes.
+  - "irs_notice_2026_10"
+  - "irs_announcement_2026_11"
+  - "irs_instruction_1040_schedule_se_2026"
+  - "irs_form_1040_es_2026"
+  - "irs_rev_proc_2025_32"
+  - "irc_1401b2"
+  - "irc_199a"
+  - "irc_199a_2026_snapshot"
+  - "irc_1401_2026_snapshot"
+description: "Verified 2026 federal planning constants. Draft pending human tax review. Mileage has two effective periods; QBI above the simple-method threshold remains an upper-bound estimate."
 parameters:
-  - fact_path: /standardMileageRate
-    name: Business standard mileage rate
-    type: rational
+  - fact_path: "/standardMileageRate"
+    name: "Business standard mileage rate"
+    type: "rational"
     value: "725/1000"
-    unit: dollars_per_mile
-    provisional: true
-    source_id: irs_instruction_1040_schedule_c_2026
-    note: >
-      PROVISIONAL 2026 business standard mileage rate (72.5 cents/mile = 725/1000 dollars/mile).
-      Modeled as a Rational so the half-cent is exact (a Dollar would round it to 0.72). Confirm
-      against the official IRS 2026 announcement before publishing; do not treat as authoritative yet.
-  - fact_path: /socialSecurityWageBase
-    name: Social Security wage base
-    type: dollar
+    unit: "dollars_per_mile"
+    source_id: "irs_notice_2026_10"
+    note: "72.5 cents per mile for January 1 through June 30, 2026; exact rational dollars per mile."
+  - fact_path: "/socialSecurityWageBase"
+    name: "Social Security wage base"
+    type: "dollar"
     value: "184500"
-    unit: dollars
-    provisional: true
-    source_id: ssa_cola_announcement_2026
-    note: >
-      PROVISIONAL 2026 Social Security taxable maximum. Confirm against the SSA Contribution and
-      Benefit Base announcement (released October 2025) before publishing; do not treat as
-      authoritative yet.
-  - fact_path: /seFilingThreshold
-    name: Self-employment tax filing threshold
-    type: dollar
+    unit: "dollars"
+    source_id: "irs_instruction_1040_schedule_se_2026"
+    note: "2026 Social Security taxable maximum, verified against the final 2026 Schedule SE instructions."
+  - fact_path: "/seFilingThreshold"
+    name: "Self-employment tax filing threshold"
+    type: "dollar"
     value: "400"
-    unit: dollars
-    source_id: irs_instruction_1040_schedule_se_2026
-    note: Net SE earnings at or above $400 trigger SE tax. Statutory; not indexed.
-  - fact_path: /highIncomeSafeHarborThreshold
-    name: High-income safe-harbor AGI threshold
-    type: dollar
+    unit: "dollars"
+    source_id: "irs_instruction_1040_schedule_se_2026"
+    note: "Net SE earnings at or above $400 trigger SE tax. Statutory; not indexed."
+  - fact_path: "/highIncomeSafeHarborThreshold"
+    name: "High-income safe-harbor AGI threshold (single)"
+    type: "dollar"
     value: "150000"
-    unit: dollars
-    source_id: irs_form_1040_es_2026
-    note: Prior-year AGI above $150,000 requires 110% (not 100%) safe-harbor coverage (IRC 6654). Statutory.
-  - fact_path: /seSocialSecurityRate
-    name: Social Security portion of SE tax rate
-    type: rational
+    unit: "dollars"
+    filing_status: "single"
+    source_id: "irs_form_1040_es_2026"
+    note: "Prior-year AGI above this threshold requires the 110% prior-year safe harbor."
+  - fact_path: "/highIncomeSafeHarborThreshold"
+    name: "High-income safe-harbor AGI threshold (mfj)"
+    type: "dollar"
+    value: "150000"
+    unit: "dollars"
+    filing_status: "mfj"
+    source_id: "irs_form_1040_es_2026"
+    note: "Prior-year AGI above this threshold requires the 110% prior-year safe harbor."
+  - fact_path: "/highIncomeSafeHarborThreshold"
+    name: "High-income safe-harbor AGI threshold (mfs)"
+    type: "dollar"
+    value: "75000"
+    unit: "dollars"
+    filing_status: "mfs"
+    source_id: "irs_form_1040_es_2026"
+    note: "Prior-year AGI above this threshold requires the 110% prior-year safe harbor."
+  - fact_path: "/seSocialSecurityRate"
+    name: "Social Security portion of SE tax rate"
+    type: "rational"
     value: "124/1000"
-    source_id: irs_instruction_1040_schedule_se_2026
-    note: 12.4% Social Security component of self-employment tax. Statutory rate.
-  - fact_path: /seMedicareRate
-    name: Medicare portion of SE tax rate
-    type: rational
+    source_id: "irs_form_1040_es_2026"
+    note: "12.4% Social Security component of self-employment tax. Statutory rate."
+  - fact_path: "/seMedicareRate"
+    name: "Medicare portion of SE tax rate"
+    type: "rational"
     value: "29/1000"
-    source_id: irs_instruction_1040_schedule_se_2026
-    note: 2.9% Medicare component of self-employment tax. Statutory rate.
-  - fact_path: /seWageMultiplier
-    name: Net earnings multiplier
-    type: rational
+    source_id: "irs_form_1040_es_2026"
+    note: "2.9% Medicare component of self-employment tax. Statutory rate."
+  - fact_path: "/seWageMultiplier"
+    name: "Net earnings multiplier"
+    type: "rational"
     value: "9235/10000"
-    source_id: irs_instruction_1040_schedule_se_2026
-    note: 92.35% net-earnings multiplier (removes the employer-equivalent half of FICA from the SE base). Statutory.
-  # Additional Medicare Tax (Form 8959). Rate is statutory (0.9%); thresholds are by filing status
-  # and are NOT inflation-indexed (unchanged since 2013), so they carry over to 2026 unchanged. The
-  # /additionalMedicareThreshold rows are status-scoped: only the one matching the session's filing
-  # status is injected.
-  - fact_path: /additionalMedicareRate
-    name: Additional Medicare Tax rate
-    type: rational
+    source_id: "irs_form_1040_es_2026"
+    note: "92.35% net-earnings multiplier (removes the employer-equivalent half of FICA from the SE base). Statutory."
+  - fact_path: "/additionalMedicareRate"
+    name: "Additional Medicare Tax rate"
+    type: "rational"
     value: "9/1000"
-    source_id: irc_1401b2
-    note: 0.9% Additional Medicare Tax on Medicare wages + SE income above the filing-status threshold (Form 8959).
-  - fact_path: /additionalMedicareThreshold
-    name: Additional Medicare Tax threshold (single)
-    type: dollar
+    source_id: "irc_1401_2026_snapshot"
+    note: "0.9% Additional Medicare Tax on Medicare wages + SE income above the filing-status threshold (Form 8959)."
+  - fact_path: "/additionalMedicareThreshold"
+    name: "Additional Medicare Tax threshold (single)"
+    type: "dollar"
     value: "200000"
-    unit: dollars
-    filing_status: single
-    source_id: irs_form_8959_2026
-    note: Single / head of household / qualifying surviving spouse — 0.9% surtax applies above $200,000.
-  - fact_path: /additionalMedicareThreshold
-    name: Additional Medicare Tax threshold (married filing jointly)
-    type: dollar
+    unit: "dollars"
+    filing_status: "single"
+    source_id: "irc_1401_2026_snapshot"
+    note: "Single / head of household / qualifying surviving spouse — 0.9% surtax applies above $200,000."
+  - fact_path: "/additionalMedicareThreshold"
+    name: "Additional Medicare Tax threshold (married filing jointly)"
+    type: "dollar"
     value: "250000"
-    unit: dollars
-    filing_status: mfj
-    source_id: irs_form_8959_2026
-    note: Married filing jointly — threshold is $250,000.
-  - fact_path: /additionalMedicareThreshold
-    name: Additional Medicare Tax threshold (married filing separately)
-    type: dollar
+    unit: "dollars"
+    filing_status: "mfj"
+    source_id: "irc_1401_2026_snapshot"
+    note: "Married filing jointly — threshold is $250,000."
+  - fact_path: "/additionalMedicareThreshold"
+    name: "Additional Medicare Tax threshold (married filing separately)"
+    type: "dollar"
     value: "125000"
-    unit: dollars
-    filing_status: mfs
-    source_id: irs_form_8959_2026
-    note: Married filing separately — threshold is $125,000.
-  # QBI deduction (Form 8995 / IRC 199A). Rate is statutory (20%). The taxable-income threshold is
-  # inflation-indexed (Rev. Proc. 2025-32) and PROVISIONAL until confirmed against the final 2026
-  # Form 8995. MFJ is double the single amount; MFS uses the single amount. Status-scoped rows.
-  - fact_path: /qbiRate
-    name: QBI deduction rate
-    type: rational
+    unit: "dollars"
+    filing_status: "mfs"
+    source_id: "irc_1401_2026_snapshot"
+    note: "Married filing separately — threshold is $125,000."
+  - fact_path: "/qbiRate"
+    name: "QBI deduction rate"
+    type: "rational"
     value: "1/5"
-    source_id: irc_199a
-    note: 20% qualified business income deduction under IRC 199A. Statutory.
-  - fact_path: /qbiThreshold
-    name: QBI taxable-income threshold (single)
-    type: dollar
+    source_id: "irc_199a"
+    note: "20% qualified business income deduction under IRC 199A. Statutory."
+  - fact_path: "/qbiThreshold"
+    name: "QBI taxable-income threshold (single)"
+    type: "dollar"
     value: "201750"
-    unit: dollars
-    filing_status: single
-    provisional: true
-    source_id: irs_form_8995_2026
-    note: Single / HoH / QSS — at or below $201,750 taxable income uses the simple Form 8995 method (TY2026, provisional).
-  - fact_path: /qbiThreshold
-    name: QBI taxable-income threshold (married filing jointly)
-    type: dollar
+    unit: "dollars"
+    filing_status: "single"
+    source_id: "irs_rev_proc_2025_32"
+    note: "2026 simple-method threshold; Rev. Proc. 2025-32 section 4.26. MFS differs from single."
+  - fact_path: "/qbiThreshold"
+    name: "QBI taxable-income threshold (married filing jointly)"
+    type: "dollar"
     value: "403500"
-    unit: dollars
-    filing_status: mfj
-    provisional: true
-    source_id: irs_form_8995_2026
-    note: Married filing jointly — threshold is $403,500 (TY2026, provisional).
-  - fact_path: /qbiThreshold
-    name: QBI taxable-income threshold (married filing separately)
-    type: dollar
-    value: "201750"
-    unit: dollars
-    filing_status: mfs
-    provisional: true
-    source_id: irs_form_8995_2026
-    note: Married filing separately — uses the single amount, $201,750 (TY2026, provisional).
+    unit: "dollars"
+    filing_status: "mfj"
+    source_id: "irs_rev_proc_2025_32"
+    note: "2026 simple-method threshold; Rev. Proc. 2025-32 section 4.26. MFS differs from single."
+  - fact_path: "/qbiThreshold"
+    name: "QBI taxable-income threshold (married filing separately)"
+    type: "dollar"
+    value: "201775"
+    unit: "dollars"
+    filing_status: "mfs"
+    source_id: "irs_rev_proc_2025_32"
+    note: "2026 simple-method threshold; Rev. Proc. 2025-32 section 4.26. MFS differs from single."
+  - fact_path: "/seMileageSplitRate"
+    name: "Mileage rate changes within this income year"
+    type: "boolean"
+    value: "true"
+    source_id: "irs_announcement_2026_11"
+  - fact_path: "/seMileageChangeMonth"
+    name: "Month the second mileage rate starts"
+    type: "int"
+    value: "7"
+    source_id: "irs_announcement_2026_11"
+  - fact_path: "/qbiMinimumDeduction"
+    name: "Minimum deduction for eligible active QBI"
+    type: "dollar"
+    value: "400"
+    source_id: "irc_199a_2026_snapshot"
+  - fact_path: "/qbiMinimumIncome"
+    name: "Minimum active QBI required for the minimum deduction"
+    type: "dollar"
+    value: "1000"
+    source_id: "irc_199a_2026_snapshot"
+  - fact_path: "/standardMileageRateAfterChange"
+    name: "Business mileage rate from July 1, 2026"
+    type: "rational"
+    value: "76/100"
+    unit: "dollars_per_mile"
+    source_id: "irs_announcement_2026_11"
+    note: "76 cents per mile for July 1 through December 31, 2026."
+source_refs:
+  - source_id: "irs_notice_2026_10"
+    chunk_id: "irs_notice_2026_10_chunk_0004"
+    pages:
+      - 3
+    text_sha256: "aa58305dfdafab850bc241852bae332d508e3d46cf641fe022a16c4dbe613b71"
+  - source_id: "irs_announcement_2026_11"
+    chunk_id: "irs_announcement_2026_11_chunk_0014"
+    pages:
+      - 13
+    text_sha256: "e5b044a44b9f514e36d252a5e018bd8839ba95da0c0c54016ddd0e2c52e6fdfe"
+  - source_id: "irs_instruction_1040_schedule_se_2026"
+    chunk_id: "irs_instruction_1040_schedule_se_2026_chunk_0001"
+    pages:
+      - 1
+    text_sha256: "661650cceecf35a9f976ea610671caa89313ac85f94bc9dbeb2c981a8038cdc9"
+  - source_id: "irs_form_1040_es_2026"
+    chunk_id: "irs_form_1040_es_2026_chunk_0001"
+    pages:
+      - 1
+    text_sha256: "7cd45b5ef5ff0d5306ac070f94750011d7dbffe2dec8f47b0f37493da33c3f87"
+  - source_id: "irs_rev_proc_2025_32"
+    chunk_id: "irs_rev_proc_2025_32_chunk_0021"
+    pages:
+      - 22
+      - 23
+      - 24
+    text_sha256: "cb36d2aa13dd00ad9790374867b58b3a7ef3327a4aca64cd1cc58b46daa376e3"
+  - source_id: "irs_rev_proc_2025_32"
+    chunk_id: "irs_rev_proc_2025_32_chunk_0008"
+    pages:
+      - 7
+      - 8
+    text_sha256: "962330cb9364569cc4ff9916ec0f4c35fab0e63a074fd5b1e645124923ae21d0"
+  - source_id: "irs_form_1040_es_2026"
+    chunk_id: "irs_form_1040_es_2026_chunk_0008"
+    pages:
+      - 8
+    text_sha256: "fd0a2c0a4a0451e92548c7c091b690c5ffb5225b0ad55b0a5833003c94f2acdd"
+  - source_id: "irs_form_1040_es_2026"
+    chunk_id: "irs_form_1040_es_2026_chunk_0009"
+    pages:
+      - 9
+    text_sha256: "ddb1203755f0d414d4dbc0fe2210585b3d21e0b3720200d64233ec1eb19630ae"
+  - source_id: "irc_199a_2026_snapshot"
+    chunk_id: "irc_199a_2026_snapshot_chunk_0030"
+    pages:
+      - 1
+    text_sha256: "213a435fbb9578b47b34b9da7cb6931130a38548d1d96ef3684254651ad21161"
+  - source_id: "irc_1401_2026_snapshot"
+    chunk_id: "irc_1401_2026_snapshot_chunk_0020"
+    pages:
+      - 1
+    text_sha256: "a72efe6552cef793fd0f619568b99b20fb5c9d7f7b46c26017689e0e0a79ec8f"

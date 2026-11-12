@@ -45,8 +45,8 @@ by topic; Spring AI's annotation scanner registers every one it finds.
 
 The planning fact module declaratively encodes:
 
-- TY2024 constants: 12.4% SS, 2.9% Medicare, 92.35% wage multiplier, $168,600
-  SS wage base, $0.67/mi standard mileage, $400 SE-tax threshold.
+- Year-indexed tax constants from YAML, including exact rational mileage rates and
+  period-specific 2026 mileage calculations, SS wage bases, and the SE-tax threshold.
 - Schedule C: gross receipts, vehicle deduction (standard mileage method),
   platform fees, supplies, net profit clipped at zero.
 - Schedule SE: net earnings (× 92.35%), SS portion (capped against the wage
@@ -72,6 +72,55 @@ by default, or from `DF_TAX_KNOWLEDGE_ROOT` if set. The tool evaluates:
 It returns candidate facts that require taxpayer confirmation, review conflicts,
 and the next applicable questions. It does not write facts into a return.
 
+## Income year, current date, and knowledge releases
+
+This service plans for income earned in the current calendar year: 2026 income is
+planned throughout 2026, even though its return is filed later. Call `create_session`
+without `taxYear`; the server's injected clock chooses the year and returns `planningDate`,
+`planningTimeZone`, and `knowledgeVersion` along with the session id. Explicit supported
+years remain available for historical planning. A year with no complete released parameter
+set fails with an actionable error; it never falls back to another year.
+
+`DF_TAX_PLANNING_TIME_ZONE` defaults to `America/New_York` and defines the New Year
+boundary independently of the deployment host. An existing session keeps its original
+income year across that boundary. `plan_questions` inherits the session year, rejects a
+conflicting explicit year, and selects that year's questions, evidence maps, and conflicts.
+Without a session it uses the same server clock. An explicit document `tax_year`/`taxYear`
+must match the interview's income year; receipt date is not its tax year.
+
+`project_net_profit` and `estimate_quarterly_payment` use the server's current date when
+`asOfDate` is omitted. Supply a date when the entered figures cover an earlier period.
+Projection dates must remain inside the session year; a 2026 session can still determine
+its January 2027 estimated-payment deadline.
+
+The 2026 review candidate is described in
+[`tax-knowledge/reviews/federal/2026`](../tax-knowledge/reviews/federal/2026/README.md).
+Its numeric constants are verified against pinned final sources, while human tax approval
+remains pending. Default runtime policy accepts `approved`, `published`, or `compiled`
+artifacts. To exercise drafts explicitly during review:
+
+```bash
+java -jar target/tax-advisor-0.0.1-SNAPSHOT.jar --spring.profiles.active=preview
+# Combine with stdio or redis as needed: --spring.profiles.active=stdio,preview
+```
+
+Preview responses and exports identify the draft state. Tax parameters are protected
+against agent overrides. Parameters and citations are loaded once; sessions and exports
+carry a combined knowledge/XML hash. A retained Redis session from a different version
+is rejected with instructions to recreate it.
+
+For 2026 mileage, full-year calculations require `businessMilesBeforeRateChange` and
+`businessMilesAfterRateChange` (January–June and July–December). Enter zero for an empty
+period. YTD projections use the corresponding `ytdBusinessMilesBeforeRateChange` and
+`ytdBusinessMilesAfterRateChange` fields. Before July, a combined YTD total can be assigned
+to the first period; from July onward the tool requires both period totals rather than
+guessing. Results expose both rates and the change date. Projections retain the completed
+first period and project the second from its own observed pace.
+
+The 2026 QBI minimum can require a taxpayer-confirmed `materiallyParticipates` answer on
+`estimate_qbi_deduction`. Unknown eligibility produces `needs_facts`; it is not inferred
+from a 1099. Form 8995-A limits/phase-in calculations remain outside this planning model.
+
 ## Tools
 
 Spring AI exposes the following tools at the MCP `tools/list` endpoint. Names
@@ -80,7 +129,7 @@ of the tool methods (camelCase, not snake_case).
 
 | Tool                          | Purpose                                                |
 | ----------------------------- | ------------------------------------------------------ |
-| `create_session`              | Allocate a new in-memory planning session (year + filing status) |
+| `create_session`              | Allocate a planning session (defaults to current income year + single status) |
 | `get_fact`                    | Read a fact from a session's graph                     |
 | `set_fact`                    | Write a value to a writable fact                       |
 | `calculate_se_tax`            | Schedule C/SE tax from full-year figures               |
@@ -258,8 +307,8 @@ scaffold):
   year's parameter with a new `source_id` requires a matching registry entry
   (enforced by `CitationRegistryTest`).
 - **Provisional parameters are flagged, not trusted silently.** A parameter may be
-  marked `provisional: true` (a value published as a draft pending the official
-  IRS/SSA announcement — e.g. the 2026 mileage rate and wage base). Such a year is
+  marked `provisional: true` when its numeric value is not yet verified against an official
+  authority. Verified numbers and human artifact approval are separate states. Such a year is
   still usable, but every tool response carries a `provisional_warning` naming the
   unverified values, and the export shows a banner plus a `⚠ provisional` marker on
   those rows — so a draft constant is never presented as a final figure.
@@ -268,8 +317,9 @@ scaffold):
 
 - Single-business Schedule C only. Multi-business (per-platform Schedule Cs)
   needs a `Collection` wrapper around the SE facts.
-- No Additional Medicare 0.9% surtax (Form 8959).
-- No QBI deduction (Section 199A).
+- QBI uses the simple method and the eligible 2026 active-business minimum. Form 8995-A
+  wage/property/SSTB limits and phase-in calculations are not modeled; above-threshold
+  results are upper bounds. SE health-insurance and retirement adjustments are not modeled.
 - One-level `explain` only — recursive walker is a follow-up.
 - `plan_questions` currently evaluates a small declarative condition subset:
   fact equality, evidence presence/attributes, and profile membership.

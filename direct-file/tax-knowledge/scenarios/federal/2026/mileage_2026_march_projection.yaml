@@ -1,0 +1,71 @@
+scenario_id: "mileage_2026_march_projection"
+description: "March actual mileage projects separately into the two six-month rate periods."
+facts:
+  /seMonthsElapsed: 3
+  /seGrossReceipts: "12000"
+  /seVehicleBusinessMilesBeforeChange: 1000
+  /seVehicleBusinessMilesAfterChange: 0
+  /sePlatformFees: "0"
+  /seSuppliesAndOther: "0"
+expected:
+  computed_facts:
+    /seVehicleDeduction: "2970"
+  projection_factors:
+    first_period: "6/3"
+    second_period: "6/3"
+tax_year: 2026
+jurisdiction: "federal"
+status: "draft"
+source_ids:
+  - "irs_announcement_2026_11"
+  - "irs_form_1040_es_2026"
+  - "irs_instruction_1040_schedule_se_2026"
+  - "irs_notice_2026_10"
+  - "irs_rev_proc_2025_32"
+source_refs:
+  - source_id: "irs_notice_2026_10"
+    chunk_id: "irs_notice_2026_10_chunk_0004"
+    pages:
+      - 3
+    text_sha256: "aa58305dfdafab850bc241852bae332d508e3d46cf641fe022a16c4dbe613b71"
+  - source_id: "irs_announcement_2026_11"
+    chunk_id: "irs_announcement_2026_11_chunk_0014"
+    pages:
+      - 13
+    text_sha256: "e5b044a44b9f514e36d252a5e018bd8839ba95da0c0c54016ddd0e2c52e6fdfe"
+  - source_id: "irs_instruction_1040_schedule_se_2026"
+    chunk_id: "irs_instruction_1040_schedule_se_2026_chunk_0001"
+    pages:
+      - 1
+    text_sha256: "661650cceecf35a9f976ea610671caa89313ac85f94bc9dbeb2c981a8038cdc9"
+  - source_id: "irs_form_1040_es_2026"
+    chunk_id: "irs_form_1040_es_2026_chunk_0001"
+    pages:
+      - 1
+    text_sha256: "7cd45b5ef5ff0d5306ac070f94750011d7dbffe2dec8f47b0f37493da33c3f87"
+  - source_id: "irs_rev_proc_2025_32"
+    chunk_id: "irs_rev_proc_2025_32_chunk_0021"
+    pages:
+      - 22
+      - 23
+      - 24
+    text_sha256: "cb36d2aa13dd00ad9790374867b58b3a7ef3327a4aca64cd1cc58b46daa376e3"
+  - source_id: "irs_rev_proc_2025_32"
+    chunk_id: "irs_rev_proc_2025_32_chunk_0008"
+    pages:
+      - 7
+      - 8
+    text_sha256: "962330cb9364569cc4ff9916ec0f4c35fab0e63a074fd5b1e645124923ae21d0"
+  - source_id: "irs_form_1040_es_2026"
+    chunk_id: "irs_form_1040_es_2026_chunk_0008"
+    pages:
+      - 8
+    text_sha256: "fd0a2c0a4a0451e92548c7c091b690c5ffb5225b0ad55b0a5833003c94f2acdd"
+  - source_id: "irs_form_1040_es_2026"
+    chunk_id: "irs_form_1040_es_2026_chunk_0009"
+    pages:
+      - 9
+    text_sha256: "ddb1203755f0d414d4dbc0fe2210585b3d21e0b3720200d64233ec1eb19630ae"
+reviewers:
+  - "small_business_tax_specialist"
+  - "qa_engineer"

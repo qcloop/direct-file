@@ -1,14 +1,21 @@
 package com.realworld.tax.advisor.knowledge;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +27,7 @@ import com.realworld.tax.advisor.knowledge.KnowledgeBundle.Signal;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,6 +41,8 @@ import org.springframework.stereotype.Service;
 public class TaxKnowledgeService {
     private static final Logger log = LoggerFactory.getLogger(TaxKnowledgeService.class);
 
+    private static final String FEDERAL = "federal";
+
     private static final String PARAMETER_FILE_SUFFIX = "-tax-parameters.yaml";
 
     private final TaxAdvisorProperties properties;
@@ -45,8 +55,16 @@ public class TaxKnowledgeService {
 
     private Map<String, Citation> citations = Map.of();
 
-    public TaxKnowledgeService(TaxAdvisorProperties properties) {
+    private final boolean allowDrafts;
+    private final Map<Integer, List<TaxParameter>> parameters = new HashMap<>();
+    private final Map<Integer, String> unavailableYears = new HashMap<>();
+    private final Set<Integer> draftYears = new HashSet<>();
+    private String version = "unavailable";
+
+    public TaxKnowledgeService(
+            TaxAdvisorProperties properties, @Value("${tax-advisor.allow-draft-artifacts:false}") boolean allowDrafts) {
         this.properties = properties;
+        this.allowDrafts = allowDrafts;
     }
 
     @PostConstruct
@@ -57,8 +75,16 @@ public class TaxKnowledgeService {
             return;
         }
 
-        this.bundle = KnowledgeBundle.load(root, yamlMapper);
+        String beforeLoad = fingerprint(root);
+        this.bundle = KnowledgeBundle.load(root, yamlMapper, allowDrafts);
         this.citations = loadCitations(root);
+        loadParameters();
+        String afterLoad = fingerprint(root);
+        if (!beforeLoad.equals(afterLoad)) {
+            throw new IllegalStateException(
+                    "Tax-knowledge files changed during startup. Restart with an immutable release directory.");
+        }
+        this.version = afterLoad + (allowDrafts ? "-preview" : "-released");
 
         log.info(
                 "Tax knowledge artifacts loaded from {}: {} questions, {} evidence maps, {} conflict rules, "
@@ -71,11 +97,29 @@ public class TaxKnowledgeService {
     }
 
     public PlanResult plan(PlanRequest request) {
+        for (EvidenceState evidence : request.evidence()) {
+            Object documentYear = evidence.attributes().get("tax_year");
+            if (documentYear == null) {
+                documentYear = evidence.attributes().get("taxYear");
+            }
+            if (documentYear != null && !Integer.toString(request.taxYear()).equals(documentYear.toString())) {
+                throw new IllegalArgumentException("Document " + evidence.documentType() + " reports income year "
+                        + documentYear + ", but this interview is for " + request.taxYear()
+                        + ". Confirm the document's income year; receipt date does not determine its tax year.");
+            }
+        }
+        KnowledgeBundle selected = bundle.forYear(request.taxYear(), request.jurisdiction());
+        if (selected.questions().isEmpty()) {
+            throw new IllegalArgumentException("No released interview artifacts for income year " + request.taxYear()
+                    + " and jurisdiction " + request.jurisdiction()
+                    + ". Install that year's approved knowledge release. "
+                    + "Draft artifacts are available only in the explicitly enabled preview profile.");
+        }
         EvaluationContext context = EvaluationContext.from(request);
 
         List<PlannedQuestion> questions = new ArrayList<>();
         List<SkippedQuestion> skipped = new ArrayList<>();
-        for (Question question : bundle.questions()) {
+        for (Question question : selected.questions()) {
             Optional<SkippedQuestion> skip = skipReason(question, request, context);
             if (skip.isPresent()) {
                 skipped.add(skip.get());
@@ -88,18 +132,20 @@ public class TaxKnowledgeService {
         return new PlanResult(
                 request.taxYear(),
                 request.jurisdiction(),
-                evidenceSignals(context),
-                candidateFacts(context),
-                reviewConflicts(context),
+                evidenceSignals(selected, context),
+                candidateFacts(selected, context),
+                reviewConflicts(selected, context),
                 questions.stream().limit(limit).toList(),
-                skipped);
+                skipped,
+                allowDrafts ? "preview" : "released",
+                version);
     }
 
     /** Topic signals raised by each piece of evidence, via the evidence maps for its document type. */
-    private List<EvidenceSignal> evidenceSignals(EvaluationContext context) {
+    private List<EvidenceSignal> evidenceSignals(KnowledgeBundle selected, EvaluationContext context) {
         List<EvidenceSignal> signals = new ArrayList<>();
         for (EvidenceState evidence : context.evidence()) {
-            for (EvidenceMap map : evidenceMapsFor(evidence)) {
+            for (EvidenceMap map : evidenceMapsFor(selected, evidence)) {
                 for (Signal signal : map.signals()) {
                     signals.add(new EvidenceSignal(
                             map.evidenceMapId(),
@@ -114,10 +160,10 @@ public class TaxKnowledgeService {
     }
 
     /** Facts each piece of evidence suggests, to be confirmed with the taxpayer rather than assumed. */
-    private List<CandidateFact> candidateFacts(EvaluationContext context) {
+    private List<CandidateFact> candidateFacts(KnowledgeBundle selected, EvaluationContext context) {
         List<CandidateFact> candidates = new ArrayList<>();
         for (EvidenceState evidence : context.evidence()) {
-            for (EvidenceMap map : evidenceMapsFor(evidence)) {
+            for (EvidenceMap map : evidenceMapsFor(selected, evidence)) {
                 for (CandidateFact candidate : map.candidateFacts()) {
                     candidates.add(candidate.withEvidence(map.evidenceMapId(), evidence));
                 }
@@ -126,14 +172,14 @@ public class TaxKnowledgeService {
         return candidates;
     }
 
-    private List<EvidenceMap> evidenceMapsFor(EvidenceState evidence) {
-        return bundle.evidenceMaps().stream()
+    private List<EvidenceMap> evidenceMapsFor(KnowledgeBundle selected, EvidenceState evidence) {
+        return selected.evidenceMaps().stream()
                 .filter(map -> map.documentType().equals(evidence.documentType()))
                 .toList();
     }
 
-    private List<ReviewConflict> reviewConflicts(EvaluationContext context) {
-        return bundle.conflictRules().stream()
+    private List<ReviewConflict> reviewConflicts(KnowledgeBundle selected, EvaluationContext context) {
+        return selected.conflictRules().stream()
                 .filter(conflict -> conflict.when().matches(context))
                 .map(conflict -> new ReviewConflict(
                         conflict.conflictId(),
@@ -188,21 +234,85 @@ public class TaxKnowledgeService {
         // User-facing messages reference the logical location, never the absolute filesystem path
         // (which leaks the host's directory layout to the agent / taxpayer).
         String location = "rules/federal/" + taxYear + "/";
-        List<Path> files = parameterFiles(taxYear, location);
-        if (files.isEmpty()) {
+        if (unavailableYears.containsKey(taxYear)) {
+            throw new IllegalArgumentException(unavailableYears.get(taxYear));
+        }
+        List<TaxParameter> rows = parameters.get(taxYear);
+        if (rows == null || rows.isEmpty()) {
             throw new IllegalArgumentException("No published tax parameters for tax year " + taxYear
                     + " in the tax-knowledge base (expected a <topic>-tax-parameters.yaml under " + location
                     + "). The planning year's parameters may not be published yet.");
         }
-        List<TaxParameter> out = new ArrayList<>();
-        for (Path file : files) {
-            out.addAll(readParameters(file, taxYear));
+        return rows;
+    }
+
+    /** Load once: editing the authoring directory cannot change citations or parameters mid-session. */
+    private void loadParameters() throws IOException {
+        Path federalRules = root.resolve("rules/federal");
+        if (!Files.isDirectory(federalRules)) {
+            return;
         }
-        if (out.isEmpty()) {
-            throw new IllegalStateException(
-                    "Tax parameter files for " + taxYear + " under " + location + " list no parameters.");
+        try (Stream<Path> years = Files.list(federalRules)) {
+            for (Path yearDir : years.filter(Files::isDirectory).sorted().toList()) {
+                Path directoryName = yearDir.getFileName();
+                if (directoryName == null || !directoryName.toString().matches("\\d{4}")) {
+                    continue;
+                }
+                int year = Integer.parseInt(directoryName.toString());
+                List<TaxParameter> rows = new ArrayList<>();
+                try {
+                    for (Path file : parameterFiles(year, "rules/federal/" + year)) {
+                        rows.addAll(readParameters(file, year));
+                    }
+                    validateParameters(rows, year);
+                    parameters.put(year, List.copyOf(rows));
+                } catch (IllegalArgumentException e) {
+                    unavailableYears.put(year, e.getMessage());
+                }
+            }
         }
-        return out;
+    }
+
+    private void validateParameters(List<TaxParameter> rows, int year) {
+        Set<String> keys = new HashSet<>();
+        for (TaxParameter row : rows) {
+            if (!keys.add(row.factPath() + ":" + row.filingStatus())) {
+                throw new IllegalArgumentException("Duplicate tax parameter for income year " + year + ": "
+                        + row.factPath() + " / " + row.filingStatus());
+            }
+            if (citation(row.sourceId()) == null) {
+                throw new IllegalArgumentException(
+                        "Missing citation for " + row.sourceId() + " in income year " + year);
+            }
+        }
+    }
+
+    public String version() {
+        return version;
+    }
+
+    /** Hash the reviewable knowledge inputs; the graph service adds the executable XML digest. */
+    private static String fingerprint(Path knowledgeRoot) throws IOException {
+        try {
+            MessageDigest hash = MessageDigest.getInstance("SHA-256");
+            for (String directory : List.of("rules", "questions", "evidence", "conflicts", "sources", "releases")) {
+                Path base = knowledgeRoot.resolve(directory);
+                if (!Files.exists(base)) {
+                    continue;
+                }
+                try (Stream<Path> files = Files.walk(base)) {
+                    for (Path file : files.filter(Files::isRegularFile).sorted().toList()) {
+                        hash.update(knowledgeRoot.relativize(file).toString().getBytes(StandardCharsets.UTF_8));
+                        hash.update((byte) 0);
+                        hash.update(Files.readAllBytes(file));
+                        hash.update((byte) 0);
+                    }
+                }
+            }
+            return HexFormat.of().formatHex(hash.digest());
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 is unavailable", e);
+        }
     }
 
     /** The year's {@code *-tax-parameters.yaml} files in a stable (sorted) order; empty if none exist. */
@@ -222,6 +332,18 @@ public class TaxKnowledgeService {
     private List<TaxParameter> readParameters(Path file, int taxYear) {
         try {
             Map<String, Object> doc = yamlMapper.readValue(file.toFile(), YamlValues.MAP_TYPE);
+            if (YamlValues.asInt(doc.get("tax_year"), 0) != taxYear || !FEDERAL.equals(doc.get("jurisdiction"))) {
+                throw new IllegalArgumentException("Tax parameter metadata does not match federal income year "
+                        + taxYear + " in " + file.getFileName());
+            }
+            if (!ArtifactPolicy.allowed(doc, allowDrafts)) {
+                throw new IllegalArgumentException(
+                        "Income year " + taxYear + " has unapproved tax parameters in " + file.getFileName()
+                                + ". Install the approved release; draft artifacts require the preview profile.");
+            }
+            if (!ArtifactPolicy.released(doc)) {
+                draftYears.add(taxYear);
+            }
             return YamlValues.maps(doc.get("parameters")).stream()
                     .map(TaxParameter::fromYaml)
                     .toList();
@@ -289,10 +411,13 @@ public class TaxKnowledgeService {
      */
     public String provisionalWarning(int taxYear) {
         List<String> names = provisionalParameterNames(taxYear);
+        String preview = draftYears.contains(taxYear)
+                ? "PREVIEW: income year " + taxYear + " includes draft artifacts awaiting tax-specialist approval. "
+                : "";
         if (names.isEmpty()) {
-            return null;
+            return preview.isEmpty() ? null : preview.trim();
         }
-        return "Tax year " + taxYear + " uses provisional, unverified constants pending official "
+        return preview + "Tax year " + taxYear + " uses provisional, unverified constants pending official "
                 + "confirmation: " + String.join(", ", names) + ". Treat these results as estimates, not "
                 + "final figures, until the values are confirmed against the official IRS/SSA announcements.";
     }
@@ -368,7 +493,7 @@ public class TaxKnowledgeService {
             boolean includeAnswered,
             Integer limit) {
         public PlanRequest {
-            jurisdiction = jurisdiction == null || jurisdiction.isBlank() ? "federal" : jurisdiction;
+            jurisdiction = jurisdiction == null || jurisdiction.isBlank() ? FEDERAL : jurisdiction;
             facts = facts == null ? Map.of() : facts;
             evidence = evidence == null ? List.of() : evidence;
             profile = profile == null ? Map.of() : profile;
@@ -388,7 +513,9 @@ public class TaxKnowledgeService {
             List<CandidateFact> candidateFacts,
             List<ReviewConflict> conflicts,
             List<PlannedQuestion> questions,
-            List<SkippedQuestion> skipped) {}
+            List<SkippedQuestion> skipped,
+            String artifactStatus,
+            String artifactVersion) {}
 
     public record EvidenceSignal(
             String evidenceMapId, String documentType, String topicId, String confidence, String reason) {}

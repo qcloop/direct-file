@@ -1,0 +1,44 @@
+name: Tax knowledge source monitor
+
+'on':
+  workflow_dispatch:
+  schedule:
+    - cron: '0 15 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  check-official-sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Check pinned sources and IRS discovery pages
+        shell: bash
+        run: |
+          overall_status=0
+          for catalog in direct-file/tax-knowledge/corpora/irs-*/source-catalog.json; do
+            corpus_dir="$(dirname "$catalog")"
+            corpus_name="$(basename "$corpus_dir")"
+            monitor_status=0
+            python3 direct-file/tax-knowledge/tools/check_source_updates.py \
+              --catalog "$catalog" \
+              --baseline "$corpus_dir/source-manifest.json" \
+              --output "source-review/$corpus_name/report.json" \
+              --snapshot-dir "source-review/$corpus_name/snapshots" || monitor_status=$?
+            if [ "$monitor_status" -ne 0 ]; then
+              overall_status=1
+            fi
+          done
+          exit "$overall_status"
+      - name: Preserve source observations for review
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tax-source-review
+          path: source-review/
+          retention-days: 14
+          if-no-files-found: error

@@ -37,7 +37,7 @@ class AdditionalMedicareTaxTest {
     void singleFilerSeOnlyOverTheTwoHundredKThreshold() {
         String sid = sessionTools.createSession("2025", "single").sessionId();
         // Net profit $300,000, no expenses -> net earnings = 300,000 x 92.35% = $277,050.
-        selfEmploymentTools.calculateSeTax(sid, "300000", null, null, null, null);
+        selfEmploymentTools.calculateSeTax(sid, "300000", null, null, null, null, null, null);
 
         var r = taxProjectionTools.calculateAdditionalMedicare(sid, "0");
 
@@ -53,7 +53,7 @@ class AdditionalMedicareTaxTest {
     void mfjW2WagesReduceTheThresholdRemainingForSeIncome() {
         String sid = sessionTools.createSession("2025", "mfj").sessionId();
         // Net profit $200,000 -> net earnings = 200,000 x 92.35% = $184,700.
-        selfEmploymentTools.calculateSeTax(sid, "200000", null, null, null, null);
+        selfEmploymentTools.calculateSeTax(sid, "200000", null, null, null, null, null, null);
 
         // $100,000 W-2 Medicare wages. MFJ threshold $250,000; wages counted first leave $150,000
         // of threshold for SE income. SE over remaining = 184,700 - 150,000 = 34,700; x 0.9% = $312.30 -> $312.
@@ -70,7 +70,7 @@ class AdditionalMedicareTaxTest {
     @Test
     void wagePortionAppliesWhenW2WagesAloneExceedTheThreshold() {
         String sid = sessionTools.createSession("2025", "single").sessionId();
-        selfEmploymentTools.calculateSeTax(sid, "0", null, null, null, null); // no SE income
+        selfEmploymentTools.calculateSeTax(sid, "0", null, null, null, null, null, null); // no SE income
 
         // $220,000 Medicare wages, single threshold $200,000: wage portion = 20,000 x 0.9% = $180.
         var r = taxProjectionTools.calculateAdditionalMedicare(sid, "220000");

@@ -155,26 +155,156 @@
       </Writable>
     </Fact>
 
-    <Fact path="/seVehicleDeduction">
-      <Name>Vehicle deduction (standard mileage method)</Name>
-      <Description>Business miles × standard mileage rate, annualized by the factor (projects
-        year-to-date miles to a
-        full year along with the rest).</Description>
+    <!-- Period-specific mileage remains in the graph so citations follow both rates. -->
+    <Fact path="/seMileageSplitRate">
+      <Name>Mileage rate changes within this income year</Name>
+      <Description>Mileage rate changes within this income year</Description>
+      <Writable>
+        <Boolean />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seMileageChangeMonth">
+      <Name>Month the second mileage rate starts</Name>
+      <Description>Month the second mileage rate starts</Description>
+      <Writable>
+        <Int />
+      </Writable>
+    </Fact>
+
+    <Fact path="/standardMileageRateAfterChange">
+      <Name>Business mileage rate from the change date</Name>
+      <Description>Business mileage rate from the change date</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seVehicleBusinessMilesBeforeChange">
+      <Name>Actual business miles before the rate change</Name>
+      <Description>Actual business miles before the rate change</Description>
+      <Writable>
+        <Int />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seVehicleBusinessMilesAfterChange">
+      <Name>Actual business miles from the rate change</Name>
+      <Description>Actual business miles from the rate change</Description>
+      <Writable>
+        <Int />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seMileageFirstPeriodFactor">
+      <Name>Projection factor for first-period business miles</Name>
+      <Description>Projection factor for first-period business miles</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seMileageSecondPeriodFactor">
+      <Name>Projection factor for second-period business miles</Name>
+      <Description>Projection factor for second-period business miles</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seMileageSecondPeriodBase">
+      <Name>Miles used to project the second rate period</Name>
+      <Description>Before the change, project the second period from the observed first-period pace.
+        After the change,
+        use the observed second-period miles. Full-year inputs set months to 12.</Description>
+      <Derived>
+        <Switch>
+          <Case>
+            <When>
+              <LessThan>
+                <Left>
+                  <Dependency path="/seMonthsElapsed" />
+                </Left>
+                <Right>
+                  <Dependency path="/seMileageChangeMonth" />
+                </Right>
+              </LessThan>
+            </When>
+            <Then>
+              <Dependency path="/seVehicleBusinessMilesBeforeChange" />
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <True />
+            </When>
+            <Then>
+              <Dependency path="/seVehicleBusinessMilesAfterChange" />
+            </Then>
+          </Case>
+        </Switch>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seSplitRateVehicleDeduction">
+      <Name>Vehicle deduction across both mileage-rate periods</Name>
+      <Description>Sum each period's miles times its exact rate and projection factor, rounding once.</Description>
       <Derived>
         <Round>
-          <Multiply>
-            <Dependency path="/seVehicleBusinessMiles" />
-            <Dependency path="/standardMileageRate" />
-            <Dependency path="/seAnnualizationFactor" />
+          <Add>
+            <Multiply>
+              <Dependency path="/seVehicleBusinessMilesBeforeChange" />
+              <Dependency path="/standardMileageRate" />
+              <Dependency path="/seMileageFirstPeriodFactor" />
+              <Dollar>1</Dollar>
+            </Multiply>
+            <Multiply>
+              <Dependency path="/seMileageSecondPeriodBase" />
+              <Dependency path="/standardMileageRateAfterChange" />
+              <Dependency path="/seMileageSecondPeriodFactor" />
+              <Dollar>1</Dollar>
+            </Multiply>
+          </Add>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seVehicleDeduction">
+      <Name>Vehicle deduction (standard mileage method)</Name>
+      <Description>Apply the session year's one-rate or period-specific mileage calculation.</Description>
+      <Derived>
+        <Switch>
+          <Case>
+            <When>
+              <Dependency path="/seMileageSplitRate" />
+            </When>
+            <Then>
+              <Dependency path="/seSplitRateVehicleDeduction" />
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <True />
+            </When>
+            <Then>
+              <Round>
+                <Multiply>
+                  <Dependency path="/seVehicleBusinessMiles" />
+                  <Dependency path="/standardMileageRate" />
+                  <Dependency path="/seAnnualizationFactor" />
             <!-- miles (Int) × rate (Rational) × factor (Rational) is a Rational; Round only accepts a
                  Dollar. Multiplying by a $1 unit coerces the exact rational dollars-value to a Dollar
                  (Rational × Dollar -> Dollar) without changing the amount, so the half-cent rate (e.g.
                  72.5¢) is preserved through the multiply and only rounded once, at the end. -->
-            <Dollar>1</Dollar>
-          </Multiply>
-        </Round>
+                  <Dollar>1</Dollar>
+                </Multiply>
+              </Round>
+            </Then>
+          </Case>
+        </Switch>
       </Derived>
     </Fact>
+
 
     <Fact path="/sePlatformFees">
       <Name>Platform / commission fees</Name>
@@ -641,9 +771,33 @@
       </Derived>
     </Fact>
 
-    <Fact path="/qbiDeduction">
-      <Name>QBI deduction (Form 8995 Line 15)</Name>
-      <Description>Lesser of 20% of QBI and 20% of taxable income net of capital gains.</Description>
+    <!-- IRC 199A(i): effective-year constants are data; eligibility requires a taxpayer answer. -->
+    <Fact path="/qbiMinimumDeduction">
+      <Name>Minimum deduction for eligible active QBI</Name>
+      <Description>Minimum deduction for eligible active QBI</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/qbiMinimumIncome">
+      <Name>Minimum active QBI required for the minimum deduction</Name>
+      <Description>Minimum active QBI required for the minimum deduction</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/qbiMaterialParticipation">
+      <Name>Taxpayer materially participates in this business under section 469(h)</Name>
+      <Description>Taxpayer materially participates in this business under section 469(h)</Description>
+      <Writable>
+        <Boolean />
+      </Writable>
+    </Fact>
+
+    <Fact path="/qbiRegularDeduction">
+      <Name>QBI deduction before the active-business minimum</Name>
       <Derived>
         <LesserOf>
           <Dependency path="/qbiComponent" />
@@ -651,6 +805,66 @@
         </LesserOf>
       </Derived>
     </Fact>
+
+    <Fact path="/qbiDeduction">
+      <Name>QBI deduction</Name>
+      <Description>The regular simple-method deduction, or the eligible active-business minimum.
+        Material participation
+        is never inferred from the presence of a 1099.</Description>
+      <Derived>
+        <Switch>
+          <Case>
+            <When>
+              <Not>
+                <LessThan>
+                  <Left>
+                    <Dependency path="/qbiRegularDeduction" />
+                  </Left>
+                  <Right>
+                    <Dependency path="/qbiMinimumDeduction" />
+                  </Right>
+                </LessThan>
+              </Not>
+            </When>
+            <Then>
+              <Dependency path="/qbiRegularDeduction" />
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <LessThan>
+                <Left>
+                  <Dependency path="/qualifiedBusinessIncome" />
+                </Left>
+                <Right>
+                  <Dependency path="/qbiMinimumIncome" />
+                </Right>
+              </LessThan>
+            </When>
+            <Then>
+              <Dependency path="/qbiRegularDeduction" />
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <Dependency path="/planning/qbiMaterialParticipation" />
+            </When>
+            <Then>
+              <Dependency path="/qbiMinimumDeduction" />
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <True />
+            </When>
+            <Then>
+              <Dependency path="/qbiRegularDeduction" />
+            </Then>
+          </Case>
+        </Switch>
+      </Derived>
+    </Fact>
+
 
     <Fact path="/qbiAboveThreshold">
       <Name>Taxable income above the QBI simple-method threshold</Name>
@@ -1106,16 +1320,14 @@
         110% of prior-year tax. Otherwise 100%
         suffices.</Description>
       <Derived>
-        <Not>
-          <LessThan>
-            <Left>
-              <Dependency path="/planning/priorYearAGI" />
-            </Left>
-            <Right>
-              <Dependency path="/highIncomeSafeHarborThreshold" />
-            </Right>
-          </LessThan>
-        </Not>
+        <GreaterThan>
+          <Left>
+            <Dependency path="/planning/priorYearAGI" />
+          </Left>
+          <Right>
+            <Dependency path="/highIncomeSafeHarborThreshold" />
+          </Right>
+        </GreaterThan>
       </Derived>
     </Fact>
 

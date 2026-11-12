@@ -1,5 +1,7 @@
 package com.realworld.tax.advisor.mcp;
 
+import java.time.Clock;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,9 +31,12 @@ public class InterviewTools {
 
     private final TaxKnowledgeService taxKnowledge;
 
-    public InterviewTools(PlanningGraphService graph, TaxKnowledgeService taxKnowledge) {
+    private final Clock clock;
+
+    public InterviewTools(PlanningGraphService graph, TaxKnowledgeService taxKnowledge, Clock clock) {
         this.graph = graph;
         this.taxKnowledge = taxKnowledge;
+        this.clock = clock;
     }
 
     // plan_questions deliberately does NOT publish an outputSchema (generateOutputSchema = false). Its
@@ -58,7 +63,11 @@ public class InterviewTools {
                                     "Optional planning session id. If supplied, the session's facts are merged in.",
                             required = false)
                     String sessionId,
-            @McpToolParam(description = "Tax year to plan for. Defaults to 2025.", required = false) Integer taxYear,
+            @McpToolParam(
+                            description = "Income year. Defaults to the session's year, or the server's current "
+                                    + "calendar year without a session. Must match the session when supplied.",
+                            required = false)
+                    Integer taxYear,
             @McpToolParam(description = "Jurisdiction. Defaults to 'federal'.", required = false) String jurisdiction,
             @McpToolParam(
                             description = "Optional fact map. Values may be raw values or {value, status}; "
@@ -77,13 +86,26 @@ public class InterviewTools {
             @McpToolParam(description = "Maximum applicable questions to return.", required = false) Integer limit) {
 
         return taxKnowledge.plan(new TaxKnowledgeService.PlanRequest(
-                taxYear == null ? 2025 : taxYear,
+                resolveYear(sessionId, taxYear),
                 jurisdiction == null ? "federal" : jurisdiction,
                 sessionAndSuppliedFacts(sessionId, facts),
                 evidenceStates(evidence),
                 profile == null ? Map.of() : profile,
                 Boolean.TRUE.equals(includeAnswered),
                 limit));
+    }
+
+    private int resolveYear(String sessionId, Integer taxYear) {
+        if (ToolSupport.isBlank(sessionId)) {
+            return taxYear == null ? Year.now(clock).getValue() : taxYear;
+        }
+        int sessionYear = graph.taxYearOf(SessionId.of(sessionId));
+        if (taxYear != null && taxYear != sessionYear) {
+            throw new IllegalArgumentException(
+                    "Tax year " + taxYear + " does not match this session's income year " + sessionYear
+                            + ". Omit taxYear to use the session year, or create a session for the requested year.");
+        }
+        return sessionYear;
     }
 
     /**

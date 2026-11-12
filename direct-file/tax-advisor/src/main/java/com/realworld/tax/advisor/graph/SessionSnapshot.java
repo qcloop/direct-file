@@ -19,24 +19,38 @@ import gov.irs.directfile.models.FactTypeWithItem;
  * {@link FactTypeWithItem} already carries its value as a (Jackson 2) JSON node.
  */
 public record SessionSnapshot(
-        int taxYear, FilingStatus filingStatus, Map<String, FactTypeWithItem> facts, Map<String, String> sourceNotes) {
+        int taxYear,
+        FilingStatus filingStatus,
+        Map<String, FactTypeWithItem> facts,
+        Map<String, String> sourceNotes,
+        String knowledgeVersion) {
+
+    /** Old serialized snapshots have no version and must be recreated before graph use. */
+    public SessionSnapshot(
+            int taxYear,
+            FilingStatus filingStatus,
+            Map<String, FactTypeWithItem> facts,
+            Map<String, String> sourceNotes) {
+        this(taxYear, filingStatus, facts, sourceNotes, "");
+    }
 
     public SessionSnapshot {
         facts = Collections.unmodifiableMap(new LinkedHashMap<>(facts));
         sourceNotes = Collections.unmodifiableMap(new LinkedHashMap<>(sourceNotes));
+        knowledgeVersion = knowledgeVersion == null ? "" : knowledgeVersion;
     }
 
     /** This session with {@code path} set to {@code fact} (replacing any earlier value in place). */
     public SessionSnapshot withFact(String path, FactTypeWithItem fact) {
         Map<String, FactTypeWithItem> updated = new LinkedHashMap<>(facts);
         updated.put(path, fact);
-        return new SessionSnapshot(taxYear, filingStatus, updated, sourceNotes);
+        return new SessionSnapshot(taxYear, filingStatus, updated, sourceNotes, knowledgeVersion);
     }
 
     /** This session with the provenance note for {@code path} set to {@code note}. */
     public SessionSnapshot withSourceNote(String path, String note) {
         Map<String, String> updated = new LinkedHashMap<>(sourceNotes);
         updated.put(path, note);
-        return new SessionSnapshot(taxYear, filingStatus, facts, updated);
+        return new SessionSnapshot(taxYear, filingStatus, facts, updated, knowledgeVersion);
     }
 }

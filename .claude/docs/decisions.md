@@ -72,6 +72,31 @@ Newest last. Each entry: the decision, the reason, and the alternative rejected.
   an enum fact in the graph (more XML + an enum-options wiring), and hard-coding a status→bracket map
   in Java (different provisions group statuses differently, e.g. Additional Medicare vs QBI).
 
+## tax-advisor session state
+
+- **Session state sits behind a `SessionStore`; Redis is an opt-in implementation, in-memory stays the
+  default.** *Why:* sessions held in one JVM's map meant a second instance could not see them and a
+  restart lost them. The client web app already runs Redis for its conversational state, so the shared
+  store reuses that endpoint (`REDIS_URL`). *This narrows an earlier stance:* the service was designed to
+  persist no taxpayer data (FTI surface). That still holds in the default profile; with the `redis`
+  profile, taxpayer-entered figures live in Redis for up to the idle timeout (60m sliding). Encryption in
+  transit / at rest and access control are the store's configuration, and whoever turns the profile on
+  owns that. *Rejected:* making Redis the only store (the stdio transport, tests, and single-instance use
+  should not need infrastructure), and client-held state (changes every tool's contract and payload).
+- **Optimistic compare-and-set instead of a lock.** The old `synchronized (session)` only excluded
+  writers in the same JVM. Each update now reads a versioned snapshot and replaces it only if unchanged
+  (a single-key Lua script in Redis; `computeIfPresent` in memory), retrying on conflict. *Rejected:* a
+  distributed lock (more moving parts, and lock expiry introduces its own failure mode) for what is
+  almost always one sequential conversation.
+- **The whole session is one value, not one key per fact.** The fact graph is rebuilt from all facts on
+  every read anyway, so per-fact keys would add round trips without saving work, and a single value
+  makes the version check trivially atomic and cluster-safe. *Trade-off:* a session is rewritten whole
+  on each write (a few KB).
+- **Session JSON goes through `StringRedisTemplate` + this service's Jackson 2 mapper**, not Spring Data
+  Redis value serializers — `FactTypeWithItem` carries a Jackson 2 `JsonNode` (CLAUDE.md invariant 3).
+- **Redis timeouts are 2s** (connect and command). The client default is 60s, which left a tool call
+  hanging for a minute when Redis was down (observed); now it fails immediately with a clear error.
+
 ## Harness engineering
 
 - **Promote invariants from prose to machine-checked gates.** Architectural/taste rules are enforced
@@ -92,3 +117,31 @@ Newest last. Each entry: the decision, the reason, and the alternative rejected.
   trend-line "score over time" (needs external CI history — the coverage floor is the in-repo stand-in).
   *Chose AOP* over instrumenting all 14 tools by hand: one advice, verified to intercept the MCP
   scanner's invocations (`ToolCallTelemetryTest`). Boot 4 AOP starter is `spring-boot-starter-aspectj`.
+
+## Annual planning-year refresh
+
+- **The server clock determines the default income year.** Users estimate 2026 income throughout
+  calendar year 2026; filing season does not shift the default back to 2025. An injected Clock and
+  configurable named zone make this deterministic and testable. `create_session` returns the year
+  and server date; interviews inherit that session year and reject conflicts. Existing sessions
+  keep their year across New Year. *Rejected:* asking an LLM to remember the date or adding a
+  separate clock MCP call that a client could omit.
+- **Verified values and artifact approval are separate.** Final annual guidance can support
+  planning before every year-end form/publication has been revised. The 2026 source inventory
+  preserves actual source revision years; draft IRS guidance is not authoritative. Default runtime
+  policy accepts released artifacts; the explicit preview profile allows drafts and labels them.
+  No generated packet asserts human approvals.
+- **Sessions pin loaded knowledge and executable XML content.** Parameters and citations load once;
+  a combined digest travels with sessions and exports. Retained sessions from another version must
+  be recreated. *Rejected:* letting a file edit or deployment reinterpret an old session silently.
+- **2026 mileage has two periods.** The graph combines January–June and July–December rates with
+  separate observed-mile inputs and projection factors. Before July it projects the observed pace
+  into both halves; afterward it retains the completed first half and projects only the second
+  half's observed pace. Unallocated post-change mileage is rejected instead of guessed.
+- **The 2026 active-business QBI minimum requires confirmed eligibility.** The graph models the
+  $1,000 QBI threshold and $400 minimum; missing material participation remains incomplete.
+  Form 8995-A limits and expanded phase-in calculations remain outside the simple-method scope.
+- **Refresh automation produces review candidates.** Source monitoring covers pinned documents
+  and IRS discovery pages. Structural provenance checks ownership/pages/actual text hashes, and
+  deterministic packages retain raw snapshots and graph hashes. Monitoring and packaging cannot
+  approve, commit, or deploy tax changes.

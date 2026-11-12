@@ -7,6 +7,11 @@ from segment_irs_sources import parse_pages, segment_manifest
 
 
 class SegmentIrsSourcesTest(unittest.TestCase):
+    def test_normalizes_pdf_control_artifacts_before_hashing_and_serialization(self):
+        pages = parse_pages("----- IRS_SOURCE_PAGE 1 -----\n\nTax\x1f source\x04 paragraph.")
+        self.assertNotIn("\x1f", pages[0].text)
+        self.assertNotIn("\x04", pages[0].text)
+
     def test_parse_page_markers(self):
         pages = parse_pages(
             """

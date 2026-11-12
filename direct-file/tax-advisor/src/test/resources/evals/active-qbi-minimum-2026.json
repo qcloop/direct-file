@@ -1,0 +1,36 @@
+{
+  "name": "Active QBI minimum, TY2026 — taxpayer-confirmed material participation",
+  "taxYear": 2026,
+  "filingStatus": "single",
+  "steps": [
+    {
+      "tool": "calculate_se_tax",
+      "args": {
+        "grossReceipts": "1076"
+      },
+      "expect": {
+        "selfEmploymentTax": 152,
+        "deductibleHalf": 76
+      }
+    },
+    {
+      "tool": "estimate_qbi_deduction",
+      "args": {
+        "materiallyParticipates": true
+      },
+      "expect": {
+        "qualifiedBusinessIncome": 1000,
+        "qbiDeduction": 400
+      }
+    },
+    {
+      "tool": "project_total_tax",
+      "args": {},
+      "expect": {
+        "taxableIncome": 0,
+        "incomeTax": 0,
+        "projectedTotalTax": 152
+      }
+    }
+  ]
+}

@@ -38,8 +38,8 @@ public enum FilingStatus {
                 .filter(status -> status.code.equals(normalized))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unknown filing status '" + raw + "'. Use one of "
-                        + codes() + " (head-of-household / qualifying surviving spouse share the 'single'"
-                        + " thresholds for these provisions)."));
+                        + codes() + ". Head-of-household and qualifying surviving spouse are not supported; "
+                        + "do not substitute single for their standard deductions or brackets."));
     }
 
     /**

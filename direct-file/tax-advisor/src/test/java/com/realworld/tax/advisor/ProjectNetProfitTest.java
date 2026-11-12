@@ -35,7 +35,8 @@ class ProjectNetProfitTest {
         String sid = sessionTools.createSession("2025", null).sessionId();
 
         // Seven months of data (through July 1). Numbers chosen to annualize cleanly (× 12/7).
-        var out = selfEmploymentTools.projectNetProfit(sid, "2025-07-01", "21000", "7000", "1750", "0", "0");
+        var out =
+                selfEmploymentTools.projectNetProfit(sid, "2025-07-01", "21000", "7000", "1750", "0", "0", null, null);
 
         assertThat(out.status()).isEqualTo("ok");
         assertThat(out.monthsElapsed()).isEqualTo(7);
@@ -62,7 +63,7 @@ class ProjectNetProfitTest {
         String sid = sessionTools.createSession("2025", null).sessionId();
 
         // calculate_se_tax writes an annualization factor of 1/1, so full-year actuals pass through.
-        selfEmploymentTools.calculateSeTax(sid, "40000", "10000", "3000", "1000", "0");
+        selfEmploymentTools.calculateSeTax(sid, "40000", "10000", "3000", "1000", "0", null, null);
 
         // 40,000 − (10,000 mi × $0.70 + 3,000 + 1,000) = 40,000 − 11,000 = 29,000.
         assertThat((BigDecimal)
@@ -76,7 +77,7 @@ class ProjectNetProfitTest {
         // A cents-precision Dollar would have stored 0.72 and given $7,200 — silently understating the
         // deduction (the user-reported gap). calculate_se_tax writes a 1/1 factor, so no annualization.
         SessionId s2026 = graph.createSession(2026);
-        selfEmploymentTools.calculateSeTax(s2026.value(), "50000", "10000", "0", "0", "0");
+        selfEmploymentTools.calculateSeTax(s2026.value(), "50000", null, "0", "0", "0", "10000", "0");
 
         assertThat((BigDecimal) graph.readFact(s2026, "/seVehicleDeduction").value())
                 .isEqualByComparingTo("7250");
@@ -84,17 +85,19 @@ class ProjectNetProfitTest {
 
     @Test
     void flagsProvisionalConstantsForADraftYearButNotAFinalizedOne() {
-        // 2026's mileage rate and wage base are provisional (draft); the tool must say so, naming them.
+        // Constants are verified, but the release is still a draft pending human tax review.
         String s2026 = sessionTools.createSession("2026", null).sessionId();
-        var out2026 = selfEmploymentTools.projectNetProfit(s2026, "2026-07-01", "21000", "7000", "0", "0", "0");
+        var out2026 =
+                selfEmploymentTools.projectNetProfit(s2026, "2026-07-01", "21000", null, "0", "0", "0", "6000", "1000");
         assertThat(out2026.provisionalWarning())
                 .contains("2026")
-                .contains("mileage")
-                .contains("Social Security wage base");
+                .contains("PREVIEW")
+                .contains("approval");
 
         // 2025 is finalized — no warning.
         String s2025 = sessionTools.createSession("2025", null).sessionId();
-        var out2025 = selfEmploymentTools.projectNetProfit(s2025, "2025-07-01", "21000", "7000", "0", "0", "0");
+        var out2025 =
+                selfEmploymentTools.projectNetProfit(s2025, "2025-07-01", "21000", "7000", "0", "0", "0", null, null);
         assertThat(out2025.provisionalWarning()).isEmpty();
     }
 
@@ -110,7 +113,8 @@ class ProjectNetProfitTest {
     void refusesToProjectFromBeforeTheTaxYearStarted() {
         String sid = sessionTools.createSession("2025", null).sessionId();
 
-        assertThatThrownBy(() -> selfEmploymentTools.projectNetProfit(sid, "2024-11-30", "5000", "0", "0", "0", "0"))
+        assertThatThrownBy(() ->
+                        selfEmploymentTools.projectNetProfit(sid, "2024-11-30", "5000", "0", "0", "0", "0", null, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("2025");
     }
@@ -121,8 +125,8 @@ class ProjectNetProfitTest {
         // which would silently return the year-to-date figure unchanged as if it were full-year.
         String sid = sessionTools.createSession("2025", null).sessionId();
 
-        assertThatThrownBy(
-                        () -> selfEmploymentTools.projectNetProfit(sid, "2026-05-31", "11690", "15000", "0", "0", "0"))
+        assertThatThrownBy(() -> selfEmploymentTools.projectNetProfit(
+                        sid, "2026-05-31", "11690", "15000", "0", "0", "0", null, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("not within tax year 2025");
     }

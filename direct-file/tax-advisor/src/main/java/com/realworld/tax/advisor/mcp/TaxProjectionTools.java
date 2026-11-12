@@ -109,7 +109,9 @@ public class TaxProjectionTools {
                     + "(AGI minus the standard deduction) — you no longer pass it in, so the income cap binds on "
                     + "the computed figure rather than an estimate. This is the SIMPLE Form 8995 method, valid "
                     + "when taxable income is at or below the filing-status threshold; above it, Form 8995-A "
-                    + "wage/property limits apply and the result is only an upper bound (flagged in the response).")
+                    + "wage/property limits apply and the result is only an upper bound (flagged in the response). "
+                    + "For 2026, the eligible active-business minimum is applied only after taxpayer confirmation "
+                    + "of material participation; the graph returns incomplete until a required answer is supplied.")
     public QbiResult estimateQbiDeduction(
             @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
             @McpToolParam(
@@ -117,15 +119,29 @@ public class TaxProjectionTools {
                                     + "Excluded from the income cap. Optional; defaults to 0 (set at "
                                     + "create_session). Pass a value only to override.",
                             required = false)
-                    String netCapitalGains) {
+                    String netCapitalGains,
+            @McpToolParam(
+                            description =
+                                    "Taxpayer-confirmed material participation in this business under IRC 469(h). "
+                                            + "Do not infer this from a 1099. Needed when the year's active-business minimum could increase "
+                                            + "the QBI deduction.",
+                            required = false)
+                    Boolean materiallyParticipates) {
         SessionId session = SessionId.of(sessionId);
+        if (materiallyParticipates != null) {
+            graph.writeFact(
+                    session,
+                    FactPaths.QBI_MATERIAL_PARTICIPATION,
+                    com.realworld.tax.advisor.graph.PersisterTypes.BOOLEAN,
+                    materiallyParticipates);
+        }
         // Taxable income before QBI is derived (AGI − standard deduction), so this tool no longer writes
         // it. Net capital gains is zero-defaulted at session creation; only overwrite when supplied.
         support.writeDollarIfSupplied(session, FactPaths.NET_CAPITAL_GAINS, netCapitalGains);
 
         ReadResult netProfit = graph.readFact(session, FactPaths.SE_NET_PROFIT);
         String note = netProfit.complete()
-                ? ""
+                ? qbiEligibilityNote(session)
                 : "Self-employment net profit isn't set yet — run calculate_se_tax or project_net_profit"
                         + " first so QBI can be computed from it.";
         ReadResult above = graph.readFact(session, FactPaths.QBI_ABOVE_THRESHOLD);
@@ -136,7 +152,7 @@ public class TaxProjectionTools {
                 : "";
         int year = graph.taxYearOf(session);
         return new QbiResult(
-                STATUS_OK,
+                support.isComplete(session, FactPaths.QBI_DEDUCTION) ? STATUS_OK : STATUS_NEEDS_FACTS,
                 year,
                 graph.filingStatusOf(session),
                 support.value(session, FactPaths.QUALIFIED_BUSINESS_INCOME),
@@ -199,7 +215,7 @@ public class TaxProjectionTools {
 
         ReadResult netProfit = graph.readFact(session, FactPaths.SE_NET_PROFIT);
         String incomplete = netProfit.complete()
-                ? ""
+                ? qbiEligibilityNote(session)
                 : "Self-employment net profit isn't set yet — run calculate_se_tax or project_net_profit"
                         + " first so income tax and total tax can be computed. ";
         String note = incomplete
@@ -208,7 +224,7 @@ public class TaxProjectionTools {
                 + " differ. Income tax is on taxable income after the standard and QBI deductions.";
         int year = graph.taxYearOf(session);
         return new TotalTaxResult(
-                STATUS_OK,
+                support.isComplete(session, FactPaths.PROJECTED_TOTAL_TAX) ? STATUS_OK : STATUS_NEEDS_FACTS,
                 year,
                 graph.filingStatusOf(session),
                 support.value(session, FactPaths.SE_NET_PROFIT),
@@ -225,6 +241,15 @@ public class TaxProjectionTools {
                 note,
                 graph.explain(session, FactPaths.PROJECTED_TOTAL_TAX),
                 support.provisionalWarning(year));
+    }
+
+    private String qbiEligibilityNote(SessionId session) {
+        return !support.isComplete(session, FactPaths.QBI_DEDUCTION)
+                        && !support.isComplete(session, FactPaths.QBI_MATERIAL_PARTICIPATION)
+                ? "Confirm material participation in this business under IRC 469(h), then call "
+                        + "estimate_qbi_deduction with materiallyParticipates=true or false. The active-business "
+                        + "minimum deduction cannot be assumed from a 1099. "
+                : "";
     }
 
     /** Structured result of {@code project_total_tax}: the full net-profit-to-total-tax ladder. */
@@ -275,11 +300,16 @@ public class TaxProjectionTools {
         List<FilingStatusProjection> projections = Arrays.stream(FilingStatus.values())
                 .map(status -> projectUnder(session, status))
                 .toList();
+        boolean incompleteProjection = projections.stream().anyMatch(p -> p.projectedTotalTax() == null);
         return new CompareFilingStatusesResult(
-                STATUS_OK,
+                incompleteProjection ? STATUS_NEEDS_FACTS : STATUS_OK,
                 year,
                 projections,
-                "Self-employment tax (Social Security + Medicare) is identical across filing statuses; only"
+                (incompleteProjection
+                                ? "Some statuses require the active-business QBI eligibility answer. "
+                                        + "Confirm material participation and call estimate_qbi_deduction before comparing again. "
+                                : "")
+                        + "Self-employment tax (Social Security + Medicare) is identical across filing statuses; only"
                         + " income tax differs, through the standard deduction and bracket widths (the Additional"
                         + " Medicare surtax threshold also differs — lower for MFS). Married filing separately is"
                         + " rarely beneficial. These are estimates on identical inputs, not a recommendation of"

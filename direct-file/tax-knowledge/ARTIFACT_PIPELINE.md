@@ -215,3 +215,37 @@ Output:
 Human check:
 - Tax owner, compliance reviewer, product/content owner, and engineering owner approve before runtime use.
 - Provenance validator has zero errors for reviewed or approved artifacts.
+
+## Annual planning-year releases
+
+The 2026 implementation and review packet are in `reviews/federal/2026/README.md`.
+Planning uses the income calendar year from the server clock, independently of the
+calendar year a return is filed. Existing sessions retain their year across New Year.
+
+For each year, inventory actual document revisions and authority/effective dates,
+record a source-backed change register under `changes/federal/<year>/`, and distinguish
+parameter changes from calculation, interview, and scope changes. Final annual guidance
+and enacted statutes may support planning before all year-end publications are revised.
+Older sources need explicit applicability review. Draft IRS instructions stay discovery
+inputs and are not authoritative runtime dependencies.
+
+`tools/check_source_updates.py` compares known-source and IRS discovery-page hashes.
+It writes a separate observation report and optional content-addressed source copies;
+it never overwrites an approved baseline. The weekly/on-demand repository workflow
+preserves these observations for review. New listings are review signals, not authority.
+
+`tools/validate_artifact_provenance.py` now validates YAML structurally and checks exact
+source ownership, chunk identity, pages, and actual text hashes. `published` is treated
+as a release status alongside reviewed/approved/compiled. The year-scoped gate must have
+zero errors and warnings before packaging. Install `tools/requirements.txt` first.
+
+`tools/build_knowledge_release.py` packages a deterministic draft candidate with source,
+artifact, and executable graph hashes plus the exact raw source snapshots. Tax owners,
+content owners, and engineers still perform the approvals described above. After approval,
+record the reviewed content identity, promote reviewed root and nested artifact statuses,
+repeat validation, and deploy the matching service build and knowledge directory together.
+
+Runtime parameter/citation data are cached at startup. All interview artifact families
+are scoped by jurisdiction and income year. Default runtime policy excludes drafts;
+preview requires an explicit profile and is labeled. Sessions/exports carry the combined
+knowledge/XML digest, and a retained session from another version is rejected.

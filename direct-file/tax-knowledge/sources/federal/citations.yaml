@@ -299,9 +299,59 @@ citations:
   irs_rev_proc_2025_32:
     authority: revenue_procedure
     citation: "Rev. Proc. 2025-32 (2026 inflation adjustments)"
-    title: "2026 inflation-adjusted tax brackets and standard deduction (provisional)"
+    title: "2026 inflation adjustments and enacted 2025 standard-deduction correction"
     url: "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf"
     plain_language: >
       The IRS announcement that sets the 2026 dollar figures — the tax-bracket edges and
-      the standard deduction for each filing status. These are used here as provisional
-      planning values until the final 2026 forms confirm them.
+      the standard deduction for each filing status. It also corrects the 2025 standard
+      deduction and describes the new minimum deduction for eligible active business income.
+
+  irs_notice_2026_10:
+    authority: notice
+    citation: "IRS Notice 2026-10, 2026 Standard Mileage Rates"
+    title: "2026 business mileage rate before July 1"
+    url: "https://www.irs.gov/pub/irs-drop/n-26-10.pdf"
+    plain_language: >
+      The business mileage rate is 72.5 cents per mile for the first half of 2026.
+      The later IRS announcement changes the rate beginning July 1, so keep each
+      period's miles separate.
+
+  irs_announcement_2026_11:
+    authority: agency_announcement
+    citation: "IRS Announcement 2026-11, 2026-29 I.R.B. 49"
+    title: "2026 business mileage rate from July 1"
+    url: "https://www.irs.gov/irb/2026-29_irb"
+    plain_language: >
+      The business mileage rate increases to 76 cents per mile beginning July 1, 2026.
+      Miles before July use 72.5 cents. The calculation applies the rate for each
+      period instead of using one rate for the whole year.
+
+  irs_pub_505_2026:
+    authority: publication
+    citation: "IRS Publication 505 (2026), Tax Withholding and Estimated Tax"
+    title: "Tax Withholding and Estimated Tax"
+    url: "https://www.irs.gov/pub/irs-pdf/p505.pdf"
+    plain_language: >
+      Explains how withholding and estimated payments work during income year 2026,
+      including payment timing, safe-harbor rules, and special cases.
+
+  irc_199a_2026_snapshot:
+    authority: statute
+    citation: "26 U.S.C. § 199A(i) (2026)"
+    title: "Minimum deduction for active qualified business income"
+    url: "https://uscode.house.gov/us/usc/119-124/t26/s199A/"
+    plain_language: >
+      For 2026, qualifying taxpayers with at least $1,000 of income from an active
+      qualified business may receive a minimum $400 QBI deduction. The taxpayer
+      must materially participate in that business. Receiving a 1099 alone does
+      not establish this eligibility.
+
+  irc_1401_2026_snapshot:
+    authority: statute
+    citation: "26 U.S.C. § 1401(b)(2) (2026)"
+    title: "Additional Medicare Tax and filing-status thresholds"
+    url: "https://uscode.house.gov/us/usc/119-124/t26/s1401/"
+    plain_language: >
+      The additional 0.9% Medicare tax has a $250,000 threshold for joint returns,
+      $125,000 for married filing separately, and $200,000 otherwise. Wages already
+      subject to Medicare tax reduce the threshold remaining for self-employment income.

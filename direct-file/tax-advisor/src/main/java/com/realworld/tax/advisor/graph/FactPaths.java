@@ -15,6 +15,13 @@ public final class FactPaths {
     public static final String SE_SOCIAL_SECURITY_WAGES_FROM_W2 = "/seSocialSecurityWagesFromW2";
     public static final String SE_MONTHS_ELAPSED = "/seMonthsElapsed";
     public static final String SE_ANNUALIZATION_FACTOR = "/seAnnualizationFactor";
+    public static final String SE_MILEAGE_SPLIT_RATE = "/seMileageSplitRate";
+    public static final String SE_MILEAGE_CHANGE_MONTH = "/seMileageChangeMonth";
+    public static final String STANDARD_MILEAGE_RATE_AFTER_CHANGE = "/standardMileageRateAfterChange";
+    public static final String SE_MILES_BEFORE_CHANGE = "/seVehicleBusinessMilesBeforeChange";
+    public static final String SE_MILES_AFTER_CHANGE = "/seVehicleBusinessMilesAfterChange";
+    public static final String SE_MILEAGE_FIRST_FACTOR = "/seMileageFirstPeriodFactor";
+    public static final String SE_MILEAGE_SECOND_FACTOR = "/seMileageSecondPeriodFactor";
 
     // Schedule C / Schedule SE results
     public static final String STANDARD_MILEAGE_RATE = "/standardMileageRate";
@@ -42,6 +49,9 @@ public final class FactPaths {
     public static final String QBI_DEDUCTION = "/qbiDeduction";
     public static final String QBI_THRESHOLD = "/qbiThreshold";
     public static final String QBI_ABOVE_THRESHOLD = "/qbiAboveThreshold";
+    public static final String QBI_MINIMUM_DEDUCTION = "/qbiMinimumDeduction";
+    public static final String QBI_MINIMUM_INCOME = "/qbiMinimumIncome";
+    public static final String QBI_MATERIAL_PARTICIPATION = "/planning/qbiMaterialParticipation";
 
     // Income-tax ladder
     public static final String OTHER_TAXABLE_INCOME = "/planning/otherTaxableIncome";

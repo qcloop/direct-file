@@ -40,7 +40,7 @@ class TotalTaxConsistencyTest {
     void derivedTotalTaxEqualsItsPartsAndQbiIsCapped() {
         String sid = sessionTools.createSession("2026", "single").sessionId();
         // Six months of year-to-date figures, annualized straight-line (factor 12/6 = 2).
-        selfEmploymentTools.projectNetProfit(sid, "2026-06-30", "18360", "6700", "450", null, null);
+        selfEmploymentTools.projectNetProfit(sid, "2026-06-30", "18360", "6700", "450", null, null, null, null);
 
         var t = taxProjectionTools.projectTotalTax(sid, null, null);
 
@@ -51,18 +51,18 @@ class TotalTaxConsistencyTest {
         BigDecimal additionalMedicare = (BigDecimal) t.additionalMedicareTax();
         BigDecimal total = (BigDecimal) t.projectedTotalTax();
 
-        // Annualized net profit matches the transcript: $36,720 gross − $9,715 mileage − $900 fees.
-        assertThat(netProfit).isEqualByComparingTo("26105");
+        // Apply both 2026 rates: $36,720 gross − round(6,700 x .725 + 6,700 x .76) − $900 fees.
+        assertThat(netProfit).isEqualByComparingTo("25870");
         // AGI = net profit − deductible half of SE tax.
-        assertThat(agi).isEqualByComparingTo("24260");
+        assertThat(agi).isEqualByComparingTo("24042");
 
         // THE FIX: the total is exactly income tax + SE tax + Additional Medicare — not a phantom number
         // that fails to equal its own breakdown (the transcript's $5,534 ≠ $441 + $3,689).
         assertThat(total).isEqualByComparingTo(incomeTax.add(seTax).add(additionalMedicare));
 
         // QBI is correctly capped at 20% of taxable income before QBI. With a ~$16,100 standard deduction,
-        // taxable income before QBI is only ~$8,160, so the income cap (~$1,632) binds far below the
-        // ~$4,852 uncapped component the transcript wrongly deducted.
+        // taxable income before QBI is only ~$7,942, so the income cap (~$1,588) binds far below the
+        // ~$4,808 uncapped component the transcript wrongly deducted.
         BigDecimal qbiDeduction = (BigDecimal) t.qbiDeduction();
         assertThat(qbiDeduction).isLessThan(new BigDecimal("4852"));
 

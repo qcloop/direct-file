@@ -77,14 +77,20 @@ Operational notes that bite:
 Purpose: a **conversational tax-planning** backend for self-employed/gig filers. It extends
 the production fact dictionary with planning facts (`tax-plan/*.xml`) and exposes **MCP tools**
 that an LLM gateway calls to drive an interview → estimate flow. It is **not** in the filing
-critical path and keeps no durable taxpayer data — planning sessions live in memory only.
+critical path. By default it keeps no durable taxpayer data — planning sessions live in memory only;
+the opt-in `redis` profile moves them to a shared Redis so the service can run as several instances
+(see "Session state" below).
 
 Key types:
 - `TaxAdvisorApplication` — Spring Boot entry point.
 - `graph/PlanningGraphService` — loads the combined dictionary (production `tax/*.xml` +
-  planning `tax-plan/*.xml`) once at startup; hands out per-session in-memory `Graph`s; owns
-  `writeFact`/`readFact`. Each session = a `UUID` + a `LinkedHashMap<path, FactTypeWithItem>`,
-  rebuilt into a `Graph(dictionary, InMemoryPersister.apply(json))` on demand under a session lock.
+  planning `tax-plan/*.xml`) once at startup; owns `writeFact`/`readFact`. It holds no session state
+  itself: each session is an immutable `SessionSnapshot` (year, filing status, ordered
+  `path → FactTypeWithItem` facts, source notes) kept in a `SessionStore`, and a
+  `Graph(dictionary, InMemoryPersister.apply(json))` is rebuilt from the facts for every read and
+  every write validation.
+- `graph/SessionStore` — where sessions live: `InMemorySessionStore` (default) or `RedisSessionStore`
+  (`redis` profile). Chosen in `config/SessionStoreConfig` from `tax-advisor.session-store.type`.
 - `graph/SessionId`, `graph/PersisterTypes`, `graph/FilingStatus`, `graph/FactPaths` — the small vocabulary
   types the rest of the service shares: the typed session identifier, persister type codes plus alias
   resolution / value shaping (the guard behind CLAUDE.md invariant 5), the `single | mfj | mfs` enum,
@@ -126,6 +132,19 @@ Transports (two profiles, same tools):
   session via `Mcp-Session-Id`. Network-accessible; `/actuator/health` for probes.
 - **stdio** (`--spring.profiles.active=stdio`) — no HTTP listener; JSON-RPC over stdin/stdout for
   desktop MCP hosts (Claude Desktop, Cursor). stdout must stay clean (CLAUDE.md invariant 4).
+
+Session state (how a second instance can serve the same session):
+- The client sends only the `sessionId` plus one call's arguments; the accumulated facts stay server-side.
+- Writes are **optimistic**, not locked: read the snapshot and its version, apply the change, build the
+  graph to validate it, then `replace` only if the version is unchanged — retrying a few times if
+  another writer (possibly another instance) got there first. A write the graph rejects throws before
+  anything is stored, so there is nothing to roll back (CLAUDE.md invariant 5's atomicity).
+- Redis layout: one hash per session, `tax-advisor:session:<id>` → `data` (snapshot JSON, written with
+  the Jackson 2 mapper) + `v` (version). Create/replace are single-key Lua scripts, so they are atomic
+  and work on a clustered Redis. Expiry is sliding (`idle-timeout`, default 60m).
+- **Not shared:** the MCP *transport* session (`Mcp-Session-Id`) is still held in memory by Spring AI.
+  Several instances therefore still need the load balancer to pin an MCP session to one instance; what
+  Redis adds is that the *planning* session survives a reconnect, a different instance, or a restart.
 
 Why Jackson 2 here specifically: `set_fact` does `objectMapper.valueToTree(rawValue)` to build a
 `FactTypeWithItem(typeCode, JsonNode)`, and `data-models`' `FactTypeWithItem.item` is a Jackson 2

@@ -7,6 +7,7 @@ source_ids:
   - irc_1
   - irc_63
   - irs_rev_proc_2024_40
+  - irs_rev_proc_2025_32
 description: >
   Year/filing-status-scoped federal ordinary income-tax schedule: the standard deduction and the
   seven ordinary-rate bracket ceilings (the top of brackets 1-6; bracket 7 is open-ended) plus the
@@ -14,8 +15,8 @@ description: >
   for the session's filing status, and the (status-invariant) rates always. These let the graph
   DERIVE projected income tax and total tax instead of accepting an agent-supplied guess.
 
-  Bracket ceilings and the standard deduction are the 2025 inflation-adjusted figures from IRS
-  Rev. Proc. 2024-40; the marginal rates are the statutory IRC 1(j) rates. Scope is ordinary income
+  Bracket ceilings are the 2025 inflation-adjusted figures from Rev. Proc. 2024-40. The standard
+  deduction includes the enacted OBBBA correction in Rev. Proc. 2025-32; marginal rates are IRC 1(j). Scope is ordinary income
   only: capital-gains/qualified-dividend rates, credits, NIIT, and AMT are not modeled here.
 parameters:
   # Seven marginal rates (status-invariant: the rate schedule is the same for every filing status;
@@ -63,31 +64,31 @@ parameters:
     source_id: irc_1
     note: 37% — top ordinary-income bracket. Statutory rate (IRC 1(j)).
 
-  # Standard deduction — filing-status-scoped (IRC 63; 2025 amounts from Rev. Proc. 2024-40).
+  # Standard deduction — filing-status-scoped (IRC 63; OBBBA correction in Rev. Proc. 2025-32).
   - fact_path: /standardDeduction
     name: Standard deduction (single)
     type: dollar
-    value: "15000"
+    value: "15750"
     unit: dollars
     filing_status: single
-    source_id: irs_rev_proc_2024_40
-    note: Single / married filing separately — 2025 standard deduction is $15,000 (Rev. Proc. 2024-40).
+    source_id: irs_rev_proc_2025_32
+    note: Single / married filing separately — 2025 standard deduction is $15,750 (Rev. Proc. 2025-32).
   - fact_path: /standardDeduction
     name: Standard deduction (married filing jointly)
     type: dollar
-    value: "30000"
+    value: "31500"
     unit: dollars
     filing_status: mfj
-    source_id: irs_rev_proc_2024_40
-    note: Married filing jointly — 2025 standard deduction is $30,000 (Rev. Proc. 2024-40).
+    source_id: irs_rev_proc_2025_32
+    note: Married filing jointly — 2025 standard deduction is $31,500 (Rev. Proc. 2025-32).
   - fact_path: /standardDeduction
     name: Standard deduction (married filing separately)
     type: dollar
-    value: "15000"
+    value: "15750"
     unit: dollars
     filing_status: mfs
-    source_id: irs_rev_proc_2024_40
-    note: Married filing separately — 2025 standard deduction is $15,000 (Rev. Proc. 2024-40).
+    source_id: irs_rev_proc_2025_32
+    note: Married filing separately — 2025 standard deduction is $15,750 (Rev. Proc. 2025-32).
 
   # Bracket ceilings (top of brackets 1-6) — filing-status-scoped; 2025 figures (Rev. Proc. 2024-40).
   # SINGLE

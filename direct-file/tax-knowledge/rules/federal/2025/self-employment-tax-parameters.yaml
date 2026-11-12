@@ -45,12 +45,29 @@ parameters:
     source_id: irs_instruction_1040_schedule_se_2025
     note: Net SE earnings at or above $400 trigger SE tax. Statutory; not indexed.
   - fact_path: /highIncomeSafeHarborThreshold
-    name: High-income safe-harbor AGI threshold
+    name: High-income safe-harbor AGI threshold (single)
     type: dollar
     value: "150000"
     unit: dollars
+    filing_status: single
     source_id: irs_form_1040_es_2025
-    note: Prior-year AGI above $150,000 requires 110% (not 100%) safe-harbor coverage (IRC 6654).
+    note: Prior-year AGI above this threshold requires the 110% prior-year safe harbor.
+  - fact_path: /highIncomeSafeHarborThreshold
+    name: High-income safe-harbor AGI threshold (mfj)
+    type: dollar
+    value: "150000"
+    unit: dollars
+    filing_status: mfj
+    source_id: irs_form_1040_es_2025
+    note: Prior-year AGI above this threshold requires the 110% prior-year safe harbor.
+  - fact_path: /highIncomeSafeHarborThreshold
+    name: High-income safe-harbor AGI threshold (mfs)
+    type: dollar
+    value: "75000"
+    unit: dollars
+    filing_status: mfs
+    source_id: irs_form_1040_es_2025
+    note: Prior-year AGI above this threshold requires the 110% prior-year safe harbor.
   - fact_path: /seSocialSecurityRate
     name: Social Security portion of SE tax rate
     type: rational
@@ -135,3 +152,25 @@ parameters:
     filing_status: mfs
     source_id: irs_form_8995_2025
     note: Married filing separately — uses the single amount, $197,300 (TY2025).
+
+  # Year-scoped switches preserve earlier-year calculation behavior.
+  - fact_path: /seMileageSplitRate
+    name: Mileage rate changes within this income year
+    type: boolean
+    value: "false"
+    source_id: irs_form_1040_es_2025
+  - fact_path: /seMileageChangeMonth
+    name: Month the second mileage rate starts
+    type: int
+    value: "0"
+    source_id: irs_form_1040_es_2025
+  - fact_path: /qbiMinimumDeduction
+    name: Minimum deduction for eligible active QBI
+    type: dollar
+    value: "0"
+    source_id: irc_199a
+  - fact_path: /qbiMinimumIncome
+    name: Minimum active QBI required for the minimum deduction
+    type: dollar
+    value: "1000"
+    source_id: irc_199a

@@ -1,6 +1,7 @@
 package com.realworld.tax.advisor.mcp;
 
-import java.time.Year;
+import java.time.Clock;
+import java.time.LocalDate;
 
 import com.realworld.tax.advisor.graph.PersisterTypes;
 import com.realworld.tax.advisor.graph.PlanningGraphService;
@@ -25,9 +26,12 @@ public class SessionTools {
 
     private final ToolSupport support;
 
-    public SessionTools(PlanningGraphService graph, ToolSupport support) {
+    private final Clock clock;
+
+    public SessionTools(PlanningGraphService graph, ToolSupport support, Clock clock) {
         this.graph = graph;
         this.support = support;
+        this.clock = clock;
     }
 
     @McpTool(
@@ -42,7 +46,9 @@ public class SessionTools {
             generateOutputSchema = true)
     public CreateSessionResult createSession(
             @McpToolParam(
-                            description = "Tax year to plan for, e.g. \"2025\". Defaults to the current calendar year.",
+                            description = "Income year to plan for. Omit to use the server's current calendar year "
+                                    + "(2026 income is planned throughout 2026, even though the return is filed later). "
+                                    + "Supply a year only when the taxpayer explicitly requests another year.",
                             required = false)
                     String taxYear,
             @McpToolParam(
@@ -53,14 +59,22 @@ public class SessionTools {
                                     + " tell the taxpayer you assumed it; status is fixed for the life of the"
                                     + " session, so to change it (or to compare) create a new session or call"
                                     + " compare_filing_statuses — do not estimate the difference by hand."
-                                    + " Head-of-household and qualifying surviving spouse use the 'single'"
-                                    + " thresholds for these provisions.",
+                                    + " Head-of-household and qualifying surviving spouse are not supported by"
+                                    + " this ordinary-income planning model; do not substitute single for them.",
                             required = false)
                     String filingStatus) {
-        int year = parseTaxYear(taxYear);
+        // Sample once: a call straddling midnight must not return a date from a different default year.
+        LocalDate planningDate = LocalDate.now(clock);
+        int year = parseTaxYear(taxYear, planningDate.getYear());
         SessionId session = graph.createSession(year, filingStatus);
         return new CreateSessionResult(
-                session.value(), year, graph.filingStatusOf(session), support.provisionalWarning(year));
+                session.value(),
+                year,
+                graph.filingStatusOf(session),
+                support.provisionalWarning(year),
+                planningDate.toString(),
+                clock.getZone().getId(),
+                graph.knowledgeVersionOf(session));
     }
 
     /**
@@ -74,7 +88,14 @@ public class SessionTools {
      * {@code provisionalWarning} is always present (empty string when the year is finalized) rather
      * than nullable, since generators tend to mark every property required.
      */
-    public record CreateSessionResult(String sessionId, int taxYear, String filingStatus, String provisionalWarning) {}
+    public record CreateSessionResult(
+            String sessionId,
+            int taxYear,
+            String filingStatus,
+            String provisionalWarning,
+            String planningDate,
+            String planningTimeZone,
+            String knowledgeVersion) {}
 
     @McpTool(
             name = "get_fact",
@@ -128,7 +149,7 @@ public class SessionTools {
         return result;
     }
 
-    private static int parseTaxYear(String taxYear) {
-        return ToolSupport.isBlank(taxYear) ? Year.now().getValue() : Integer.parseInt(taxYear.trim());
+    private static int parseTaxYear(String taxYear, int currentYear) {
+        return ToolSupport.isBlank(taxYear) ? currentYear : Integer.parseInt(taxYear.trim());
     }
 }

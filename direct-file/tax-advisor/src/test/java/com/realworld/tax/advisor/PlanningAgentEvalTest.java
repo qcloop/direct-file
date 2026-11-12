@@ -101,11 +101,18 @@ class PlanningAgentEvalTest {
                         txt(a, "businessMiles"),
                         txt(a, "platformFees"),
                         txt(a, "suppliesAndOther"),
-                        txt(a, "socialSecurityWagesFromW2"));
+                        txt(a, "socialSecurityWagesFromW2"),
+                        txt(a, "businessMilesBeforeRateChange"),
+                        txt(a, "businessMilesAfterRateChange"));
             case "calculate_additional_medicare" ->
                 taxProjectionTools.calculateAdditionalMedicare(sessionId, txt(a, "medicareWagesFromW2"));
             case "estimate_qbi_deduction" ->
-                taxProjectionTools.estimateQbiDeduction(sessionId, txt(a, "netCapitalGains"));
+                taxProjectionTools.estimateQbiDeduction(
+                        sessionId,
+                        txt(a, "netCapitalGains"),
+                        a.has("materiallyParticipates")
+                                ? a.get("materiallyParticipates").asBoolean()
+                                : null);
             case "project_total_tax" ->
                 taxProjectionTools.projectTotalTax(sessionId, txt(a, "otherOrdinaryIncome"), txt(a, "netCapitalGains"));
             default -> throw new IllegalArgumentException("eval dispatch has no case for tool: " + tool);

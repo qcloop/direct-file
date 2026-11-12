@@ -17,6 +17,8 @@ import com.realworld.tax.advisor.knowledge.TaxKnowledgeService.CandidateFact;
  * rules that flag contradictions for review — together with the code that loads them.
  */
 record KnowledgeBundle(List<Question> questions, List<EvidenceMap> evidenceMaps, List<ConflictRule> conflictRules) {
+    private static final String TAX_YEAR = "tax_year";
+    private static final String JURISDICTION = "jurisdiction";
 
     /** The bundle used when no tax-knowledge root is available: question planning is disabled. */
     static KnowledgeBundle empty() {
@@ -24,19 +26,39 @@ record KnowledgeBundle(List<Question> questions, List<EvidenceMap> evidenceMaps,
     }
 
     /** Load every artifact under {@code questions/}, {@code evidence/} and {@code conflicts/} of the root. */
-    static KnowledgeBundle load(Path knowledgeRoot, ObjectMapper yamlMapper) throws IOException {
+    static KnowledgeBundle load(Path knowledgeRoot, ObjectMapper yamlMapper, boolean allowDrafts) throws IOException {
         return new KnowledgeBundle(
-                loadQuestionFiles(knowledgeRoot.resolve("questions"), yamlMapper),
-                loadEvidenceFiles(knowledgeRoot.resolve("evidence"), yamlMapper),
-                loadConflictFiles(knowledgeRoot.resolve("conflicts"), yamlMapper));
+                loadQuestionFiles(knowledgeRoot.resolve("questions"), yamlMapper, allowDrafts),
+                loadEvidenceFiles(knowledgeRoot.resolve("evidence"), yamlMapper, allowDrafts),
+                loadConflictFiles(knowledgeRoot.resolve("conflicts"), yamlMapper, allowDrafts));
     }
 
-    private static List<Question> loadQuestionFiles(Path root, ObjectMapper yamlMapper) throws IOException {
+    KnowledgeBundle forYear(int taxYear, String jurisdiction) {
+        return new KnowledgeBundle(
+                questions.stream()
+                        .filter(q -> q.taxYear() == taxYear && jurisdiction.equals(q.jurisdiction()))
+                        .toList(),
+                evidenceMaps.stream()
+                        .filter(m -> m.taxYear() == taxYear && jurisdiction.equals(m.jurisdiction()))
+                        .toList(),
+                conflictRules.stream()
+                        .filter(c -> c.taxYear() == taxYear && jurisdiction.equals(c.jurisdiction()))
+                        .toList());
+    }
+
+    private static List<Question> loadQuestionFiles(Path root, ObjectMapper yamlMapper, boolean allowDrafts)
+            throws IOException {
         List<Question> out = new ArrayList<>();
         for (Map<String, Object> doc : yamlDocuments(root, yamlMapper)) {
-            int taxYear = YamlValues.asInt(doc.get("tax_year"), 0);
-            String jurisdiction = YamlValues.asString(doc.get("jurisdiction"));
+            if (!ArtifactPolicy.allowed(doc, allowDrafts)) {
+                continue;
+            }
+            int taxYear = YamlValues.asInt(doc.get(TAX_YEAR), 0);
+            String jurisdiction = YamlValues.asString(doc.get(JURISDICTION));
             for (Map<String, Object> item : YamlValues.maps(doc.get("questions"))) {
+                if (!ArtifactPolicy.allowedItem(item, allowDrafts)) {
+                    continue;
+                }
                 out.add(new Question(
                         YamlValues.asString(item.get("question_id")),
                         YamlValues.asString(item.get("topic_id")),
@@ -55,10 +77,17 @@ record KnowledgeBundle(List<Question> questions, List<EvidenceMap> evidenceMaps,
         return out;
     }
 
-    private static List<EvidenceMap> loadEvidenceFiles(Path root, ObjectMapper yamlMapper) throws IOException {
+    private static List<EvidenceMap> loadEvidenceFiles(Path root, ObjectMapper yamlMapper, boolean allowDrafts)
+            throws IOException {
         List<EvidenceMap> out = new ArrayList<>();
         for (Map<String, Object> doc : yamlDocuments(root, yamlMapper)) {
+            if (!ArtifactPolicy.allowed(doc, allowDrafts)) {
+                continue;
+            }
             for (Map<String, Object> item : YamlValues.maps(doc.get("evidence_maps"))) {
+                if (!ArtifactPolicy.allowedItem(item, allowDrafts)) {
+                    continue;
+                }
                 List<Signal> signals = YamlValues.maps(item.get("signals")).stream()
                         .map(signal -> new Signal(
                                 YamlValues.asString(signal.get("topic_id")),
@@ -76,6 +105,8 @@ record KnowledgeBundle(List<Question> questions, List<EvidenceMap> evidenceMaps,
                         .toList();
                 out.add(new EvidenceMap(
                         YamlValues.asString(item.get("evidence_map_id")),
+                        YamlValues.asInt(doc.get(TAX_YEAR), 0),
+                        YamlValues.asString(doc.get(JURISDICTION)),
                         YamlValues.asString(item.get("document_type")),
                         signals,
                         candidateFacts,
@@ -85,12 +116,21 @@ record KnowledgeBundle(List<Question> questions, List<EvidenceMap> evidenceMaps,
         return out;
     }
 
-    private static List<ConflictRule> loadConflictFiles(Path root, ObjectMapper yamlMapper) throws IOException {
+    private static List<ConflictRule> loadConflictFiles(Path root, ObjectMapper yamlMapper, boolean allowDrafts)
+            throws IOException {
         List<ConflictRule> out = new ArrayList<>();
         for (Map<String, Object> doc : yamlDocuments(root, yamlMapper)) {
+            if (!ArtifactPolicy.allowed(doc, allowDrafts)) {
+                continue;
+            }
             for (Map<String, Object> item : YamlValues.maps(doc.get("conflicts"))) {
+                if (!ArtifactPolicy.allowedItem(item, allowDrafts)) {
+                    continue;
+                }
                 out.add(new ConflictRule(
                         YamlValues.asString(item.get("conflict_id")),
+                        YamlValues.asInt(doc.get(TAX_YEAR), 0),
+                        YamlValues.asString(doc.get(JURISDICTION)),
                         YamlValues.asString(item.get("severity")),
                         ConditionGroup.from(item.get("when")),
                         YamlValues.asString(item.get("message")),
@@ -113,7 +153,15 @@ record KnowledgeBundle(List<Question> questions, List<EvidenceMap> evidenceMaps,
 
             List<Map<String, Object>> docs = new ArrayList<>();
             for (Path file : yamlFiles) {
-                docs.add(yamlMapper.readValue(file.toFile(), YamlValues.MAP_TYPE));
+                Map<String, Object> doc = yamlMapper.readValue(file.toFile(), YamlValues.MAP_TYPE);
+                Path relative = root.relativize(file);
+                if (relative.getNameCount() < 3
+                        || !relative.getName(0).toString().equals(doc.get(JURISDICTION))
+                        || !relative.getName(1).toString().equals(String.valueOf(doc.get(TAX_YEAR)))) {
+                    throw new IllegalArgumentException(
+                            "Interview artifact metadata must match its jurisdiction/year directory: " + relative);
+                }
+                docs.add(doc);
             }
             return docs;
         }
@@ -135,6 +183,8 @@ record KnowledgeBundle(List<Question> questions, List<EvidenceMap> evidenceMaps,
 
     record EvidenceMap(
             String evidenceMapId,
+            int taxYear,
+            String jurisdiction,
             String documentType,
             List<Signal> signals,
             List<CandidateFact> candidateFacts,
@@ -144,6 +194,8 @@ record KnowledgeBundle(List<Question> questions, List<EvidenceMap> evidenceMaps,
 
     record ConflictRule(
             String conflictId,
+            int taxYear,
+            String jurisdiction,
             String severity,
             ConditionGroup when,
             String message,

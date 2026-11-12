@@ -1,0 +1,35 @@
+{
+  "entries": [
+    {
+      "agency": "US Congress",
+      "bytes_downloaded": 57474,
+      "description": "26 USC 199A, laws through Public Law 119-124 (October 15, 2026)",
+      "disposition": "active",
+      "document_format": "html",
+      "document_status": "enacted",
+      "filename": "usc26-section199A.html",
+      "local_path": "corpora/irs-2026/downloads/usc26-section199A.html",
+      "product_id": "usc26-section199A",
+      "revision_year": 2026,
+      "sha256": "7292dac7f3c1b4e68cd6e8b9b548ddadbe375d92a347a282ec5f5759ae2144b9",
+      "source_id": "irc_199a_2026_snapshot",
+      "url": "https://uscode.house.gov/us/usc/119-124/t26/s199A/"
+    },
+    {
+      "agency": "US Congress",
+      "bytes_downloaded": 89782,
+      "description": "26 USC 1401, laws through Public Law 119-124 (October 15, 2026)",
+      "disposition": "active",
+      "document_format": "html",
+      "document_status": "enacted",
+      "filename": "usc26-section1401.html",
+      "local_path": "corpora/irs-2026/downloads/usc26-section1401.html",
+      "product_id": "usc26-section1401",
+      "revision_year": 2026,
+      "sha256": "a1b23089917d3c60e41dacf1e5326819c4ef7e1028b5e5a6ee88599e36a82186",
+      "source_id": "irc_1401_2026_snapshot",
+      "url": "https://uscode.house.gov/us/usc/119-124/t26/s1401/"
+    }
+  ],
+  "tax_year": 2026
+}

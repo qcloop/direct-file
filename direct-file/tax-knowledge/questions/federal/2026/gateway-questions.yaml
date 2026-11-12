@@ -1,0 +1,215 @@
+jurisdiction: "federal"
+questions:
+  - asks_when:
+      all: []
+    priority: "gateway"
+    prompt: "Have you earned, or do you expect to earn, wages or salary in income year 2026?"
+    question_id: "has_w2_income"
+    skip_when:
+      any:
+        - evidence: "form_w2"
+          status: "confirmed_absent"
+    source_ids:
+      - "irs_form_1040_es_2026"
+    topic_id: "w2_income"
+    why_we_ask: "W-2 wages and withholding are reported on Form 1040."
+    writes:
+      - "/hasW2"
+    help_text: "Plan for income earned in 2026. A W-2 received during 2026 may report 2025 income; confirm its income year before using it."
+  - asks_when:
+      all: []
+    help_text: "Include business income whether or not a 1099 has arrived. Keep actual year-to-date amounts separate from expected future amounts."
+    priority: "gateway"
+    prompt: "Have you earned, or do you expect to earn, money from freelance, gig, contractor, or business work in income year 2026?"
+    question_id: "has_self_employment_income"
+    skip_when:
+      any:
+        - equals: false
+          fact: "/hasSelfEmploymentIncome"
+          status: "confirmed"
+    source_ids:
+      - "irs_form_1040_es_2026"
+    topic_id: "self_employment"
+    why_we_ask: "Self-employment income may need Schedule C and self-employment tax calculations."
+    writes:
+      - "/hasSelfEmploymentIncome"
+  - asks_when:
+      all:
+        - equals: true
+          fact: "/hasSelfEmploymentIncome"
+    priority: "gateway"
+    prompt: "Have you used, or do you expect to use, a vehicle for this business or gig work in 2026?"
+    question_id: "uses_vehicle_for_business"
+    skip_when:
+      any:
+        - equals: false
+          fact: "/hasSelfEmploymentIncome"
+    source_ids:
+      - "irs_form_1040_es_2026"
+    topic_id: "self_employment"
+    why_we_ask: "Vehicle use can affect deductible business expenses."
+    writes:
+      - "/usesVehicleForBusiness"
+  - asks_when:
+      all:
+        - equals: true
+          fact: "/hasSelfEmploymentIncome"
+        - equals: true
+          fact: "/usesVehicleForBusiness"
+    help_text: "Enter 0 if none. Exclude commuting and personal miles. Keep the two date periods separate because the 2026 mileage rate changes on July 1. The projection tool estimates future mileage from these actual amounts."
+    priority: "detail"
+    prompt: "How many actual business miles have you driven before July 1, 2026, through the date your figures cover?"
+    question_id: "se_vehicle_business_miles_before_rate_change"
+    skip_when:
+      any:
+        - equals: false
+          fact: "/hasSelfEmploymentIncome"
+        - equals: false
+          fact: "/usesVehicleForBusiness"
+    source_ids:
+      - "irs_announcement_2026_11"
+    topic_id: "self_employment"
+    why_we_ask: "Each period has its own standard mileage rate. The deterministic graph applies both rates and projects remaining mileage when needed."
+    writes:
+      - "/seVehicleBusinessMilesBeforeChange"
+  - asks_when:
+      all:
+        - equals: true
+          fact: "/hasSelfEmploymentIncome"
+        - equals: true
+          fact: "/usesVehicleForBusiness"
+    help_text: "Enter 0 if none. Exclude commuting and personal miles. Keep the two date periods separate because the 2026 mileage rate changes on July 1. The projection tool estimates future mileage from these actual amounts."
+    priority: "detail"
+    prompt: "How many actual business miles have you driven from July 1, 2026 onward, through the date your figures cover?"
+    question_id: "se_vehicle_business_miles_after_rate_change"
+    skip_when:
+      any:
+        - equals: false
+          fact: "/hasSelfEmploymentIncome"
+        - equals: false
+          fact: "/usesVehicleForBusiness"
+    source_ids:
+      - "irs_announcement_2026_11"
+    topic_id: "self_employment"
+    why_we_ask: "Each period has its own standard mileage rate. The deterministic graph applies both rates and projects remaining mileage when needed."
+    writes:
+      - "/seVehicleBusinessMilesAfterChange"
+  - asks_when:
+      all:
+        - equals: true
+          fact: "/hasSelfEmploymentIncome"
+    help_text: "These are amounts the platform withheld; they are deductible business expenses on Schedule C, separate from vehicle mileage."
+    priority: "detail"
+    prompt: "Did the platforms you worked for (Uber, Lyft, DoorDash, Instacart, etc.) keep commissions or service fees out of your pay?"
+    question_id: "se_platform_fees"
+    skip_when:
+      any:
+        - equals: false
+          fact: "/hasSelfEmploymentIncome"
+    source_ids:
+      - "irs_form_1040_es_2026"
+    topic_id: "self_employment"
+    why_we_ask: "Platform and commission fees reduce your net self-employment profit and the self-employment tax on it."
+    writes:
+      - "/sePlatformFees"
+  - asks_when:
+      all:
+        - equals: true
+          fact: "/hasSelfEmploymentIncome"
+    help_text: "Include the ordinary and necessary costs of doing the work. Do NOT include gas, car maintenance, insurance, or depreciation — those vehicle costs are already covered by the standard mileage deduction (captured separately as business miles), and deducting them here too would double-count."
+    priority: "detail"
+    prompt: "Did you have other business expenses for this work — supplies, an insulated bag, the business-use portion of your phone, etc.?"
+    question_id: "se_supplies_and_other_expenses"
+    skip_when:
+      any:
+        - equals: false
+          fact: "/hasSelfEmploymentIncome"
+    source_ids:
+      - "irs_form_1040_es_2026"
+    topic_id: "self_employment"
+    why_we_ask: "Other ordinary business expenses further reduce your net profit and self-employment tax."
+    writes:
+      - "/seSuppliesAndOther"
+  - asks_when:
+      all:
+        - equals: true
+          fact: "/hasSelfEmploymentIncome"
+    help_text: "Gig pay usually has no withholding, so you may owe quarterly estimated tax. Last year's tax sets the safe-harbor target."
+    priority: "detail"
+    prompt: "What was your total federal tax for income year 2025 (Form 1040, line 24), to help plan your 2026 estimated payments?"
+    question_id: "se_prior_year_total_tax"
+    skip_when:
+      any:
+        - equals: false
+          fact: "/hasSelfEmploymentIncome"
+    source_ids:
+      - "irs_form_1040_es_2026"
+    topic_id: "self_employment"
+    why_we_ask: "The IRC §6654 safe harbor is a percentage of your prior-year tax, so it anchors the quarterly-payment estimate."
+    writes:
+      - "/planning/priorYearTotalTax"
+  - question_id: "qbi_material_participation"
+    topic_id: "self_employment"
+    priority: "detail"
+    prompt: "Do you materially participate in this business under the IRS material-participation rules?"
+    help_text: "This is a tax eligibility question, not simply whether a 1099 exists. Confirm the applicable IRS tests or seek tax review if unsure. Leave the answer unset when eligibility is unknown."
+    why_we_ask: "The 2026 minimum QBI deduction requires qualifying active business income and material participation."
+    writes:
+      - "/planning/qbiMaterialParticipation"
+    asks_when:
+      all:
+        - fact: "/hasSelfEmploymentIncome"
+          equals: true
+    skip_when:
+      any:
+        - fact: "/hasSelfEmploymentIncome"
+          equals: false
+    source_ids:
+      - "irs_rev_proc_2025_32"
+      - "irc_199a_2026_snapshot"
+    source_refs:
+      - source_id: "irs_rev_proc_2025_32"
+        chunk_id: "irs_rev_proc_2025_32_chunk_0008"
+        pages:
+          - 7
+          - 8
+        text_sha256: "962330cb9364569cc4ff9916ec0f4c35fab0e63a074fd5b1e645124923ae21d0"
+      - source_id: "irc_199a_2026_snapshot"
+        chunk_id: "irc_199a_2026_snapshot_chunk_0030"
+        pages:
+          - 1
+        text_sha256: "213a435fbb9578b47b34b9da7cb6931130a38548d1d96ef3684254651ad21161"
+status: "draft"
+tax_year: 2026
+source_ids:
+  - "irs_form_1040_es_2026"
+  - "irs_announcement_2026_11"
+  - "irs_rev_proc_2025_32"
+  - "irc_199a_2026_snapshot"
+source_refs:
+  - source_id: "irs_form_1040_es_2026"
+    chunk_id: "irs_form_1040_es_2026_chunk_0001"
+    pages:
+      - 1
+    text_sha256: "7cd45b5ef5ff0d5306ac070f94750011d7dbffe2dec8f47b0f37493da33c3f87"
+  - source_id: "irs_form_1040_es_2026"
+    chunk_id: "irs_form_1040_es_2026_chunk_0008"
+    pages:
+      - 8
+    text_sha256: "fd0a2c0a4a0451e92548c7c091b690c5ffb5225b0ad55b0a5833003c94f2acdd"
+  - source_id: "irs_announcement_2026_11"
+    chunk_id: "irs_announcement_2026_11_chunk_0014"
+    pages:
+      - 13
+    text_sha256: "e5b044a44b9f514e36d252a5e018bd8839ba95da0c0c54016ddd0e2c52e6fdfe"
+  - source_id: "irs_rev_proc_2025_32"
+    chunk_id: "irs_rev_proc_2025_32_chunk_0008"
+    pages:
+      - 7
+      - 8
+    text_sha256: "962330cb9364569cc4ff9916ec0f4c35fab0e63a074fd5b1e645124923ae21d0"
+  - source_id: "irc_199a_2026_snapshot"
+    chunk_id: "irc_199a_2026_snapshot_chunk_0030"
+    pages:
+      - 1
+    text_sha256: "213a435fbb9578b47b34b9da7cb6931130a38548d1d96ef3684254651ad21161"

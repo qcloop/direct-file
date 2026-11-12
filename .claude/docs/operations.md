@@ -75,6 +75,24 @@ curl -X POST http://localhost:8090/mcp \
   -d '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}'
 ```
 
+Shared session store (several instances, sessions survive restarts):
+```bash
+REDIS_URL=redis://localhost:6379 java -jar .../tax-advisor-0.0.1-SNAPSHOT.jar --spring.profiles.active=redis
+```
+- `REDIS_URL` defaults to `redis://localhost:6379` — the same endpoint the client web app uses. Keys are
+  namespaced `tax-advisor:session:<id>` and expire after `tax-advisor.session-store.idle-timeout` (60m,
+  sliding), so they do not collide with or outlive the web app's own keys.
+- Without the profile the store is in-memory, Redis is never contacted, and its health indicator is off.
+  With it, an unreachable Redis shows as `DOWN` in `/actuator/health` and tool calls fail within 2s.
+- Each instance still owns its MCP transport sessions: put instances behind a load balancer that pins
+  `Mcp-Session-Id` to the instance that issued it.
+- For AWS (ElastiCache / MemoryDB): use a `rediss://` URL with credentials for TLS + auth. The store
+  uses only single-key commands and scripts, so it is compatible with cluster mode, but a
+  cluster-mode-enabled endpoint needs Spring's cluster settings (`spring.data.redis.cluster.nodes`)
+  rather than just the URL. IAM-token auth (short-lived tokens) is not wired up.
+- `RedisSessionStoreTest` runs against `REDIS_URL` and is **skipped** when no Redis answers, so a green
+  build without Redis running has not exercised the Redis store.
+
 stdio transport (subprocess of a desktop MCP host):
 ```bash
 java -jar .../tax-advisor-0.0.1-SNAPSHOT.jar --spring.profiles.active=stdio

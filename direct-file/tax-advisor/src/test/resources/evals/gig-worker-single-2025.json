@@ -5,7 +5,9 @@
   "steps": [
     {
       "tool": "calculate_se_tax",
-      "args": { "grossReceipts": "60000" },
+      "args": {
+        "grossReceipts": "60000"
+      },
       "expect": {
         "netProfit": 60000,
         "netEarningsFromSe": 55410,
@@ -15,17 +17,23 @@
     },
     {
       "tool": "calculate_additional_medicare",
-      "args": { "medicareWagesFromW2": "0" },
-      "expect": { "additionalMedicareTax": 0 }
+      "args": {
+        "medicareWagesFromW2": "0"
+      },
+      "expect": {
+        "additionalMedicareTax": 0
+      }
     },
     {
       "tool": "estimate_qbi_deduction",
-      "args": { "netCapitalGains": "0" },
+      "args": {
+        "netCapitalGains": "0"
+      },
       "expect": {
         "qualifiedBusinessIncome": 55761,
         "qbiComponent": 11152,
-        "qbiIncomeLimit": 8152,
-        "qbiDeduction": 8152,
+        "qbiIncomeLimit": 8002,
+        "qbiDeduction": 8002,
         "aboveThreshold": false
       }
     },
@@ -34,8 +42,8 @@
       "args": {},
       "expect": {
         "adjustedGrossIncome": 55761,
-        "qbiDeduction": 8152,
-        "taxableIncome": 32609,
+        "qbiDeduction": 8002,
+        "taxableIncome": 32009,
         "selfEmploymentTax": 8478
       }
     }

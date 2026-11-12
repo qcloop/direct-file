@@ -3,10 +3,14 @@ package com.realworld.tax.advisor.graph;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -80,6 +84,7 @@ public class PlanningGraphService {
 
     private FactDictionary dictionary;
     private TaxDictionaryDigest digest;
+    private String knowledgeVersion;
 
     private final SessionStore sessions;
 
@@ -108,8 +113,14 @@ public class PlanningGraphService {
             throw new IllegalStateException("No fact XML resources found for patterns " + properties.factXmlPatterns());
         }
 
+        String beforeLoad = fingerprint(all);
         this.digest = new XmlProcessor().process("combined", all.toArray(new Resource[0]));
         this.dictionary = new FactGraphLoader().createFactDictionary(digest);
+        this.knowledgeVersion = fingerprint(all);
+        if (!beforeLoad.equals(knowledgeVersion)) {
+            throw new IllegalStateException(
+                    "Fact-graph XML changed during startup. Restart with immutable runtime resources.");
+        }
         log.info(
                 "Planning fact dictionary loaded: {} facts across {} patterns",
                 digest.getFacts().size(),
@@ -142,10 +153,10 @@ public class PlanningGraphService {
         // parameters, so we never create a session that silently uses another year's values.
         List<TaxParameter> params = taxKnowledge.taxParametersForYear(taxYear);
         Map<String, FactTypeWithItem> facts = new LinkedHashMap<>();
-        addYearParameters(facts, params, status);
+        addYearParameters(facts, params, status, taxYear);
         addZeroDefaultedOptionalIncome(facts);
         buildGraph(id, facts).save();
-        return new SessionSnapshot(taxYear, status, facts, Map.of());
+        return new SessionSnapshot(taxYear, status, facts, Map.of(), knowledgeVersion);
     }
 
     /**
@@ -154,12 +165,51 @@ public class PlanningGraphService {
      * session whose filing status matches; status-agnostic parameters always are.
      */
     private void addYearParameters(
-            Map<String, FactTypeWithItem> facts, List<TaxParameter> params, FilingStatus status) {
+            Map<String, FactTypeWithItem> facts, List<TaxParameter> params, FilingStatus status, int taxYear) {
         for (TaxParameter p : params) {
             if (status.appliesTo(p.filingStatus())) {
                 PersisterTypes.TypedValue typed = PersisterTypes.forParameter(p.type(), p.value(), p.factPath());
-                facts.put(p.factPath(), fact(typed.typeCode(), typed.value()));
+                if (facts.putIfAbsent(p.factPath(), fact(typed.typeCode(), typed.value())) != null) {
+                    throw new IllegalArgumentException("Overlapping tax parameters for " + p.factPath()
+                            + " in income year " + taxYear + " / " + status.code());
+                }
             }
+        }
+        // A partially copied year must fail at session creation, before any tool can claim a result.
+        List<String> required = new ArrayList<>(List.of(
+                FactPaths.STANDARD_MILEAGE_RATE,
+                "/socialSecurityWageBase",
+                "/seFilingThreshold",
+                "/highIncomeSafeHarborThreshold",
+                "/seSocialSecurityRate",
+                "/seMedicareRate",
+                "/seWageMultiplier",
+                "/additionalMedicareRate",
+                FactPaths.ADDITIONAL_MEDICARE_THRESHOLD,
+                "/qbiRate",
+                FactPaths.QBI_THRESHOLD,
+                FactPaths.QBI_MINIMUM_DEDUCTION,
+                FactPaths.QBI_MINIMUM_INCOME,
+                FactPaths.SE_MILEAGE_SPLIT_RATE,
+                FactPaths.SE_MILEAGE_CHANGE_MONTH,
+                FactPaths.STANDARD_DEDUCTION,
+                "/planning/highIncomeSafeHarborRate",
+                "/planning/currentYearSafeHarborRate"));
+        for (int bracket = 1; bracket <= 7; bracket++) {
+            required.add("/incomeTax/bracket" + bracket + "Rate");
+            if (bracket < 7) {
+                required.add("/incomeTax/bracket" + bracket + "Ceiling");
+            }
+        }
+        if (facts.containsKey(FactPaths.SE_MILEAGE_SPLIT_RATE)
+                && facts.get(FactPaths.SE_MILEAGE_SPLIT_RATE).item().asBoolean()) {
+            required.add(FactPaths.STANDARD_MILEAGE_RATE_AFTER_CHANGE);
+        }
+        List<String> missing =
+                required.stream().filter(path -> !facts.containsKey(path)).toList();
+        if (!missing.isEmpty()) {
+            throw new IllegalArgumentException("Incomplete tax parameters for income year " + taxYear + " / "
+                    + status.code() + ": " + String.join(", ", missing) + ". Install the complete knowledge release.");
         }
     }
 
@@ -204,7 +254,7 @@ public class PlanningGraphService {
                 facts.put(path, fact);
             }
         });
-        sessions.create(id, new SessionSnapshot(source.taxYear(), filingStatus, facts, Map.of()));
+        sessions.create(id, new SessionSnapshot(source.taxYear(), filingStatus, facts, Map.of(), knowledgeVersion));
         return id;
     }
 
@@ -215,6 +265,31 @@ public class PlanningGraphService {
 
     public int taxYearOf(SessionId sessionId) {
         return require(sessionId).snapshot().taxYear();
+    }
+
+    public String knowledgeVersionOf(SessionId sessionId) {
+        return require(sessionId).snapshot().knowledgeVersion();
+    }
+
+    private String fingerprint(List<Resource> resources) throws IOException {
+        try {
+            MessageDigest hash = MessageDigest.getInstance("SHA-256");
+            hash.update(taxKnowledge.version().getBytes(StandardCharsets.UTF_8));
+            // Content digests, rather than classpath URLs, keep the identity stable across hosts.
+            List<String> xmlHashes = new ArrayList<>();
+            for (Resource resource : resources) {
+                try (var input = resource.getInputStream()) {
+                    xmlHashes.add(HexFormat.of()
+                            .formatHex(MessageDigest.getInstance("SHA-256").digest(input.readAllBytes())));
+                }
+            }
+            for (String xmlHash : xmlHashes.stream().sorted().toList()) {
+                hash.update(xmlHash.getBytes(StandardCharsets.UTF_8));
+            }
+            return HexFormat.of().formatHex(hash.digest());
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 is unavailable", e);
+        }
     }
 
     public String filingStatusOf(SessionId sessionId) {
@@ -261,6 +336,12 @@ public class PlanningGraphService {
         FactTypeWithItem fact = fact(typeCode, rawValue);
         for (int attempt = 0; attempt < MAX_UPDATE_ATTEMPTS; attempt++) {
             SessionStore.Stored current = require(sessionId);
+            if (taxKnowledge.taxParametersForYear(current.snapshot().taxYear()).stream()
+                    .anyMatch(parameter -> parameter.factPath().equals(path))) {
+                throw new IllegalArgumentException(
+                        "Tax parameter " + path + " is fixed by this session's knowledge release. "
+                                + "It cannot be overwritten with taxpayer or agent input.");
+            }
             SessionSnapshot updated = current.snapshot().withFact(path, fact);
             boolean ok = (boolean) buildGraph(sessionId, updated.facts()).save()._1();
             if (sessions.replace(sessionId, current, updated)) {
@@ -458,10 +539,16 @@ public class PlanningGraphService {
     }
 
     private SessionStore.Stored require(SessionId id) {
-        return sessions.find(id)
+        SessionStore.Stored stored = sessions.find(id)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown or expired planning session: " + id
                         + ". Sessions expire when idle and may not survive a service restart; "
                         + "call create_session to start a new one, then re-enter the facts."));
+        if (!knowledgeVersion.equals(stored.snapshot().knowledgeVersion())) {
+            throw new IllegalArgumentException("This session belongs to a different tax-knowledge release. "
+                    + "Call create_session for income year " + stored.snapshot().taxYear()
+                    + " and re-enter the facts so calculations and citations use the same release.");
+        }
+        return stored;
     }
 
     private static IllegalStateException contended(SessionId id) {

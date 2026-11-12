@@ -138,6 +138,9 @@ def parse_pages(text: str) -> list[Page]:
 
 
 def normalize_page_text(text: str) -> str:
+    # PDF font/control artifacts are not legal YAML scalars. Normalize before hashing,
+    # so the saved citation text and its digest describe exactly the same content.
+    text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", " ", text)
     lines = [line.rstrip() for line in text.replace("\r\n", "\n").replace("\r", "\n").split("\n")]
     compacted: list[str] = []
     blank = False
@@ -228,7 +231,7 @@ def detect_heading(paragraph: str) -> str | None:
 
 
 def source_id_for_entry(entry: dict[str, Any], tax_year: int) -> str:
-    return f"irs_{entry['product_id']}_{tax_year}"
+    return entry.get("source_id") or f"irs_{entry['product_id']}_{tax_year}"
 
 
 def segment_manifest(args: argparse.Namespace) -> list[pathlib.Path]:
@@ -253,9 +256,15 @@ def segment_manifest(args: argparse.Namespace) -> list[pathlib.Path]:
                 "source_id": enriched["source_id"],
                 "product_id": enriched["product_id"],
                 "tax_year": args.tax_year,
+                "source_revision_year": enriched.get("revision_year"),
+                "document_status": enriched.get("document_status", "unverified"),
+                "applicable_tax_years": enriched.get("applicable_tax_years", [args.tax_year]),
                 "title": enriched.get("description"),
                 "source_url": enriched["url"],
-                "pdf_sha256": enriched.get("sha256"),
+                "pdf_sha256": enriched.get("sha256") if enriched.get("document_format", "pdf") == "pdf" else None,
+                "source_sha256": enriched.get("sha256"),
+                "document_format": enriched.get("document_format", "pdf"),
+                "agency": enriched.get("agency", "IRS"),
                 "text_path": str(text_path),
                 "generated_at": dt.datetime.now(dt.UTC).isoformat(),
                 "chunking": {"max_words": args.max_words},

@@ -17,15 +17,12 @@ is resolved, delete it (git history keeps the record).
 
 - **QBI is the simple method only (Form 8995).** Above the filing-status threshold, Form 8995-A
   (SSTB / W-2-wage / UBIA limits) governs; the tool returns an upper bound and flags it. Not modeled:
-  the 8995-A limits, the phase-in range between threshold and threshold+range, and the 2026 OBBBA
-  changes (expanded phase-in, $400 minimum-deduction floor).
+  the 8995-A limits and the expanded 2026 phase-in range. The eligible 2026 $400 minimum is now
+  modeled with an explicit material-participation answer; unknown eligibility stays unknown.
 - **QBI base omits SE health-insurance and SE-retirement deductions** (not modeled), so QBI is a
   slight overestimate when those apply. QBI here = net profit − deductible ½ SE tax only.
-- **2026 QBI thresholds are `provisional`** (Rev. Proc. 2025-32) — confirm against the final 2026
-  Form 8995.
-- **Filing status supports single / mfj / mfs only.** HoH and QSS aren't first-class; for the
-  provisions modeled so far they share the "single" thresholds (correct for §3101(b)(2) Additional
-  Medicare; verify per-provision before relying on it for new features).
+- **Filing status supports single / mfj / mfs only.** HoH and QSS are rejected; their standard
+  deductions and ordinary brackets must not be approximated by single.
 - **Single consolidated Schedule C** (one SE business). Multi-business is additive (Collection +
   re-rolled sums).
 - **Annualization is straight-line** (12 ÷ months) — seasonal income will differ.
@@ -35,9 +32,34 @@ is resolved, delete it (git history keeps the record).
   the AMT, and itemized deductions; it always assumes the standard deduction. Income besides the
   Schedule C is a single agent-supplied `/planning/otherTaxableIncome` (e.g. W-2 box 1), not a modeled
   W-2 with its own withholding. So `projectedCurrentYearTax` is a planning estimate, not a 1040 line 22/24.
-- **2026 ordinary brackets + standard deduction are `provisional`** (Rev. Proc. 2025-32, post-OBBBA) —
-  confirm against the final 2026 figures. 2024/2025 are final (Rev. Procs. 2023-34 / 2024-40), but the
-  2025 standard deduction here is the Rev. Proc. baseline; verify any OBBBA mid-year adjustment.
+- **2026 release awaits human tax/content/engineering review.** Its values are verified against
+  pinned final sources, but artifacts remain draft and require the explicit `preview` profile. See
+  `direct-file/tax-knowledge/reviews/federal/2026/README.md`. The default profile rejects drafts.
+- **Legacy 2025 source YAML contains PDF control artifacts.** Structural provenance validation
+  exposes invalid YAML in some old generated chunks. Re-segment and review those sources before
+  seeking a global provenance pass; the 2026 corpus normalizes controls before hashing.
+- **Special deductions are not modeled.** Qualified tips, overtime, senior/car-loan deductions,
+  and the 2026 non-itemizer charitable deduction remain outside the ordinary-income model.
+- **Future income years need reviewed releases.** The clock advances automatically, but a year
+  without complete released parameters is refused; it never falls back to stale law.
+
+## tax-advisor — session state
+
+- **The MCP transport session is still per-instance.** Redis shares planning sessions, not Spring AI's
+  `Mcp-Session-Id` state, so multi-instance deployments still need session-pinned routing. spring-ai
+  2.0.2 ships a stateless server mode (`McpServerStatelessAutoConfiguration`) that would remove this;
+  not evaluated.
+- **One store round trip per fact read.** A tool that reads a dozen facts loads the session from Redis a
+  dozen times (and rebuilds the graph each time, as before). Fine locally; if latency to a remote Redis
+  matters, load the snapshot once per tool call and read every fact from it.
+- **The in-memory store never evicts.** Only the Redis store has an idle timeout; a long-running
+  single instance on the default profile still accumulates sessions until restart.
+- **AWS readiness is partial.** TLS/auth via the URL works with Spring's stock support; cluster-mode
+  endpoints need extra config, IAM-token auth is not implemented, and nothing here has been run against
+  ElastiCache/MemoryDB. On a Redis shared with other apps, its eviction policy can drop sessions before
+  the idle timeout (behaves as an early expiry).
+- **Redis tests need a Redis.** `RedisSessionStoreTest` skips when `REDIS_URL` is unreachable; CI should
+  provide one (the repo's compose file already defines a `redis` service) or the store goes untested.
 
 ## Harness / process (from the harness-engineering adoption)
 

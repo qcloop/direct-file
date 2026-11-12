@@ -2,16 +2,19 @@ parameter_set_id: estimated_tax_parameters_ty2026
 tax_year: 2026
 jurisdiction: federal
 topic_id: estimated_tax
-status: published
+status: draft
 source_ids:
   - irs_form_1040_es_2026
   - irc_6654
 description: >
-  Year-indexed IRC §6654 estimated-tax safe-harbor percentages. Merged with the other
-  *-tax-parameters.yaml for this year by the topic-agnostic loader and injected into the
-  session fact graph at the given fact_path. These percentages are statutory and do not vary by
-  year, so this set is published; only the self-employment set's dollar figures are provisional
-  for 2026.
+  Statutory estimated-tax safe-harbor percentages verified against final 2026 Form 1040-ES.
+  Draft pending tax review together with the complete 2026 planning release.
+source_refs:
+- source_id: irs_form_1040_es_2026
+  chunk_id: irs_form_1040_es_2026_chunk_0001
+  pages:
+  - 1
+  text_sha256: 7cd45b5ef5ff0d5306ac070f94750011d7dbffe2dec8f47b0f37493da33c3f87
 parameters:
   - fact_path: /planning/highIncomeSafeHarborRate
     name: High-income prior-year safe-harbor rate

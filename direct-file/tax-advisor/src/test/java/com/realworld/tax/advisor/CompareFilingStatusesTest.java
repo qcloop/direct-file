@@ -44,8 +44,9 @@ class CompareFilingStatusesTest {
     void seTaxIsConstantWhileIncomeTaxFallsWithTheHigherStandardDeduction() {
         // Transcript scenario: delivery driver, ~6 months of data, $16,785 gross, 8,700 miles, TY2026.
         String s = sessionTools.createSession("2026", "single").sessionId();
-        selfEmploymentTools.projectNetProfit(s, "2026-06-30", "16785", "8700", null, null, null);
+        selfEmploymentTools.projectNetProfit(s, "2026-06-30", "16785", "8700", null, null, null, null, null);
 
+        taxProjectionTools.estimateQbiDeduction(s, null, true); // taxpayer confirms material participation
         var r = taxProjectionTools.compareFilingStatuses(s);
         assertThat(r.status()).isEqualTo("ok");
         assertThat(r.projections())

@@ -30,7 +30,7 @@ class TaxKnowledgePlanningIntegrationTest {
     void documentEvidenceProducesCandidateFactsAndConflictReviewItems() {
         Object result = interviewTools.planQuestions(
                 null,
-                null,
+                2025,
                 null,
                 Map.of("/hasSelfEmploymentIncome", Map.of("value", false, "status", "confirmed")),
                 List.<Object>of(Map.of("document_type", "form_1099_nec", "nonemployee_compensation", "12000")),
@@ -62,7 +62,7 @@ class TaxKnowledgePlanningIntegrationTest {
     void priorAnswersGateDetailQuestions() {
         Object result = interviewTools.planQuestions(
                 null,
-                null,
+                2025,
                 null,
                 Map.of(
                         "/hasSelfEmploymentIncome", Map.of("value", true, "status", "confirmed"),

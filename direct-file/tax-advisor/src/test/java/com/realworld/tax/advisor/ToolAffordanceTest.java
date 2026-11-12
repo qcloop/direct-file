@@ -61,7 +61,7 @@ class ToolAffordanceTest {
         // No SE inputs yet — both tools should say so rather than return a misleading zero silently.
         assertThat(taxProjectionTools.projectTotalTax(s, null, null).note())
                 .contains("calculate_se_tax", "project_net_profit");
-        assertThat(taxProjectionTools.estimateQbiDeduction(s, null).note())
+        assertThat(taxProjectionTools.estimateQbiDeduction(s, null, null).note())
                 .contains("calculate_se_tax", "project_net_profit");
     }
 }

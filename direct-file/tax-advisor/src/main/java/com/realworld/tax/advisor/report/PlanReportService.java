@@ -112,7 +112,14 @@ public class PlanReportService {
 
         String generatedAt = Instant.now().truncatedTo(ChronoUnit.SECONDS).toString();
         String body = renderBody(new ReportContext(
-                sessionId, taxYear, generatedAt, inputPaths, graph.sourceNotes(sessionId), params, includeCitations));
+                sessionId,
+                taxYear,
+                generatedAt,
+                graph.knowledgeVersionOf(sessionId),
+                inputPaths,
+                graph.sourceNotes(sessionId),
+                params,
+                includeCitations));
         String sha256 = sha256Hex(body);
         String markdown = body + INTEGRITY_DELIMITER + renderIntegrity(sha256);
         return new PlanReport(markdown, sha256, generatedAt, taxYear);
@@ -124,6 +131,12 @@ public class PlanReportService {
         Set<String> citedSourceIds = new LinkedHashSet<>();
 
         appendHeader(sb, ctx);
+        String releaseWarning = taxKnowledge.provisionalWarning(ctx.taxYear());
+        if (releaseWarning != null && releaseWarning.startsWith("PREVIEW:")) {
+            sb.append("> **Draft release awaiting tax review.** ")
+                    .append(releaseWarning)
+                    .append("\n\n");
+        }
         appendProvisionalBanner(sb, ctx);
         appendInputs(sb, ctx);
         appendParameters(sb, ctx, citedSourceIds);
@@ -139,6 +152,9 @@ public class PlanReportService {
                 .append(ctx.taxYear())
                 .append(" (federal)\n\n");
         sb.append("Generated (UTC): ").append(ctx.generatedAt()).append("\n\n");
+        sb.append("Knowledge and graph version (SHA-256): ")
+                .append(ctx.knowledgeVersion())
+                .append("\n\n");
         sb.append("> **This is a planning estimate, not a filed tax return.** The figures below are\n")
                 .append("> based on values you provided. Those values are **self-reported and have not been\n")
                 .append("> verified** against source documents (1099s, bank records, mileage logs); this\n")
@@ -395,6 +411,7 @@ public class PlanReportService {
             SessionId sessionId,
             int taxYear,
             String generatedAt,
+            String knowledgeVersion,
             List<String> inputPaths,
             Map<String, String> sourceNotes,
             List<TaxParameter> params,

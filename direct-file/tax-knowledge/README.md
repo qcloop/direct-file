@@ -131,3 +131,28 @@ python3 tax-knowledge/tools/validate_artifact_provenance.py \
   --root tax-knowledge \
   --sources-dir tax-knowledge/sources/irs/2025
 ```
+
+## Annual refresh and current-year planning
+
+The MCP server defaults to the current **income calendar year**, read from its own
+configurable clock. A 2026 session plans 2026 income throughout 2026. Interview artifacts
+follow that session year; explicit prior-year planning remains possible when supported.
+
+The [2026 review packet](reviews/federal/2026/README.md) links the source inventory,
+change register, scenarios, release manifest, validation commands, and promotion steps.
+The refresh uses final annual guidance and enacted law as they become available during
+the year; it does not wait for every year-end publication to be revised. Older publications
+require explicit applicability review. Draft IRS instructions are discovery inputs only.
+
+Install `tools/requirements.txt` in a virtual environment for structural YAML provenance
+validation and release packaging. The validator also recognizes legacy `published` status
+and checks actual source/chunk ownership, pages, and text hashes. Use `--tax-year 2026`
+with `--sources-dir tax-knowledge/sources/irs/2026` to validate this release independently
+of unresolved legacy source-format issues.
+
+`tools/check_source_updates.py` compares pinned document hashes and IRS discovery pages
+without changing an approved baseline. The weekly/on-demand GitHub workflow saves review
+reports and content-addressed observations; a detected change requires review. It does
+not approve artifacts or deploy a release. `tools/build_knowledge_release.py` creates a
+deterministic draft review ZIP containing artifact/graph hashes and exact raw source
+snapshots. Human approvals remain an explicit release step.

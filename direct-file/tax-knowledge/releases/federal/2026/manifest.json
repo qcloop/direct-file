@@ -1,0 +1,331 @@
+{
+  "artifacts": [
+    {
+      "path": "changes/federal/2026/2025-to-2026.yaml",
+      "sha256": "fa3e0bc1b519781d559cb45bb7d606517be41308da86a6d1708a4c9dfab43c9b"
+    },
+    {
+      "path": "conflicts/federal/2026/document-answer-conflicts.yaml",
+      "sha256": "3c8487dc6c1c1c2a9b3f8adb78128266721d10a1fcfcd8f0481f8ac84fb70926"
+    },
+    {
+      "path": "corpora/irs-2026/active-pdf-manifest.json",
+      "sha256": "7702024f50788d4d09633f2307efd34007aa1bb43bdb0d1519b8d0816e972a80"
+    },
+    {
+      "path": "corpora/irs-2026/downloads/f1040es.pdf",
+      "sha256": "396ffad25baa737b33a67d27624f7444be3ac4e7245d287aebe5f89864f90b54"
+    },
+    {
+      "path": "corpora/irs-2026/downloads/i1040sc.pdf",
+      "sha256": "b5536db91498a450572e37078d7d5ee8fdc400e385d4fee3a26c230a33e399b6"
+    },
+    {
+      "path": "corpora/irs-2026/downloads/i1040sse.pdf",
+      "sha256": "7054fa6c86d893018f69d15f461430a58a1ee3759e817de660ef6cdfe84dc2c0"
+    },
+    {
+      "path": "corpora/irs-2026/downloads/i8959.pdf",
+      "sha256": "1d223be73b4bac959a00e9b55784297bafa73a986567987c083671abf687b68f"
+    },
+    {
+      "path": "corpora/irs-2026/downloads/i8995.pdf",
+      "sha256": "875843baead68f6fa9aa7c3f6f27d6c1f37cb971ac334bcf414acdb4c1487684"
+    },
+    {
+      "path": "corpora/irs-2026/downloads/irb26-29.pdf",
+      "sha256": "ba14ab76bf382cad90b7feb20fc443c4bda5e3743878fb4f6b2d79b8c8ef18cd"
+    },
+    {
+      "path": "corpora/irs-2026/downloads/n-26-10.pdf",
+      "sha256": "8fdda8f02245c38134e08fca50238732c74b0ae693c408252dedf96623d4977a"
+    },
+    {
+      "path": "corpora/irs-2026/downloads/p334.pdf",
+      "sha256": "722639ba7bfd6f5348234b58d21e1afd8cb0c04895138bd5c4539142dde6c60a"
+    },
+    {
+      "path": "corpora/irs-2026/downloads/p463.pdf",
+      "sha256": "ddc3bb15e437bd65c37da2036debdae78c1a0bf5a080b19d5301c81f5ec5ae5d"
+    },
+    {
+      "path": "corpora/irs-2026/downloads/p505.pdf",
+      "sha256": "c69e87caa93cdefa4493f0ec1d8478b1ff9ec1329ee18c7b9d442f2dcb79c621"
+    },
+    {
+      "path": "corpora/irs-2026/downloads/rp-25-32.pdf",
+      "sha256": "e9ada115fb43a4af5ea326ca91edd40ab0bf29b9be01d2c13d7b8fa96214635b"
+    },
+    {
+      "path": "corpora/irs-2026/downloads/usc26-section1401.html",
+      "sha256": "a1b23089917d3c60e41dacf1e5326819c4ef7e1028b5e5a6ee88599e36a82186"
+    },
+    {
+      "path": "corpora/irs-2026/downloads/usc26-section199A.html",
+      "sha256": "7292dac7f3c1b4e68cd6e8b9b548ddadbe375d92a347a282ec5f5759ae2144b9"
+    },
+    {
+      "path": "corpora/irs-2026/pdf-manifest.json",
+      "sha256": "8f11e61a5a6cfbf4b285b92589772bb04db2a722c6775db1568b3e724c5a3e3e"
+    },
+    {
+      "path": "corpora/irs-2026/source-catalog.json",
+      "sha256": "c3495eabbe55963ee9b1e1d27533184a6c3ee2f506975695e06487ee8b32b4e2"
+    },
+    {
+      "path": "corpora/irs-2026/source-manifest.json",
+      "sha256": "093b20eafca4fcd383fba06adb3873c0cf07ff8bedb1a2da04569d76abd5ee6d"
+    },
+    {
+      "path": "corpora/irs-2026/statute-manifest.json",
+      "sha256": "2284f72051f3c17fbe0c6cacb781b70740e3afdcb6524b08184d7d3848162c94"
+    },
+    {
+      "path": "evidence/federal/2026/document-signals.yaml",
+      "sha256": "5a9b25b88f15d9edf9417948d1a3275b1b5150f968f3da660e9407ae34f2bc96"
+    },
+    {
+      "path": "questions/federal/2026/gateway-questions.yaml",
+      "sha256": "c2cdb574c1c15e9846d1f79feea315065d0916fd7c40bd64a5ae01da2cef6316"
+    },
+    {
+      "path": "reviews/federal/2026/README.md",
+      "sha256": "5ad5b51eff833b0c23b08164a72480a5c83225c57999720eff998f65a0714c62"
+    },
+    {
+      "path": "rules/federal/2026/estimated-tax-parameters.yaml",
+      "sha256": "fdb00b9ee204c5cff968a18568be70f133b22eb88c73cdadc426bcf1c6181819"
+    },
+    {
+      "path": "rules/federal/2026/income-tax-parameters.yaml",
+      "sha256": "1e3602834b586ad3d3e7caddedb055375c5c211d5cb81df406dae130cd4c35bc"
+    },
+    {
+      "path": "rules/federal/2026/self-employment-tax-parameters.yaml",
+      "sha256": "b63b4c28742e1ee7e6cecf77c63f5458200c6cc9523a0d5a2e3b5ed72a928a66"
+    },
+    {
+      "path": "scenarios/federal/2026/mileage_2026_march_projection.yaml",
+      "sha256": "afd6c467a3e1fe18af8437141bc52648f4c5d6f27ebb74f06b60bc07adc3c60e"
+    },
+    {
+      "path": "scenarios/federal/2026/qbi_2026_active_minimum_boundary.yaml",
+      "sha256": "17148cde70fa46953439a767e8c79e5cb40f584b2fcb77be18bc11f50b39f837"
+    },
+    {
+      "path": "scenarios/federal/2026/se_2026_split_mileage_actuals.yaml",
+      "sha256": "9906af76a016c5a1bee9c09019d2a8f834e6e7a7cfdf2d8ccfd524e631081fb1"
+    },
+    {
+      "path": "sources/federal/citations.yaml",
+      "sha256": "d3551c0bc346a5d7906f261e0601a96f71f7433c0ceca8d8a07ec304f024e680"
+    },
+    {
+      "path": "sources/irs/2026/irc_1401_2026_snapshot.yaml",
+      "sha256": "884c77b13280f5b8571afe95a9251f86fbbf479e945cc8753d1af10c3c597452"
+    },
+    {
+      "path": "sources/irs/2026/irc_199a_2026_snapshot.yaml",
+      "sha256": "a1aebae6e4b9dae6fd263239f3e9539456e4c12089074875bcd45e40e462091a"
+    },
+    {
+      "path": "sources/irs/2026/irs_announcement_2026_11.yaml",
+      "sha256": "5b58fc0129376994f9e1a1b017a1c2cbe593a890bc0d72ac19caae35405558df"
+    },
+    {
+      "path": "sources/irs/2026/irs_form_1040_es_2026.yaml",
+      "sha256": "c84873a649936d3748bf456f3bcfa33b9639feed61ab3111c6b05f649d321ed0"
+    },
+    {
+      "path": "sources/irs/2026/irs_instruction_1040_schedule_se_2026.yaml",
+      "sha256": "1c038377cefd0dfeeb5bbb1da135fef31f8f3e4aaf02d79f002b6e15ba6c5100"
+    },
+    {
+      "path": "sources/irs/2026/irs_notice_2026_10.yaml",
+      "sha256": "d1c96e813c5ce59760f69d9c536b69b01ef1687ac1cae7fbb7ea4afd9562a7ca"
+    },
+    {
+      "path": "sources/irs/2026/irs_pub_505_2026.yaml",
+      "sha256": "cc12a9ec1dde6ea4a62431af8411b7b8824d86d48a6b6007ebfdc3aee87c4685"
+    },
+    {
+      "path": "sources/irs/2026/irs_rev_proc_2025_32.yaml",
+      "sha256": "3ab6bc1879705f466c0687d7e839c5acdf00d26308b7bfe9195b7da7c2cbd5a8"
+    }
+  ],
+  "content_sha256": "3915547d1d9be2103b3e95991cd1123fea1faa3630046c7711b3d3d08b49ec76",
+  "human_approvals": [],
+  "jurisdiction": "federal",
+  "limitations": [
+    "Form 8995-A limits and phase-in calculations are not modeled; QBI above threshold is an upper bound",
+    "Credits, preferential capital-gains rates, itemized deductions, NIIT, AMT, and special personal deductions are not modeled",
+    "Only single, MFJ, and MFS are supported",
+    "Monthly projections assume even income within their observation periods"
+  ],
+  "release_id": "federal-2026-3915547d1d9be210",
+  "required_reviewers": [
+    "tax_specialist",
+    "engineering_owner",
+    "content_owner"
+  ],
+  "runtime_graph_files": [
+    {
+      "path": "backend/src/main/resources/tax/cdcc.xml",
+      "sha256": "bc6992b545ed0795e954fd0535fcb01d0e4336660109c4711a30fd7c1c563cdc"
+    },
+    {
+      "path": "backend/src/main/resources/tax/constants.xml",
+      "sha256": "bd5a77b23c36bc49b7cc086d6160912fe3b08a4e1da78d1170848fa74647eda0"
+    },
+    {
+      "path": "backend/src/main/resources/tax/copy.xml",
+      "sha256": "fe1874bab371646c8dddbaf57bb339da77808bea9fab684cb1c5c6661a25dccf"
+    },
+    {
+      "path": "backend/src/main/resources/tax/ctcOdc.xml",
+      "sha256": "d9c8a94d04e1807c74fcf909abe786956d92c4e83a16bdd97adf3e396e934cd8"
+    },
+    {
+      "path": "backend/src/main/resources/tax/dependentsBenefitSplit.xml",
+      "sha256": "39a5efee2413104b092cbc53c5992ebeefc334c11dce3c8c5de5094c588d6820"
+    },
+    {
+      "path": "backend/src/main/resources/tax/dependentsRelationship.xml",
+      "sha256": "566dc83287293686aa830c3423a19dbed5531ca36888b8d4f473fbd60271433a"
+    },
+    {
+      "path": "backend/src/main/resources/tax/educatorAdjustment.xml",
+      "sha256": "c685f34d9630489ce7f0b0dbf22848bf46611dafa39c04df5113e51fbe5b9b12"
+    },
+    {
+      "path": "backend/src/main/resources/tax/eitc.xml",
+      "sha256": "85e85e0bf107132453f24414a1f9a0a29d8f74d6687f710c5c6895838ddccab9"
+    },
+    {
+      "path": "backend/src/main/resources/tax/elderlyAndDisabled.xml",
+      "sha256": "da4371f138fbdcdcee855dd114a63d6332795d4dc08e7d3e82b873a6582548e7"
+    },
+    {
+      "path": "backend/src/main/resources/tax/estimatedPayments.xml",
+      "sha256": "9b2a00fbd6d572aee9746a42ca385c1a52011d28db86f8434765e86303e027ea"
+    },
+    {
+      "path": "backend/src/main/resources/tax/familyAndHousehold.xml",
+      "sha256": "ac77c15aab91f9cf3e7c53304b28b4c6615cb73c8c433f07c260d4afe7cb10af"
+    },
+    {
+      "path": "backend/src/main/resources/tax/filers.xml",
+      "sha256": "fd40e89d3547e0220b205b591728e12327d31cbd20ed46d3bea137c8f04fe754"
+    },
+    {
+      "path": "backend/src/main/resources/tax/filingStatus.xml",
+      "sha256": "df224d1b67e13a9b733eafcc91239161bd8e727e661dfbef872a6c78ea65afa2"
+    },
+    {
+      "path": "backend/src/main/resources/tax/flow.xml",
+      "sha256": "947670f4a7a3ea740aec79825a7a4b30f890b5a0d865dd483d83f101dc8ba86a"
+    },
+    {
+      "path": "backend/src/main/resources/tax/form1099Misc.xml",
+      "sha256": "31743c12f6b1158d855bed7e79d0903df51f922c65d616f71e07fa07c7bae33e"
+    },
+    {
+      "path": "backend/src/main/resources/tax/form1099Rs.xml",
+      "sha256": "e60ed3dc4ddf018e7d99fedafb8329a6608f4cb476115f74ed5d0347f642d74b"
+    },
+    {
+      "path": "backend/src/main/resources/tax/formW2s.xml",
+      "sha256": "132af792a325df746af291d445e09b9529d87faa2f724ef4388ec0f73ca21f3d"
+    },
+    {
+      "path": "backend/src/main/resources/tax/hsa.xml",
+      "sha256": "4589d8cc2070dc30dc6a7c3771291d84be3df76ca26ff921179f222334431207"
+    },
+    {
+      "path": "backend/src/main/resources/tax/imported.xml",
+      "sha256": "9acbffa2775dd3e70e086c063b1e5915c595f07ed18b8e8ab56f852ad12f3de9"
+    },
+    {
+      "path": "backend/src/main/resources/tax/income.xml",
+      "sha256": "cdad1e76bcd1500ae7b43cda3b00ecf484b622f2df9cc5b3f6baa1e67fcb538f"
+    },
+    {
+      "path": "backend/src/main/resources/tax/interest.xml",
+      "sha256": "e9027f46350e8553b309ac1b4a6bfb985fce13620bfd5c2805aedbc1f876edd9"
+    },
+    {
+      "path": "backend/src/main/resources/tax/mefTypes.xml",
+      "sha256": "741383ff9143ef346dbe253e6263b957f41706ce9af6e79a648bffc588136bd4"
+    },
+    {
+      "path": "backend/src/main/resources/tax/paymentMethod.xml",
+      "sha256": "6a3f83b843c8299115c77e97a7d8166d26b1af3343bde93b7756c78b1c87b12d"
+    },
+    {
+      "path": "backend/src/main/resources/tax/ptc.xml",
+      "sha256": "e2ddd2851bdcc0be194bd925845dfa30c9fdd1650d3655188c7aaa8d0928e780"
+    },
+    {
+      "path": "backend/src/main/resources/tax/refundPrefs.xml",
+      "sha256": "d1560e468d946e21d4781b21878277cabdf9282f6a238e13c596912d397b3d43"
+    },
+    {
+      "path": "backend/src/main/resources/tax/saversCredits.xml",
+      "sha256": "0788660d2ab4ed2dd8fec48fc503eb9e082ad2e7e0ade718cc2d161540cf6ee8"
+    },
+    {
+      "path": "backend/src/main/resources/tax/schedule2.xml",
+      "sha256": "6e10d30ff88bedb2e7afec4d9218fe5197dee3859e2a0ee9dd1d9fff764d04ae"
+    },
+    {
+      "path": "backend/src/main/resources/tax/schedule3.xml",
+      "sha256": "b447da06e42631ac62b482e59a35984e8593603d4e3c3acf0979cd2012a7a3af"
+    },
+    {
+      "path": "backend/src/main/resources/tax/signing.xml",
+      "sha256": "9cc564bd78ebeb43e518c8dc8a4b484b23fa7fe7b1f91f26f3f86cd94248f5bd"
+    },
+    {
+      "path": "backend/src/main/resources/tax/socialSecurity.xml",
+      "sha256": "e281e8a75c460f6df6a9c23b61c7cec79e38410f928c9f25c2b80f6daf28b07a"
+    },
+    {
+      "path": "backend/src/main/resources/tax/spouseSection.xml",
+      "sha256": "f0c773f73f5654e2071a6b6ed36f54c880d08e456bad58ae5c65f1bdd6a5e6e9"
+    },
+    {
+      "path": "backend/src/main/resources/tax/standardDeduction.xml",
+      "sha256": "f2410d5b2d697751c7df27ef8af8bdf2b60c75a3bd27237b2766f3734919905f"
+    },
+    {
+      "path": "backend/src/main/resources/tax/studentLoanAdjustment.xml",
+      "sha256": "d7f057a7c099593e124f36c7d744b522c4196141a583c2e04957ddda14149a4b"
+    },
+    {
+      "path": "backend/src/main/resources/tax/taxCalculations.xml",
+      "sha256": "69e897dbfa61eb15eadb78eddcf770c926fc6abcca42ee2ab792ecc3c49a9a8a"
+    },
+    {
+      "path": "backend/src/main/resources/tax/unemployment.xml",
+      "sha256": "47ffce2a228cfe3f31bd797ed90c40a46b96a8625d75e02bf633b61906f0bd54"
+    },
+    {
+      "path": "backend/src/main/resources/tax/validations.xml",
+      "sha256": "9e45720df284c2be846223441601024a028434a8175098a221cd02e82293d4b0"
+    },
+    {
+      "path": "tax-advisor/src/main/resources/tax-plan/selfEmployment.xml",
+      "sha256": "ac15865bc1cdbe6f80b62d66ad481632040456886afd5d5456feb6ac288ad97c"
+    }
+  ],
+  "schema_version": 1,
+  "scope": [
+    "single-business Schedule C",
+    "Schedule SE",
+    "ordinary-rate income-tax planning",
+    "simple-method QBI with active-business minimum",
+    "estimated-payment planning"
+  ],
+  "status": "draft",
+  "tax_year": 2026
+}

@@ -43,7 +43,7 @@ class PlanReportTest {
     /** A gig-worker session whose SE-tax and quarterly figures are all computed before export. */
     private String seededSession() {
         String sid = sessionTools.createSession("2025", null).sessionId();
-        selfEmploymentTools.calculateSeTax(sid, "40000", "10000", "3000", "1000", "0");
+        selfEmploymentTools.calculateSeTax(sid, "40000", "10000", "3000", "1000", "0", null, null);
         sessionTools.setFact(sid, "/planning/priorYearTotalTax", "dollar", null, "3800", "2024 Form 1040, line 24");
         sessionTools.setFact(sid, "/planning/priorYearAGI", "dollar", null, "58000", null);
         // projectedCurrentYearTax is derived (income + SE + Additional Medicare) from the calculate_se_tax
@@ -95,12 +95,12 @@ class PlanReportTest {
     @Test
     void flagsProvisionalParametersInTheReportForADraftYear() {
         String sid = sessionTools.createSession("2026", null).sessionId();
-        selfEmploymentTools.calculateSeTax(sid, "40000", "10000", "0", "0", "0");
+        selfEmploymentTools.calculateSeTax(sid, "40000", null, "0", "0", "0", "10000", "0");
         String md = reportService.generate(SessionId.of(sid)).markdown();
 
-        // 2026's draft constants surface as a banner and are marked in the parameter table.
-        assertThat(md).contains("Provisional values for 2026");
-        assertThat(md).contains("⚠ provisional");
+        // Verified constants remain distinct from the human approval state of the release.
+        assertThat(md).contains("Draft release awaiting tax review");
+        assertThat(md).contains("Knowledge and graph version (SHA-256)");
     }
 
     @Test

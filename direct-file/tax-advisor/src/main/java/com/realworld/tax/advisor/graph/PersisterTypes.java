@@ -81,7 +81,13 @@ public final class PersisterTypes {
             return Long.parseLong(value.trim());
         }
         if (BOOLEAN.equals(typeCode)) {
-            return Boolean.parseBoolean(value.trim());
+            String trimmed = value.trim();
+            if (!"true".equalsIgnoreCase(trimmed) && !"false".equalsIgnoreCase(trimmed)) {
+                throw new IllegalArgumentException(
+                        "Boolean facts require true or false. Leave an unknown answer unset; "
+                                + "do not coerce it to false.");
+            }
+            return Boolean.parseBoolean(trimmed);
         }
         return value;
     }
@@ -101,7 +107,14 @@ public final class PersisterTypes {
         return switch (type == null ? "dollar" : type.toLowerCase()) {
             case "int" -> new TypedValue(INT, Long.parseLong(value.trim()));
             case "rational" -> new TypedValue(RATIONAL, parseRational(value, factPath));
-            default -> new TypedValue(DOLLAR, value);
+            case "boolean" -> {
+                if (!"true".equals(value) && !"false".equals(value)) {
+                    throw new IllegalArgumentException("Boolean parameter " + factPath + " must be true or false.");
+                }
+                yield new TypedValue(BOOLEAN, Boolean.parseBoolean(value));
+            }
+            case "dollar" -> new TypedValue(DOLLAR, value);
+            default -> throw new IllegalArgumentException("Unsupported parameter type " + type + " for " + factPath);
         };
     }
 

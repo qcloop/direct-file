@@ -1,0 +1,5 @@
+# Raw sources and extracted text are reproducible; manifests and citation chunks are versioned.
+/corpora/*/downloads/
+/corpora/*/text/
+/corpora/*/vision-text/
+/.venv/

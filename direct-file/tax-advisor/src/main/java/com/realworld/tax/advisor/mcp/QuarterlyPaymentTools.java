@@ -1,5 +1,6 @@
 package com.realworld.tax.advisor.mcp;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -54,10 +55,12 @@ public class QuarterlyPaymentTools {
     private final PlanningGraphService graph;
 
     private final ToolSupport support;
+    private final Clock clock;
 
-    public QuarterlyPaymentTools(PlanningGraphService graph, ToolSupport support) {
+    public QuarterlyPaymentTools(PlanningGraphService graph, ToolSupport support, Clock clock) {
         this.graph = graph;
         this.support = support;
+        this.clock = clock;
     }
 
     @McpTool(
@@ -70,11 +73,13 @@ public class QuarterlyPaymentTools {
                     + "returns a 'needs_facts' response so the agent can gather them.")
     public QuarterlyPaymentResult estimateQuarterlyPayment(
             @McpToolParam(description = SESSION_ID_DESCRIPTION) String sessionId,
-            @McpToolParam(description = "ISO date (YYYY-MM-DD). Required because the fact graph has no clock.")
+            @McpToolParam(
+                            description = "ISO date (YYYY-MM-DD). Omit to use the server's current date.",
+                            required = false)
                     String asOfDate) {
         SessionId session = SessionId.of(sessionId);
 
-        LocalDate asOf = LocalDate.parse(asOfDate);
+        LocalDate asOf = ToolSupport.isBlank(asOfDate) ? LocalDate.now(clock) : LocalDate.parse(asOfDate);
 
         List<MissingFact> missing = missingQuarterlyFacts(session);
         if (!missing.isEmpty()) {
@@ -137,7 +142,9 @@ public class QuarterlyPaymentTools {
         derivation.put("selfEmploymentTax", support.value(session, FactPaths.SE_TAX));
         derivation.put(
                 "safeHarborRule",
-                highIncomeRule ? "110% of prior-year tax (AGI > $150,000)" : "100% of prior-year tax");
+                highIncomeRule
+                        ? "110% of prior-year tax (AGI exceeds the filing-status threshold)"
+                        : "100% of prior-year tax");
         derivation.put("safeHarborTarget", support.value(session, FactPaths.SAFE_HARBOR_TARGET));
         derivation.put("ytdPaymentsAlreadyApplied", support.value(session, FactPaths.YTD_PAYMENTS_APPLIED));
         derivation.put("remainingDueThroughYearEnd", support.value(session, FactPaths.REMAINING_PAYMENT_DUE));

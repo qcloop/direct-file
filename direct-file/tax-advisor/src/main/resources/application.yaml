@@ -9,6 +9,10 @@ spring:
       # `redis` profile is active. For AWS (ElastiCache / MemoryDB) set REDIS_URL to the cluster's
       # endpoint with the TLS scheme and credentials, e.g. rediss://user:token@host:6379.
       url: ${REDIS_URL:redis://localhost:6379}
+      # Fail fast when Redis is unreachable or slow. The client's default command timeout is 60s,
+      # which would leave a tool call (and the LLM waiting on it) hanging for a minute per attempt.
+      connect-timeout: 2s
+      timeout: 2s
       # This service uses StringRedisTemplate directly; it declares no Spring Data repositories.
       repositories:
         enabled: false
@@ -28,6 +32,13 @@ spring:
           This server encodes IRS-correct tax-planning logic for self-employed and
           gig/delivery filers. Defer to it: do not invent tax interview questions,
           amounts, or rules from general knowledge.
+
+          Start with create_session and omit taxYear for current-year planning. The server reads
+          its clock and returns taxYear and planningDate: income earned during calendar year 2026
+          is planned as 2026, even though its return is filed later. Use that session's income year
+          for plan_questions. Supply another year only when the taxpayer explicitly requests it.
+          For current year-to-date figures, projection and payment tools can use the server date
+          when asOfDate is omitted; supply a date when the figures cover an earlier period.
 
 
           Before asking the taxpayer any interview question, call plan_questions and ask
@@ -87,6 +98,8 @@ management:
 
 tax-advisor:
   tax-knowledge-root: ${DF_TAX_KNOWLEDGE_ROOT:../tax-knowledge}
+  # The income-year boundary follows this zone, not the deployment host's default zone.
+  planning-time-zone: ${DF_TAX_PLANNING_TIME_ZONE:America/New_York}
   # Where planning sessions live between tool calls. `memory` (default): this JVM only, nothing is
   # persisted, sessions are lost on restart and invisible to other instances. `redis`: shared through
   # spring.data.redis.url so any instance can serve any session — activate the `redis` profile

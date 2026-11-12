@@ -56,7 +56,7 @@ class ToolCallTelemetryTest {
         double errBefore = errors("get_fact", "IllegalArgumentException");
 
         String s = sessionTools.createSession("2025", "single").sessionId();
-        selfEmploymentTools.calculateSeTax(s, "60000", null, null, null, null); // -> ok
+        selfEmploymentTools.calculateSeTax(s, "60000", null, null, null, null, null, null); // -> ok
 
         // Quarterly on a fresh session has no prior-year facts -> needs_facts (a real misuse signal).
         String fresh = sessionTools.createSession("2025", "single").sessionId();

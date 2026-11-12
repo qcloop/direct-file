@@ -1,0 +1,133 @@
+{
+  "human_approvals": [],
+  "jurisdiction": "federal",
+  "review_status": "draft",
+  "schema_version": 1,
+  "scope": "Self-employment and ordinary-income planning; not filing authorization",
+  "sources": [
+    {
+      "description": "2026 inflation adjustments and 2025 corrections",
+      "disposition": "active",
+      "document_status": "final",
+      "filename": "rp-25-32.pdf",
+      "revision_year": 2025,
+      "source_id": "irs_rev_proc_2025_32",
+      "url": "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf"
+    },
+    {
+      "description": "Estimated Tax for Individuals",
+      "disposition": "active",
+      "document_status": "final",
+      "filename": "f1040es.pdf",
+      "revision_year": 2026,
+      "source_id": "irs_form_1040_es_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/f1040es.pdf"
+    },
+    {
+      "description": "2026 standard mileage rates",
+      "disposition": "active",
+      "document_status": "final",
+      "filename": "n-26-10.pdf",
+      "revision_year": 2026,
+      "source_id": "irs_notice_2026_10",
+      "url": "https://www.irs.gov/pub/irs-drop/n-26-10.pdf"
+    },
+    {
+      "description": "Internal Revenue Bulletin 2026-29",
+      "disposition": "active",
+      "document_status": "final",
+      "filename": "irb26-29.pdf",
+      "revision_year": 2026,
+      "source_id": "irs_announcement_2026_11",
+      "url": "https://www.irs.gov/pub/irs-irbs/irb26-29.pdf"
+    },
+    {
+      "description": "Instructions for Schedule SE",
+      "disposition": "active",
+      "document_status": "final",
+      "filename": "i1040sse.pdf",
+      "revision_year": 2026,
+      "source_id": "irs_instruction_1040_schedule_se_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/i1040sse.pdf"
+    },
+    {
+      "description": "Instructions for Schedule C",
+      "disposition": "carry_forward_review_required",
+      "document_status": "final",
+      "filename": "i1040sc.pdf",
+      "revision_year": 2025,
+      "source_id": "irs_instruction_schedule_c_revision_2025",
+      "url": "https://www.irs.gov/pub/irs-pdf/i1040sc.pdf"
+    },
+    {
+      "description": "Tax Guide for Small Business",
+      "disposition": "carry_forward_review_required",
+      "document_status": "final",
+      "filename": "p334.pdf",
+      "revision_year": 2025,
+      "source_id": "irs_p334_2025",
+      "url": "https://www.irs.gov/pub/irs-pdf/p334.pdf"
+    },
+    {
+      "description": "Travel, Gift, and Car Expenses",
+      "disposition": "carry_forward_review_required",
+      "document_status": "final",
+      "filename": "p463.pdf",
+      "revision_year": 2025,
+      "source_id": "irs_p463_2025",
+      "url": "https://www.irs.gov/pub/irs-pdf/p463.pdf"
+    },
+    {
+      "description": "Tax Withholding and Estimated Tax",
+      "disposition": "active",
+      "document_status": "final",
+      "filename": "p505.pdf",
+      "revision_year": 2026,
+      "source_id": "irs_pub_505_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/p505.pdf"
+    },
+    {
+      "description": "Instructions for Form 8995",
+      "disposition": "watch_for_2026_final",
+      "document_status": "final",
+      "filename": "i8995.pdf",
+      "revision_year": 2025,
+      "source_id": "irs_instructions_form_8995_revision_2025",
+      "url": "https://www.irs.gov/pub/irs-pdf/i8995.pdf"
+    },
+    {
+      "description": "Instructions for Form 8959",
+      "disposition": "carry_forward_review_required",
+      "document_status": "final",
+      "filename": "i8959.pdf",
+      "revision_year": 2025,
+      "source_id": "irs_instructions_form_8959_revision_2025",
+      "url": "https://www.irs.gov/pub/irs-pdf/i8959.pdf"
+    },
+    {
+      "description": "26 USC 199A, laws through Public Law 119-124 (October 15, 2026)",
+      "disposition": "active",
+      "document_status": "enacted",
+      "filename": "usc26-section199A.html",
+      "revision_year": 2026,
+      "source_id": "irc_199a_2026_snapshot",
+      "url": "https://uscode.house.gov/us/usc/119-124/t26/s199A/"
+    },
+    {
+      "description": "26 USC 1401, laws through Public Law 119-124 (October 15, 2026)",
+      "disposition": "active",
+      "document_status": "enacted",
+      "filename": "usc26-section1401.html",
+      "revision_year": 2026,
+      "source_id": "irc_1401_2026_snapshot",
+      "url": "https://uscode.house.gov/us/usc/119-124/t26/s1401/"
+    }
+  ],
+  "tax_year": 2026,
+  "watch_urls": [
+    "https://www.irs.gov/forms-pubs/changes-to-current-forms-publications",
+    "https://www.irs.gov/forms-instructions-and-publications",
+    "https://www.irs.gov/irb",
+    "https://www.irs.gov/draft-tax-forms"
+  ]
+}
