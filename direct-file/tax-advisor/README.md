@@ -155,6 +155,7 @@ of the tool methods (camelCase, not snake_case).
 | `set_fact`                    | Write a value to a writable fact                       |
 | `calculate_se_tax`            | Schedule C/SE tax from full-year figures               |
 | `calculate_additional_medicare` | Form 8959 0.9% Additional Medicare Tax (wage + SE portions) |
+| `check_qbi_eligibility` | Single-Schedule-C scope check, missing questions, supported deduction, and explicit unsupported reasons |
 | `estimate_qbi_deduction`      | Form 8995 / §199A 20% QBI deduction (taxable-income cap derived) |
 | `project_net_profit`          | Project full-year net profit + SE tax from YTD figures |
 | `project_total_tax`           | Full net-profit → AGI → taxable income → income tax + SE + Additional Medicare (total tax derived, not guessed) |
@@ -346,3 +347,19 @@ scaffold):
   fact equality, evidence presence/attributes, and profile membership.
 - No auth on the MCP endpoints. In production these must sit behind the
   same auth boundary as the rest of Direct File.
+
+### Guided QBI eligibility
+
+`check_qbi_eligibility` screens the supported single-Schedule-C scope after all income
+has been recorded. It requires explicit business-type, US regular-for-profit business,
+and special-case answers. It excludes complex cases, uncertain answers, and income
+above the graph-owned simple-method threshold; this does not mean those taxpayers
+are legally ineligible for QBI. It asks about material participation only when the
+active-business minimum requires it. Its deduction comes directly from the graph.
+The caller must replay answers for each check and must not use unchecked projection
+amounts as a completed estimate after an unsupported result.
+
+Sources: IRS QBI overview (https://www.irs.gov/newsroom/qualified-business-income-deduction),
+Form 8995 instructions (https://www.irs.gov/instructions/i8995), and Publication 925
+(https://www.irs.gov/publications/p925), checked 2026-11-13. This scope check adds no
+tax constants and does not assert artifact review or approval.
