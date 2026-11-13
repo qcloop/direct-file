@@ -59,6 +59,12 @@ java -jar direct-file/tax-advisor/target/tax-advisor-0.0.1-SNAPSHOT.jar
 # or: cd direct-file/tax-advisor && ../backend/mvnw spring-boot:run
 ```
 - `DF_TAX_KNOWLEDGE_ROOT` (default `../tax-knowledge`) points at the YAML knowledge root.
+- Planning defaults to the current income calendar year from a server Clock.
+  `DF_TAX_PLANNING_TIME_ZONE` defaults to `America/New_York`; sessions retain their income year
+  across New Year, and unsupported years never fall back to another year's constants.
+- The 2026 candidate is draft pending human tax review. Use `--spring.profiles.active=preview`
+  explicitly for authoring/review (combine as `stdio,preview` or `redis,preview`). Default runtime
+  policy rejects drafts. See `direct-file/tax-knowledge/reviews/federal/2026/README.md` for promotion.
 - Health: `GET /actuator/health` (also `/health/liveness`, `/health/readiness`). Only `health`
   is web-exposed by default; add `management.endpoints.web.exposure.include` to expose more.
 

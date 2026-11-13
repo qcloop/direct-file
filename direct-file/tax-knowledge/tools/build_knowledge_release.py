@@ -3,6 +3,7 @@
 from __future__ import annotations
 import argparse
 import hashlib
+import io
 import json
 from pathlib import Path
 import sys
@@ -11,13 +12,46 @@ import zipfile
 from validate_artifact_provenance import validate
 
 
-def build(root: Path, year: int) -> dict:
+def compiled_graph_entries(root: Path, service_jar: Path) -> list[dict]:
+    """Inventory what the classpath actually contains, then verify its checked-in source matches."""
+    compiled = []
+    with zipfile.ZipFile(service_jar) as outer:
+        for name in outer.namelist():
+            if name.startswith("BOOT-INF/classes/"):
+                resource = name.removeprefix("BOOT-INF/classes/")
+                if resource.startswith(("tax/", "tax-plan/")) and resource.endswith(".xml") and resource.count("/") == 1:
+                    compiled.append((resource, outer.read(name)))
+            elif name.startswith("BOOT-INF/lib/") and name.endswith(".jar"):
+                with zipfile.ZipFile(io.BytesIO(outer.read(name))) as nested:
+                    for resource in nested.namelist():
+                        if resource.startswith(("tax/", "tax-plan/")) and resource.endswith(".xml") and resource.count("/") == 1:
+                            compiled.append((resource, nested.read(resource)))
+    entries, seen = [], set()
+    for resource, data in compiled:
+        if resource in seen:
+            raise ValueError("Duplicate runtime graph resource: " + resource)
+        seen.add(resource)
+        module = "tax-advisor" if resource.startswith("tax-plan/") else "backend"
+        source = root.parent / module / "src/main/resources" / resource
+        digest = hashlib.sha256(data).hexdigest()
+        if not source.is_file() or hashlib.sha256(source.read_bytes()).hexdigest() != digest:
+            raise ValueError("Compiled graph does not match its source; rebuild the service and dependencies: " + resource)
+        entries.append({"path": source.relative_to(root.parent).as_posix(), "classpath_resource": resource, "sha256": digest})
+    if not entries:
+        raise ValueError("No executable graph XML in the service jar")
+    return sorted(entries, key=lambda entry: entry["path"])
+
+
+def build(root: Path, year: int, service_jar: Path | None = None) -> dict:
+    service_jar = service_jar or root.parent / "tax-advisor/target/tax-advisor-0.0.1-SNAPSHOT.jar"
+    if not service_jar.is_file():
+        raise ValueError("Build the tax-advisor service before packaging its knowledge release")
     args = argparse.Namespace(root=root, sources_dir=root / "sources/irs" / str(year), tax_year=year)
     provenance = validate(args)
     if provenance["errors"] or provenance["warnings"]:
         raise ValueError("Provenance must have zero errors and warnings: " + json.dumps(provenance))
     paths = []
-    for family in ("rules", "questions", "evidence", "conflicts", "scenarios", "topics", "factgraph", "changes"):
+    for family in ("rules", "questions", "evidence", "conflicts", "scenarios", "topics", "factgraph", "changes", "relevance"):
         paths.extend(sorted((root / family / "federal" / str(year)).glob("*.yaml")))
     for required in ("rules", "questions", "evidence", "conflicts", "scenarios"):
         if not any(path.parts[-4] == required for path in paths):
@@ -26,6 +60,10 @@ def build(root: Path, year: int) -> dict:
     paths.extend(sorted((root / "corpora" / f"irs-{year}").glob("*.json")))
     paths.append(root / "sources/federal/citations.yaml")
     paths.extend(sorted((root / "reviews/federal" / str(year)).glob("*.md")))
+    paths.extend(sorted((root / "runs").glob(f"irs-{year}-*.md")))
+    inventory_readme = root / "corpora" / f"irs-{year}" / "README.md"
+    if inventory_readme.is_file():
+        paths.append(inventory_readme)
     source_manifest = root / "corpora" / f"irs-{year}" / "source-manifest.json"
     if source_manifest.exists():
         for entry in json.loads(source_manifest.read_text())["entries"]:
@@ -37,11 +75,9 @@ def build(root: Path, year: int) -> dict:
             paths.append(snapshot)
     entries = [{"path": path.relative_to(root).as_posix(), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
                for path in sorted(set(paths))]
-    graphs = sorted((root.parent / "backend/src/main/resources/tax").glob("*.xml"))
-    graphs += sorted((root.parent / "tax-advisor/src/main/resources/tax-plan").glob("*.xml"))
-    graph_entries = [{"path": path.relative_to(root.parent).as_posix(),
-                      "sha256": hashlib.sha256(path.read_bytes()).hexdigest()} for path in graphs]
-    payload = json.dumps({"artifacts": entries, "runtime_graph_files": graph_entries}, sort_keys=True, separators=(",", ":"))
+    graph_entries = compiled_graph_entries(root, service_jar)
+    jar_digest = hashlib.sha256(service_jar.read_bytes()).hexdigest()
+    payload = json.dumps({"artifacts": entries, "runtime_graph_files": graph_entries, "service_jar_sha256": jar_digest}, sort_keys=True, separators=(",", ":"))
     version = hashlib.sha256(payload.encode()).hexdigest()
     return {"schema_version": 1, "release_id": f"federal-{year}-{version[:16]}", "tax_year": year,
             "jurisdiction": "federal", "status": "draft", "content_sha256": version,
@@ -51,7 +87,7 @@ def build(root: Path, year: int) -> dict:
             "limitations": ["Form 8995-A limits and phase-in calculations are not modeled; QBI above threshold is an upper bound",
                             "Credits, preferential capital-gains rates, itemized deductions, NIIT, AMT, and special personal deductions are not modeled",
                             "Only single, MFJ, and MFS are supported", "Monthly projections assume even income within their observation periods"],
-            "artifacts": entries, "runtime_graph_files": graph_entries}
+            "artifacts": entries, "runtime_graph_files": graph_entries, "service_jar_sha256": jar_digest}
 
 
 def main(argv: list[str]) -> int:
@@ -60,9 +96,10 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--tax-year", type=int, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--package", type=Path)
+    parser.add_argument("--service-jar", type=Path, help="Matching executable service build; defaults to the tax-advisor target jar")
     args = parser.parse_args(argv)
     try:
-        release = build(args.root, args.tax_year)
+        release = build(args.root, args.tax_year, args.service_jar)
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 1

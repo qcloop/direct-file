@@ -2,6 +2,10 @@
   "downloaded": true,
   "entries": [
     {
+      "applicable_tax_years": [
+        2025,
+        2026
+      ],
       "bytes_downloaded": 260406,
       "description": "2026 inflation adjustments and 2025 corrections",
       "disposition": "active",
@@ -173,18 +177,381 @@
       "sha256": "a1b23089917d3c60e41dacf1e5326819c4ef7e1028b5e5a6ee88599e36a82186",
       "source_id": "irc_1401_2026_snapshot",
       "url": "https://uscode.house.gov/us/usc/119-124/t26/s1401/"
+    },
+    {
+      "applicability_review": "Verify printed revision and effective dates before artifact promotion.",
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 119172,
+      "description": "Profit or Loss From Business (Schedule C)",
+      "disposition": "source_review_required",
+      "document_status": "final",
+      "filename": "f1040sc.pdf",
+      "listing_posted_date": "2026-10-29",
+      "local_path": "corpora/irs-2026/downloads/f1040sc.pdf",
+      "product_id": "f1040sc",
+      "revision_label": "2026",
+      "revision_year": 2026,
+      "sha256": "cc44e7d1150e54d991835814c1191f60a32617730ca9e50e6f532b51293a86b4",
+      "source_id": "irs_form_schedule_c_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/f1040sc.pdf"
+    },
+    {
+      "applicability_review": "Verify printed revision and effective dates before artifact promotion.",
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 77739,
+      "description": "Self-Employment Tax (Schedule SE)",
+      "disposition": "source_review_required",
+      "document_status": "final",
+      "filename": "f1040sse.pdf",
+      "listing_posted_date": "2026-11-03",
+      "local_path": "corpora/irs-2026/downloads/f1040sse.pdf",
+      "product_id": "f1040sse",
+      "revision_label": "2026",
+      "revision_year": 2026,
+      "sha256": "a42f5a19c0e84a966a49b5f4ca021d3f49c4fda2e087da0b00bf2003525f8655",
+      "source_id": "irs_form_schedule_se_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/f1040sse.pdf"
+    },
+    {
+      "applicability_review": "Verify printed revision and effective dates before artifact promotion.",
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 1449821,
+      "description": "General Instructions for Certain Information Returns",
+      "disposition": "source_review_required",
+      "document_status": "final",
+      "filename": "p1099.pdf",
+      "listing_posted_date": "2026-03-26",
+      "local_path": "corpora/irs-2026/downloads/p1099.pdf",
+      "processing_year": 2027,
+      "product_id": "p1099",
+      "revision_label": "2026",
+      "revision_year": 2026,
+      "sha256": "72136f4ec750020c80cc7da46d72f16a5ef1b2578faa89dc8aa45867e70342a7",
+      "source_id": "irs_pub_1099_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/p1099.pdf"
+    },
+    {
+      "applicability_review": "Verify printed revision and effective dates before artifact promotion.",
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 1195405,
+      "description": "Tax Calendars",
+      "disposition": "source_review_required",
+      "document_status": "final",
+      "filename": "p509.pdf",
+      "listing_posted_date": "2025-12-04",
+      "local_path": "corpora/irs-2026/downloads/p509.pdf",
+      "product_id": "p509",
+      "revision_label": "2026",
+      "revision_year": 2026,
+      "sha256": "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb",
+      "source_id": "irs_pub_509_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    },
+    {
+      "applicability_review": "Printed December 2026 revision verified. Form cover explains first use for calendar-year 2026 reporting, filed beginning January 2027; evidence mappings still require review.",
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 580107,
+      "description": "Payment Card and Third Party Network Transactions",
+      "disposition": "source_review_required",
+      "document_status": "final",
+      "filename": "f1099k.pdf",
+      "listing_posted_date": "2026-05-26",
+      "local_path": "corpora/irs-2026/downloads/f1099k.pdf",
+      "processing_year": 2027,
+      "product_id": "f1099k",
+      "revision_label": "December 2026",
+      "revision_year": 2026,
+      "sha256": "fa3a2b659f7ee13d59ea6c66ad992a5ab55afa0060db275ad1ee122478189b89",
+      "source_id": "irs_form_1099_k_dec2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/f1099k.pdf"
+    },
+    {
+      "applicability_review": "Printed December 2026 revision verified. Form cover explains first use for calendar-year 2026 reporting, filed beginning January 2027; evidence mappings still require review.",
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 177311,
+      "description": "Instructions for Form 1099-K",
+      "disposition": "source_review_required",
+      "document_status": "final",
+      "filename": "i1099k.pdf",
+      "listing_posted_date": "2026-05-28",
+      "local_path": "corpora/irs-2026/downloads/i1099k.pdf",
+      "processing_year": 2027,
+      "product_id": "i1099k",
+      "revision_label": "December 2026",
+      "revision_year": 2026,
+      "sha256": "d7f48a804e26d83b5419aa51bb76fee7b129a388960c01d82e83e255337ea699",
+      "source_id": "irs_instructions_1099_k_dec2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/i1099k.pdf"
+    },
+    {
+      "applicability_review": "Printed December 2026 revision verified. Form cover explains first use for calendar-year 2026 reporting, filed beginning January 2027; evidence mappings still require review.",
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 537467,
+      "description": "Nonemployee Compensation",
+      "disposition": "source_review_required",
+      "document_status": "final",
+      "filename": "f1099nec.pdf",
+      "listing_posted_date": "2026-06-09",
+      "local_path": "corpora/irs-2026/downloads/f1099nec.pdf",
+      "processing_year": 2027,
+      "product_id": "f1099nec",
+      "revision_label": "December 2026",
+      "revision_year": 2026,
+      "sha256": "68a8f00078be6dd6a4912cc4209df317b31840d5fe19560222d39df9f2f7ff49",
+      "source_id": "irs_form_1099_nec_dec2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/f1099nec.pdf"
+    },
+    {
+      "applicability_review": "Printed December 2026 revision verified. Form cover explains first use for calendar-year 2026 reporting, filed beginning January 2027; evidence mappings still require review.",
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 561788,
+      "description": "Miscellaneous Information",
+      "disposition": "source_review_required",
+      "document_status": "final",
+      "filename": "f1099msc.pdf",
+      "listing_posted_date": "2026-05-28",
+      "local_path": "corpora/irs-2026/downloads/f1099msc.pdf",
+      "processing_year": 2027,
+      "product_id": "f1099msc",
+      "revision_label": "December 2026",
+      "revision_year": 2026,
+      "sha256": "38051fe1cdce8fac5183a7e7b182b1a0de590dcfec3e4f66a156eba3f98943fa",
+      "source_id": "irs_form_1099_misc_dec2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/f1099msc.pdf"
+    },
+    {
+      "applicability_review": "Printed December 2026 revision verified. Form cover explains first use for calendar-year 2026 reporting, filed beginning January 2027; evidence mappings still require review.",
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 312867,
+      "description": "Instructions for Forms 1099-MISC and 1099-NEC",
+      "disposition": "source_review_required",
+      "document_status": "final",
+      "filename": "i1099mec.pdf",
+      "listing_posted_date": "2026-07-01",
+      "local_path": "corpora/irs-2026/downloads/i1099mec.pdf",
+      "processing_year": 2027,
+      "product_id": "i1099mec",
+      "revision_label": "December 2026",
+      "revision_year": 2026,
+      "sha256": "883fb800e5100ff74a37fb0427d0c16c14031a2421a058254f71c66f8c03087e",
+      "source_id": "irs_instructions_1099_misc_nec_dec2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/i1099mec.pdf"
+    },
+    {
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 98358,
+      "corrects_source_ids": [
+        "irs_form_1040_es_2026"
+      ],
+      "description": "Correction to 2026 Form 1040-ES SALT reminder",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "1040-es-salt-correction.html",
+      "local_path": "corpora/irs-2026/downloads/1040-es-salt-correction.html",
+      "product_id": "1040_es_salt_correction",
+      "revision_year": 2026,
+      "sha256": "10e51a20bd62856abc8d8f255a525eb9e0b0bacf13f31cc3e7a3e17817b9e79d",
+      "source_id": "irs_1040_es_salt_correction_2026",
+      "url": "https://www.irs.gov/forms-pubs/correction-to-state-and-local-income-tax-deduction-amount-in-the-2026-form-1040-es"
+    },
+    {
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 98578,
+      "corrects_source_ids": [
+        "irs_form_1040_es_2026"
+      ],
+      "description": "Correction to 2026 Form 1040-ES mailing addresses",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "1040-es-address-correction.html",
+      "local_path": "corpora/irs-2026/downloads/1040-es-address-correction.html",
+      "product_id": "1040_es_address_correction",
+      "revision_year": 2026,
+      "sha256": "3782d4099e8d6836188cc4df8d29cd7a9ef952a2236dcf5156c2e444724eba5c",
+      "source_id": "irs_1040_es_address_correction_2026",
+      "url": "https://www.irs.gov/forms-pubs/correction-to-the-mailing-addresses-in-the-2026-form-1040-es"
+    },
+    {
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 98145,
+      "corrects_source_ids": [],
+      "description": "New Publication 1099: tax year 2026 / processing year 2027",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "publication-1099-transition.html",
+      "local_path": "corpora/irs-2026/downloads/publication-1099-transition.html",
+      "product_id": "publication_1099_transition",
+      "revision_year": 2026,
+      "sha256": "c27b0e41d358643a440def7a7be85b096e6aa48111701eeafb7fa57a1c482bfc",
+      "source_id": "irs_pub_1099_transition_2026",
+      "url": "https://www.irs.gov/forms-pubs/new-publication-1099-general-instructions-for-certain-information-returns-forms-1096-1097-1098-1099-3921-3922-5498-and-w-2g"
+    },
+    {
+      "applicable_tax_years": [
+        2025
+      ],
+      "bytes_downloaded": 97738,
+      "corrects_source_ids": [
+        "irs_instructions_form_8995_revision_2025"
+      ],
+      "description": "Form 8995 taxable income before QBI correction",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "8995-qbi-correction.html",
+      "local_path": "corpora/irs-2026/downloads/8995-qbi-correction.html",
+      "product_id": "8995_qbi_correction",
+      "revision_year": 2026,
+      "sha256": "020abade377b75f14fb1bcc230c181123b78cca86e0e7c9f4b4285de9cdd01eb",
+      "source_id": "irs_8995_qbi_correction_posted_2026",
+      "url": "https://www.irs.gov/forms-pubs/corrections-to-the-instructions-on-how-to-calculate-the-taxable-income-before-qbi-deduction-for-form-8995"
+    },
+    {
+      "applicable_tax_years": [
+        2025
+      ],
+      "bytes_downloaded": 97927,
+      "corrects_source_ids": [],
+      "description": "Form 8995-A taxable income before QBI correction",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "8995a-qbi-correction.html",
+      "local_path": "corpora/irs-2026/downloads/8995a-qbi-correction.html",
+      "product_id": "8995a_qbi_correction",
+      "revision_year": 2026,
+      "sha256": "368da758115694b240c46fb9297a2a7b4172718f42ed793688f02b1a62fe82ca",
+      "source_id": "irs_8995a_qbi_correction_posted_2026",
+      "url": "https://www.irs.gov/forms-pubs/corrections-to-the-instructions-on-how-to-calculate-the-taxable-income-before-qbi-deduction-for-form-8995-a"
+    },
+    {
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 98007,
+      "corrects_source_ids": [],
+      "description": "2026 mileage rates and automobile fair market values update",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "mileage-update-2026.html",
+      "local_path": "corpora/irs-2026/downloads/mileage-update-2026.html",
+      "product_id": "mileage_update_2026",
+      "revision_year": 2026,
+      "sha256": "611c013e7741635af1e831d366def3cb2575af31c50aac5cdadb90240b23006a",
+      "source_id": "irs_mileage_update_2026",
+      "url": "https://www.irs.gov/forms-pubs/the-standard-mileage-rates-and-maximum-automobile-fair-market-values-have-been-updated-for-2026"
+    },
+    {
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 98077,
+      "corrects_source_ids": [],
+      "description": "2026 W-2/W-3 dependent care exclusion correction",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "w2-dependent-care-correction.html",
+      "local_path": "corpora/irs-2026/downloads/w2-dependent-care-correction.html",
+      "product_id": "w2_dependent_care_correction",
+      "revision_year": 2026,
+      "sha256": "3117e15d3d2ada4bdf67f03d87550d0f341059bff0f7759531d92e4ec36225f6",
+      "source_id": "irs_w2_dependent_care_correction_2026",
+      "url": "https://www.irs.gov/forms-pubs/correction-to-the-dependent-care-benefits-exclusion-amount-in-the-2026-general-instructions-for-forms-w-2-and-w-3"
+    },
+    {
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 97433,
+      "corrects_source_ids": [],
+      "description": "Changes to 2026 W-2 family forms",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "w2-changes-2026.html",
+      "local_path": "corpora/irs-2026/downloads/w2-changes-2026.html",
+      "product_id": "w2_changes_2026",
+      "revision_year": 2026,
+      "sha256": "72f39fb70fe6a0f55252e11b8d6e49a1be4bca08714f9b0e09b8ef02f5091b10",
+      "source_id": "irs_w2_changes_2026",
+      "url": "https://www.irs.gov/forms-pubs/changes-to-the-2026-forms-w-2-w-2as-w-2gu-and-w-2vi-posted-on-irsgov"
+    },
+    {
+      "applicability_review": "Notice calls the instructions 2026; the linked current i8829.pdf is printed 2025. Applicability remains unresolved.",
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 96845,
+      "corrects_source_ids": [],
+      "description": "Updates to Form 8829 instructions",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "8829-update.html",
+      "local_path": "corpora/irs-2026/downloads/8829-update.html",
+      "product_id": "8829_update",
+      "revision_year": 2026,
+      "sha256": "7baaa91d530e0be30135610aa6f8e9c1edadb0dbfb2fb31db311ba4da01213b3",
+      "source_id": "irs_8829_update_posted_2026",
+      "url": "https://www.irs.gov/forms-pubs/updates-to-the-instructions-for-form-8829"
+    },
+    {
+      "applicability_review": "Downloaded PDF is printed 2025; correction notice calls it 2026. Resolve mismatch before 2026 use.",
+      "applicable_tax_years": [
+        2025
+      ],
+      "bytes_downloaded": 182532,
+      "description": "Instructions for Form 8829, Expenses for Business Use of Your Home",
+      "disposition": "carry_forward_review_required",
+      "document_status": "final",
+      "filename": "i8829.pdf",
+      "local_path": "corpora/irs-2026/downloads/i8829.pdf",
+      "product_id": "i8829",
+      "revision_year": 2025,
+      "sha256": "6a02b8a4e5f9295ea5ab1ba03987c8dcf2a6313e5eb526b438210e10d19abee8",
+      "source_id": "irs_instructions_8829_revision_2025",
+      "url": "https://www.irs.gov/pub/irs-pdf/i8829.pdf"
     }
   ],
-  "retrieved_at": "2026-11-12T19:11:53.051045+00:00",
+  "retrieved_at": "2026-11-12T20:07:24.082505+00:00",
   "schema_version": 1,
   "tax_year": 2026,
   "watch_pages": [
     {
-      "sha256": "5a49bd9178527db4b4dec15416ca19c3367cdfa34677d251470772719e3d49fa",
+      "sha256": "4ee80ae12405ed9a27a4a3e21d5542a72cbcf723b890f9901179d01d7eed0c46",
       "url": "https://www.irs.gov/forms-pubs/changes-to-current-forms-publications"
     },
     {
-      "sha256": "db229aeb693e873aae251bbf2ebfd3b75f0ebb78849e012ec64e8c2c142bc6b5",
+      "sha256": "169299b504f36380f750cac6defe55b73b79673b78f654d132975c2a2275371a",
       "url": "https://www.irs.gov/forms-instructions-and-publications"
     },
     {
@@ -192,7 +559,7 @@
       "url": "https://www.irs.gov/irb"
     },
     {
-      "sha256": "df51882438889f2ff655913c3aa0284674627935e67b20a18e699fec2adb1927",
+      "sha256": "bcf1fabebdc2db80aae7356d82c6428f70693845018e96f4cc7efc52f1f9a1ee",
       "url": "https://www.irs.gov/draft-tax-forms"
     }
   ]

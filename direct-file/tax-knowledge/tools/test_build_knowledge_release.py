@@ -1,6 +1,7 @@
 import hashlib
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 import yaml
@@ -18,6 +19,13 @@ class BuildKnowledgeReleaseTest(unittest.TestCase):
         for family in ('rules', 'questions', 'evidence', 'conflicts', 'scenarios'):
             self.write(f'{family}/federal/2026/artifact.yaml', {'tax_year': 2026, 'status': 'draft', 'source_refs': [ref]})
         self.write('sources/federal/citations.yaml', {'citations': {}})
+        source = self.root.parent / 'tax-advisor/src/main/resources/tax-plan/module.xml'
+        source.parent.mkdir(parents=True)
+        source.write_text('<FactDictionaryModule/>')
+        jar = self.root.parent / 'tax-advisor/target/tax-advisor-0.0.1-SNAPSHOT.jar'
+        jar.parent.mkdir()
+        with zipfile.ZipFile(jar, 'w') as archive:
+            archive.writestr('BOOT-INF/classes/tax-plan/module.xml', source.read_bytes())
 
     def write(self, name, doc):
         path = self.root / name
@@ -37,9 +45,36 @@ class BuildKnowledgeReleaseTest(unittest.TestCase):
         path.write_text(path.read_text() + '\nnew_wording: Changed interview text\n')
         self.assertNotEqual(first, build(self.root, 2026)['release_id'])
 
+    def test_review_package_pins_classifications_inventory_and_year_run_reports(self):
+        self.write('relevance/federal/2026/source-relevance.yaml', {'relevance': []})
+        for name in ('runs/irs-2026-source-expansion.md', 'corpora/irs-2026/README.md', 'runs/irs-2025-older.md'):
+            path = self.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('Review evidence.\n')
+        result = build(self.root, 2026)
+        names = {entry['path'] for entry in result['artifacts']}
+        self.assertIn('relevance/federal/2026/source-relevance.yaml', names)
+        self.assertIn('corpora/irs-2026/README.md', names)
+        self.assertIn('runs/irs-2026-source-expansion.md', names)
+        self.assertNotIn('runs/irs-2025-older.md', names)
+
     def test_missing_artifact_family_cannot_be_packaged(self):
         (self.root / 'conflicts/federal/2026/artifact.yaml').unlink()
         with self.assertRaisesRegex(ValueError, 'Missing conflicts'):
+            build(self.root, 2026)
+
+    def test_unshipped_backend_graph_files_are_not_claimed_as_runtime_inputs(self):
+        backend = self.root.parent / 'backend/src/main/resources/tax/unused.xml'
+        backend.parent.mkdir(parents=True)
+        backend.write_text('<Unused/>')
+        result = build(self.root, 2026)
+        self.assertEqual(len(result['runtime_graph_files']), 1)
+        self.assertEqual(result['runtime_graph_files'][0]['classpath_resource'], 'tax-plan/module.xml')
+
+    def test_unbuilt_graph_source_changes_are_rejected(self):
+        source = self.root.parent / 'tax-advisor/src/main/resources/tax-plan/module.xml'
+        source.write_text('<Changed/>')
+        with self.assertRaisesRegex(ValueError, 'Compiled graph does not match'):
             build(self.root, 2026)
 
     def test_changed_raw_source_cannot_be_packaged_under_an_old_hash(self):

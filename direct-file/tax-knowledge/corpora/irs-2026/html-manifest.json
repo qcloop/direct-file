@@ -1,0 +1,195 @@
+{
+  "downloaded": true,
+  "entries": [
+    {
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 98358,
+      "corrects_source_ids": [
+        "irs_form_1040_es_2026"
+      ],
+      "description": "Correction to 2026 Form 1040-ES SALT reminder",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "1040-es-salt-correction.html",
+      "local_path": "corpora/irs-2026/downloads/1040-es-salt-correction.html",
+      "product_id": "1040_es_salt_correction",
+      "revision_year": 2026,
+      "sha256": "10e51a20bd62856abc8d8f255a525eb9e0b0bacf13f31cc3e7a3e17817b9e79d",
+      "source_id": "irs_1040_es_salt_correction_2026",
+      "url": "https://www.irs.gov/forms-pubs/correction-to-state-and-local-income-tax-deduction-amount-in-the-2026-form-1040-es"
+    },
+    {
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 98578,
+      "corrects_source_ids": [
+        "irs_form_1040_es_2026"
+      ],
+      "description": "Correction to 2026 Form 1040-ES mailing addresses",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "1040-es-address-correction.html",
+      "local_path": "corpora/irs-2026/downloads/1040-es-address-correction.html",
+      "product_id": "1040_es_address_correction",
+      "revision_year": 2026,
+      "sha256": "3782d4099e8d6836188cc4df8d29cd7a9ef952a2236dcf5156c2e444724eba5c",
+      "source_id": "irs_1040_es_address_correction_2026",
+      "url": "https://www.irs.gov/forms-pubs/correction-to-the-mailing-addresses-in-the-2026-form-1040-es"
+    },
+    {
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 98145,
+      "corrects_source_ids": [],
+      "description": "New Publication 1099: tax year 2026 / processing year 2027",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "publication-1099-transition.html",
+      "local_path": "corpora/irs-2026/downloads/publication-1099-transition.html",
+      "product_id": "publication_1099_transition",
+      "revision_year": 2026,
+      "sha256": "c27b0e41d358643a440def7a7be85b096e6aa48111701eeafb7fa57a1c482bfc",
+      "source_id": "irs_pub_1099_transition_2026",
+      "url": "https://www.irs.gov/forms-pubs/new-publication-1099-general-instructions-for-certain-information-returns-forms-1096-1097-1098-1099-3921-3922-5498-and-w-2g"
+    },
+    {
+      "applicable_tax_years": [
+        2025
+      ],
+      "bytes_downloaded": 97738,
+      "corrects_source_ids": [
+        "irs_instructions_form_8995_revision_2025"
+      ],
+      "description": "Form 8995 taxable income before QBI correction",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "8995-qbi-correction.html",
+      "local_path": "corpora/irs-2026/downloads/8995-qbi-correction.html",
+      "product_id": "8995_qbi_correction",
+      "revision_year": 2026,
+      "sha256": "020abade377b75f14fb1bcc230c181123b78cca86e0e7c9f4b4285de9cdd01eb",
+      "source_id": "irs_8995_qbi_correction_posted_2026",
+      "url": "https://www.irs.gov/forms-pubs/corrections-to-the-instructions-on-how-to-calculate-the-taxable-income-before-qbi-deduction-for-form-8995"
+    },
+    {
+      "applicable_tax_years": [
+        2025
+      ],
+      "bytes_downloaded": 97927,
+      "corrects_source_ids": [],
+      "description": "Form 8995-A taxable income before QBI correction",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "8995a-qbi-correction.html",
+      "local_path": "corpora/irs-2026/downloads/8995a-qbi-correction.html",
+      "product_id": "8995a_qbi_correction",
+      "revision_year": 2026,
+      "sha256": "368da758115694b240c46fb9297a2a7b4172718f42ed793688f02b1a62fe82ca",
+      "source_id": "irs_8995a_qbi_correction_posted_2026",
+      "url": "https://www.irs.gov/forms-pubs/corrections-to-the-instructions-on-how-to-calculate-the-taxable-income-before-qbi-deduction-for-form-8995-a"
+    },
+    {
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 98007,
+      "corrects_source_ids": [],
+      "description": "2026 mileage rates and automobile fair market values update",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "mileage-update-2026.html",
+      "local_path": "corpora/irs-2026/downloads/mileage-update-2026.html",
+      "product_id": "mileage_update_2026",
+      "revision_year": 2026,
+      "sha256": "611c013e7741635af1e831d366def3cb2575af31c50aac5cdadb90240b23006a",
+      "source_id": "irs_mileage_update_2026",
+      "url": "https://www.irs.gov/forms-pubs/the-standard-mileage-rates-and-maximum-automobile-fair-market-values-have-been-updated-for-2026"
+    },
+    {
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 98077,
+      "corrects_source_ids": [],
+      "description": "2026 W-2/W-3 dependent care exclusion correction",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "w2-dependent-care-correction.html",
+      "local_path": "corpora/irs-2026/downloads/w2-dependent-care-correction.html",
+      "product_id": "w2_dependent_care_correction",
+      "revision_year": 2026,
+      "sha256": "3117e15d3d2ada4bdf67f03d87550d0f341059bff0f7759531d92e4ec36225f6",
+      "source_id": "irs_w2_dependent_care_correction_2026",
+      "url": "https://www.irs.gov/forms-pubs/correction-to-the-dependent-care-benefits-exclusion-amount-in-the-2026-general-instructions-for-forms-w-2-and-w-3"
+    },
+    {
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 97433,
+      "corrects_source_ids": [],
+      "description": "Changes to 2026 W-2 family forms",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "w2-changes-2026.html",
+      "local_path": "corpora/irs-2026/downloads/w2-changes-2026.html",
+      "product_id": "w2_changes_2026",
+      "revision_year": 2026,
+      "sha256": "72f39fb70fe6a0f55252e11b8d6e49a1be4bca08714f9b0e09b8ef02f5091b10",
+      "source_id": "irs_w2_changes_2026",
+      "url": "https://www.irs.gov/forms-pubs/changes-to-the-2026-forms-w-2-w-2as-w-2gu-and-w-2vi-posted-on-irsgov"
+    },
+    {
+      "applicability_review": "Notice calls the instructions 2026; the linked current i8829.pdf is printed 2025. Applicability remains unresolved.",
+      "applicable_tax_years": [
+        2026
+      ],
+      "bytes_downloaded": 96845,
+      "corrects_source_ids": [],
+      "description": "Updates to Form 8829 instructions",
+      "disposition": "source_review_required",
+      "document_format": "html",
+      "document_status": "final",
+      "filename": "8829-update.html",
+      "local_path": "corpora/irs-2026/downloads/8829-update.html",
+      "product_id": "8829_update",
+      "revision_year": 2026,
+      "sha256": "7baaa91d530e0be30135610aa6f8e9c1edadb0dbfb2fb31db311ba4da01213b3",
+      "source_id": "irs_8829_update_posted_2026",
+      "url": "https://www.irs.gov/forms-pubs/updates-to-the-instructions-for-form-8829"
+    }
+  ],
+  "retrieved_at": "2026-11-12T20:07:24.082505+00:00",
+  "schema_version": 1,
+  "tax_year": 2026,
+  "watch_pages": [
+    {
+      "sha256": "4ee80ae12405ed9a27a4a3e21d5542a72cbcf723b890f9901179d01d7eed0c46",
+      "url": "https://www.irs.gov/forms-pubs/changes-to-current-forms-publications"
+    },
+    {
+      "sha256": "169299b504f36380f750cac6defe55b73b79673b78f654d132975c2a2275371a",
+      "url": "https://www.irs.gov/forms-instructions-and-publications"
+    },
+    {
+      "sha256": "fb95344b6046e63b458ac1cd4c57de339e6095301f8dd7edcd64032b7b9a40cc",
+      "url": "https://www.irs.gov/irb"
+    },
+    {
+      "sha256": "bcf1fabebdc2db80aae7356d82c6428f70693845018e96f4cc7efc52f1f9a1ee",
+      "url": "https://www.irs.gov/draft-tax-forms"
+    }
+  ]
+}

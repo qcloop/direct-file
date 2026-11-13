@@ -1,0 +1,62 @@
+source_id: "irs_1040_es_address_correction_2026"
+product_id: "1040_es_address_correction"
+tax_year: 2026
+source_revision_year: 2026
+document_status: "final"
+disposition: "source_review_required"
+corrects_source_ids:
+  - "irs_form_1040_es_2026"
+applicable_tax_years:
+  - 2026
+title: "Correction to 2026 Form 1040-ES mailing addresses"
+source_url: "https://www.irs.gov/forms-pubs/correction-to-the-mailing-addresses-in-the-2026-form-1040-es"
+pdf_sha256: null
+source_sha256: "3782d4099e8d6836188cc4df8d29cd7a9ef952a2236dcf5156c2e444724eba5c"
+document_format: "html"
+agency: "IRS"
+text_path: "direct-file/tax-knowledge/corpora/irs-2026/text/1040-es-address-correction.txt"
+generated_at: "2026-11-12T20:10:18.888790+00:00"
+chunking:
+  max_words: 450
+chunks:
+  - chunk_id: "irs_1040_es_address_correction_2026_chunk_0001"
+    source_id: "irs_1040_es_address_correction_2026"
+    product_id: "1040_es_address_correction"
+    title: "Correction to 2026 Form 1040-ES mailing addresses"
+    pages:
+      - 1
+    heading: null
+    text: |
+      If you downloaded or printed Form 1040-ES prior to Feb. 13, 2026, the address where you should mail your estimated tax payment voucher may have changed. The 2026 Form 1040-ES has been updated to reflect the correction.
+      Here is the correct list of states and mailing addresses for estimated tax payment vouchers:
+      If you live in… Then send it to…
+      Alabama, Alaska, Arizona, California, Colorado, Florida, Georgia, Hawaii, Idaho, Kansas, Louisiana, Michigan, Mississippi, Montana, Nebraska, Nevada, New Mexico, North Carolina, North Dakota, Ohio, Oregon, Pennsylvania, South Carolina, South Dakota, Tennessee, Texas, Utah, Washington, Wyoming Internal Revenue Service
+      P.O. Box 1300
+    text_sha256: "f6e32bf196025924fecf211a0ea1e9c50cd9b96a39657f74157827be01db052d"
+    source_url: "https://www.irs.gov/forms-pubs/correction-to-the-mailing-addresses-in-the-2026-form-1040-es"
+    pdf_sha256: "3782d4099e8d6836188cc4df8d29cd7a9ef952a2236dcf5156c2e444724eba5c"
+  - chunk_id: "irs_1040_es_address_correction_2026_chunk_0002"
+    source_id: "irs_1040_es_address_correction_2026"
+    product_id: "1040_es_address_correction"
+    title: "Correction to 2026 Form 1040-ES mailing addresses"
+    pages:
+      - 1
+    heading: "Charlotte, NC 28201-1300"
+    text: |
+      Charlotte, NC 28201-1300
+      Arkansas, Connecticut, Delaware, District of Columbia, Illinois, Indiana, Iowa, Kentucky, Maine, Maryland, Massachusetts, Minnesota, Missouri, New Hampshire, New Jersey, New York, Oklahoma, Rhode Island, Vermont, Virginia, West Virginia, Wisconsin Internal Revenue Service
+      P.O. Box 931100
+    text_sha256: "bd63e4e597b30728107ed00fc673d6100074b34b5f04ca117ef6f6a3eb99580c"
+    source_url: "https://www.irs.gov/forms-pubs/correction-to-the-mailing-addresses-in-the-2026-form-1040-es"
+    pdf_sha256: "3782d4099e8d6836188cc4df8d29cd7a9ef952a2236dcf5156c2e444724eba5c"
+  - chunk_id: "irs_1040_es_address_correction_2026_chunk_0003"
+    source_id: "irs_1040_es_address_correction_2026"
+    product_id: "1040_es_address_correction"
+    title: "Correction to 2026 Form 1040-ES mailing addresses"
+    pages:
+      - 1
+    heading: "Louisville, KY 40293-1100"
+    text: "Louisville, KY 40293-1100"
+    text_sha256: "b075cab9bf294dee1ba4ca7df24b0dc0f26d8766f9262cb9385131e3295ee3c9"
+    source_url: "https://www.irs.gov/forms-pubs/correction-to-the-mailing-addresses-in-the-2026-form-1040-es"
+    pdf_sha256: "3782d4099e8d6836188cc4df8d29cd7a9ef952a2236dcf5156c2e444724eba5c"

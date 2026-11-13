@@ -19,8 +19,9 @@ is resolved, delete it (git history keeps the record).
   (SSTB / W-2-wage / UBIA limits) governs; the tool returns an upper bound and flags it. Not modeled:
   the 8995-A limits and the expanded 2026 phase-in range. The eligible 2026 $400 minimum is now
   modeled with an explicit material-participation answer; unknown eligibility stays unknown.
-- **QBI base omits SE health-insurance and SE-retirement deductions** (not modeled), so QBI is a
-  slight overestimate when those apply. QBI here = net profit − deductible ½ SE tax only.
+- **QBI base omits SE health-insurance, SE-retirement, and qualified-tip adjustments** (not
+  modeled), so QBI and minimum-deduction eligibility can be overstated when these apply.
+  QBI here = net profit − deductible ½ SE tax only; affected cases need tax review.
 - **Filing status supports single / mfj / mfs only.** HoH and QSS are rejected; their standard
   deductions and ordinary brackets must not be approximated by single.
 - **Single consolidated Schedule C** (one SE business). Multi-business is additive (Collection +

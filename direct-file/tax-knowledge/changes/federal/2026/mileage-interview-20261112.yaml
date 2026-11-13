@@ -1,0 +1,43 @@
+tax_year: 2026
+jurisdiction: federal
+status: draft
+human_approvals: []
+requirement: User approved total-first mileage with a conditional follow-up. The IRS
+  source establishes the rate boundary; interview sequencing is a product decision.
+source_refs:
+- source_id: irs_announcement_2026_11
+  chunk_id: irs_announcement_2026_11_chunk_0014
+  pages:
+  - 13
+  text_sha256: e5b044a44b9f514e36d252a5e018bd8839ba95da0c0c54016ddd0e2c52e6fdfe
+changes:
+- change_id: total_first_mileage_interview
+  status: draft
+  kind: interview_and_input_handling
+  implementation: Retain one mileage total; return needs_facts with an authored question
+    only when actuals span the rate change. Derive one period by subtraction when
+    total and the other period are known. Keep unknown allocations pending.
+  fact_paths:
+  - /seVehicleBusinessMiles
+  - /planning/mileageAllocationPending
+  - /planning/mileageAsOfDate
+  - /planning/mileageIsProjection
+  - /seVehicleBusinessMilesBeforeChange
+  - /seVehicleBusinessMilesAfterChange
+  validation:
+  - MileageInterviewIntegrationTest
+  - TaxYear2026IntegrationTest
+  - ProjectNetProfitTest
+  safety_properties:
+  - Pending input/date/mode and Schedule C figures are saved atomically.
+  - Earlier period allocations are cleared on an unresolved replacement, making dependent
+    graph results incomplete.
+  - A follow-up may reuse inputs only for the same calculation mode and observation
+    date.
+  - Actual period miles remain separate from projected future miles; no automatic
+    allocation estimate is made.
+  limitations:
+  - The existing graph supports a single rate or two periods beginning at the configured
+    month boundary.
+  - New years still require complete year-specific approved parameters and interview
+    artifacts.

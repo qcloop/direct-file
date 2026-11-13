@@ -82,3 +82,44 @@ Entry template:
   evidence map, platform-fee/supplies/prior-year questions, anti-double-count help text). Commits
   `5ccd5b6`, `d00126f`.
 - **Status:** shipped.
+
+## FIND-005 — web agent supplied a placeholder planning session
+- **Signal:** User-visible reference `f9cc7369-84db-4615-890b-81eb225f99ce` matched
+  the companion TaxAdvisor app log at 2026-11-13 00:10:10 UTC. Ollama called
+  `plan_questions` with `sessionId: "?"`, without a preceding successful session
+  creation. The MCP server correctly returned an unknown/expired-session error.
+- **Finding:** Client tool-argument/session-orchestration failure. The generic UI
+  message suggested retrying an outage, which would not fix the invalid ID. This
+  report did not establish a mileage-calculation failure.
+- **Eval:** Companion app `Agents/src/provider/__tests__/ollama-sessions.test.ts`
+  and `Tools/src/mcp/__tests__/tool-failure.test.ts`: the reported no-session call,
+  stream/non-stream restoration, session ambiguity/isolation, and recovery message.
+  New regressions fail with the original code and pass with the patch. An AI SDK
+  replay into the real local MCP interview succeeded with synthetic inputs.
+- **Fix:** Companion app adapter processes responses even without an existing ID;
+  omits a placeholder for the optional sessionless interview; resolves placeholders
+  only when one session is known in that request; preserves explicit unknown IDs
+  and ambiguous contexts. Session failures receive an actionable recovery diagnostic.
+  Existing session-creation gating in that app is preserved. No tax-law/graph change.
+- **Status:** fixed locally in the companion app; typecheck, lint, 73 tests,
+  production build, MCP connectivity, and the real-MCP regression passed.
+
+## FIND-006 — obsolete runtime and empty optional mileage fields blocked total-only estimates
+- **Signal:** Companion log reference `5192d4cf-36bd-402d-8162-8f2bdf85fed1`
+  contained the obsolete split-rejection message. A synthetic local-model replay then
+  reproduced a positive total plus zero/zero optional period placeholders. After
+  calculation succeeded, the model sometimes omitted the assumption in its reply.
+- **Finding:** Building a newer jar had not replaced the listening JVM. Mandatory
+  allocation questions and optional-field placeholders made a total-only flow brittle.
+  Disclosure must be visible without depending on model prose.
+- **Eval:** `EstimatedMileageIntegrationTest`, exact-only mileage integration tests,
+  live MCP schema checks on the actual 8090 endpoint, companion summary/scenario and
+  chat-stream tests, and targeted local Ollama behavior eval.
+- **Fix:** User-selected labeled even-calendar-day estimate in the graph, distinct
+  actual/estimated/projected outputs, partial actual refinement, strict opt-in, atomic
+  input replacement, empty-pair handling, and actionable invalid-mileage diagnostics.
+  Client retains labels and canonical scenario inputs and appends a missing assumption
+  note deterministically. The actual local preview JVM was replaced with the tested jar.
+- **Status:** fixed locally; 103 service tests, 34 pipeline tests, 86 companion tests,
+  mandatory static/build gates, HTTP and client checks passed. See
+  `direct-file/tax-knowledge/runs/irs-2026-mileage-estimate-20261113.md`.

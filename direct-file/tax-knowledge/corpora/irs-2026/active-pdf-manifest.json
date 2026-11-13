@@ -2,6 +2,10 @@
   "downloaded": true,
   "entries": [
     {
+      "applicable_tax_years": [
+        2025,
+        2026
+      ],
       "bytes_downloaded": 260406,
       "description": "2026 inflation adjustments and 2025 corrections",
       "disposition": "active",
@@ -80,7 +84,25 @@
       "url": "https://www.irs.gov/pub/irs-pdf/p505.pdf"
     }
   ],
-  "retrieved_at": "2026-11-12T18:50:17.526589+00:00",
+  "retrieved_at": "2026-11-12T20:07:24.082505+00:00",
   "schema_version": 1,
-  "tax_year": 2026
+  "tax_year": 2026,
+  "watch_pages": [
+    {
+      "sha256": "4ee80ae12405ed9a27a4a3e21d5542a72cbcf723b890f9901179d01d7eed0c46",
+      "url": "https://www.irs.gov/forms-pubs/changes-to-current-forms-publications"
+    },
+    {
+      "sha256": "169299b504f36380f750cac6defe55b73b79673b78f654d132975c2a2275371a",
+      "url": "https://www.irs.gov/forms-instructions-and-publications"
+    },
+    {
+      "sha256": "fb95344b6046e63b458ac1cd4c57de339e6095301f8dd7edcd64032b7b9a40cc",
+      "url": "https://www.irs.gov/irb"
+    },
+    {
+      "sha256": "bcf1fabebdc2db80aae7356d82c6428f70693845018e96f4cc7efc52f1f9a1ee",
+      "url": "https://www.irs.gov/draft-tax-forms"
+    }
+  ]
 }

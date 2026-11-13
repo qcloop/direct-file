@@ -1,0 +1,81 @@
+tax_year: 2026
+jurisdiction: federal
+status: draft
+# Discovery classifications do not establish applicability or authorize runtime changes.
+rules:
+  - topic_id: self_employment
+    owner: small_business_tax_specialist
+    terms:
+      - schedule c
+      - schedule se
+      - self-employment
+      - net profit
+      - business miles
+      - standard mileage
+      - nonemployee compensation
+    artifact_targets:
+      - factgraph
+      - evidence_map
+      - interview
+      - validation
+      - scenario
+  - topic_id: estimated_tax
+    owner: federal_individual_income_tax_specialist
+    terms:
+      - estimated tax
+      - 1040-es
+      - installment
+      - payment voucher
+    artifact_targets:
+      - factgraph
+      - interview
+      - validation
+      - scenario
+  - topic_id: qbi
+    owner: small_business_tax_specialist
+    terms:
+      - qualified business income
+      - qbi
+      - 199a
+      - 8995
+    artifact_targets:
+      - factgraph
+      - interview
+      - validation
+      - scenario
+  - topic_id: income_evidence
+    owner: small_business_tax_specialist
+    terms:
+      - 1099-k
+      - 1099-nec
+      - 1099-misc
+      - cash tips
+      - occupation code
+      - reporting threshold
+    artifact_targets:
+      - evidence_map
+      - interview
+      - conflict
+      - pdf_config
+  - topic_id: w2_income
+    owner: federal_individual_income_tax_specialist
+    terms:
+      - form w-2
+      - wages
+      - dependent care
+      - fringe benefit
+    artifact_targets:
+      - evidence_map
+      - interview
+      - validation
+  - topic_id: scope_review
+    owner: federal_individual_income_tax_specialist
+    terms:
+      - itemized
+      - home office
+      - business use of your home
+      - overtime
+      - deduction
+    artifact_targets:
+      - interview
+      - validation

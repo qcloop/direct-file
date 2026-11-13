@@ -1,0 +1,305 @@
+source_id: "irs_form_1099_misc_dec2026"
+product_id: "f1099msc"
+tax_year: 2026
+source_revision_year: 2026
+document_status: "final"
+disposition: "source_review_required"
+revision_label: "December 2026"
+processing_year: 2027
+applicability_review: "Printed December 2026 revision verified. Form cover explains first use for calendar-year 2026 reporting, filed beginning January 2027; evidence mappings still require review."
+applicable_tax_years:
+  - 2026
+title: "Miscellaneous Information"
+source_url: "https://www.irs.gov/pub/irs-pdf/f1099msc.pdf"
+pdf_sha256: "38051fe1cdce8fac5183a7e7b182b1a0de590dcfec3e4f66a156eba3f98943fa"
+source_sha256: "38051fe1cdce8fac5183a7e7b182b1a0de590dcfec3e4f66a156eba3f98943fa"
+document_format: "pdf"
+agency: "IRS"
+text_path: "direct-file/tax-knowledge/corpora/irs-2026/text/f1099msc.txt"
+generated_at: "2026-11-12T20:10:18.884622+00:00"
+chunking:
+  max_words: 450
+chunks:
+  - chunk_id: "irs_form_1099_misc_dec2026_chunk_0001"
+    source_id: "irs_form_1099_misc_dec2026"
+    product_id: "f1099msc"
+    title: "Miscellaneous Information"
+    pages:
+      - 1
+    heading: "Attention:"
+    text: |
+      Attention:
+      Which Revision To Use for Which Year. We issue information returns up to a year in
+      advance of when issuers will first file them. For all forms that we do not issue annually (such
+      as Form 1040), the year of the revision date is the first year for which issuers are to use the
+      form to report amounts. For example, we issued an April 2025 revision of Form 1099-NEC,
+      Nonemployee Compensation, to use first to report amounts for calendar year 2025. Filers will
+      first file the April 2025 revision with the IRS beginning in January 2026, to report amounts for
+      2025. Likewise, we are developing a December 2026 revision of Form 1099-NEC, to use first
+      to report amounts for calendar year 2026 with the first filings with the IRS beginning in
+      January 2027.
+      We release these and other information return forms and their instructions up to a year in
+      advance of when you, as an issuer, are required to file them with the IRS. We do this because
+      the information return forms have multiple uses. We also provide a copy of the form for the
+      form issuer to use to furnish a copy of the form to the recipient. We require filers of
+      information returns, including Forms 1099-NEC and 1099-S, to furnish a copy of what is or will
+      be filed with the IRS to the recipient. In many cases, issuers of 1099 forms prefer to furnish
+      the information return to the recipient at the time they know what they will have to report to the
+      IRS beginning the following January. For example, you cannot file the December 2026
+      revision of Form 1099-S with the IRS for a reportable home sale occurring in January 2026
+      until January 2027. However, you may want to furnish the recipient (the seller of the home)
+      their copy of Form 1099-S at the closing of the sale, to avoid issues with mailing the Form
+      1099-S the following January, a year later, when the recipient may have a new mailing
+      address. We therefore make the Form 1099-S for use in reporting 2026 sales available just
+      before 2026, so issuers can use it to meet their responsibility to furnish a copy to the recipient
+      for sales beginning in 2026, even though the form can’t be filed with the IRS until January
+      2027. We also post drafts and final revisions of information returns well in advance so that
+      issuers will know at the beginning of a year what information they need to collect during that
+      year so they can report it to the IRS beginning in January of the following year.
+      Note: We make available Copy A for informational purposes only. Copy A appears in red,
+      similar to the official printed form. However, official printed versions of Copy A are scannable,
+      but self-printed copies of Copy A from this PDF are not. Do not print and file copy A of this
+      PDF; we may impose a penalty for filing information return forms that we can’t scan. See part
+      O in Publication 1099, General Instructions for Certain Information Returns, at
+      IRS.gov/Form1099 for more information about penalties.
+      You may download and print Copy B and other copies of this form, which appear in black, to
+      satisfy the requirement to furnish the information to the recipient.
+      If you have 10 or more information returns, in the aggregate, to file, you may be required to
+      e-file information returns. You’ll find that it is easier and faster to e-file using our free
+      Information Return Intake System (IRIS). See IRS.gov/InfoReturn and IRS.gov/IRIS for details.
+      To order official IRS information returns, which include a scannable Copy A for filing with the
+      IRS and all other applicable copies of the form, go to IRS.gov/EmployerForms. We’ll mail you
+      the forms you request and their instructions, as well as any publications you may order.
+      Note: The order limit for most information returns is 10 due to the e-file requirement.
+      See IRS Publications 1141, 1167, and 1179 for more information about these tax forms.
+    text_sha256: "31f09cb946bdfff0f49f95afd8da8ee94bb59c7af2aaeb07400fd876c289dc61"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1099msc.pdf"
+    pdf_sha256: "38051fe1cdce8fac5183a7e7b182b1a0de590dcfec3e4f66a156eba3f98943fa"
+  - chunk_id: "irs_form_1099_misc_dec2026_chunk_0002"
+    source_id: "irs_form_1099_misc_dec2026"
+    product_id: "f1099msc"
+    title: "Miscellaneous Information"
+    pages:
+      - 2
+    heading: null
+    text: |
+      9595 VOID CORRECTED
+      PAYER’S name 1   Rents OMB No. 1545-0115
+      $ Form 1099-MISC Miscellaneous
+      Street address Room or suite no. 2   Royalties (Rev. December 2026) Information
+      For calendar year
+      City or town Telephone number $
+      3   Other income 4   Federal income tax Copy A
+      withheld
+      State or province Country ZIP or foreign postal code For
+      $ $ Internal Revenue
+      PAYER’S TIN RECIPIENT’S TIN 5   Fishing boat proceeds 6   Medical and health care Service Center
+      payments
+      $ $
+      RECIPIENT’S name 7   Payer made direct sales 8   Substitute payments in For filing
+      totaling $5,000 or more of lieu of dividends or interest information,
+      consumer products to
+      recipient for resale $ Privacy Act, and
+      Street address Apt. no. 9   Crop insurance proceeds 10   Gross proceeds paid to Paperwork
+      an attorney Reduction Act
+      $ $ Notice, see the
+      City or town 11   Fish purchased for resale 12   Section 409A deferrals General
+      $ $ Instructions for
+      State or province Country ZIP or foreign postal code 13a Cash tips 13b TTOC Certain
+      $ Information
+      FATCA filing 14   Overtime compensation 15   Nonqualified deferred Returns.
+      requirement compensation
+      $ $ www.irs.gov/Form1099
+      Account number (see instructions) 2nd TIN not. 16   State tax withheld 17   State/Payer’s state no. 18   State income
+      $ $
+      $ $
+      Form 1099-MISC (Rev. 12-2026) Created 5/26/26 Cat. No. 14425J www.irs.gov/Form1099MISC Department of the Treasury - Internal Revenue Service
+      Do Not Cut or Separate Forms on This Page — Do Not Cut or Separate Forms on This Page
+    text_sha256: "a0b51d8023dec14ff0ae007bafbdc8ed21e8b190b8c4f550dfdd3ea38d507bf7"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1099msc.pdf"
+    pdf_sha256: "38051fe1cdce8fac5183a7e7b182b1a0de590dcfec3e4f66a156eba3f98943fa"
+  - chunk_id: "irs_form_1099_misc_dec2026_chunk_0003"
+    source_id: "irs_form_1099_misc_dec2026"
+    product_id: "f1099msc"
+    title: "Miscellaneous Information"
+    pages:
+      - 3
+    heading: "VOID CORRECTED"
+    text: |
+      VOID CORRECTED
+      PAYER’S name 1   Rents OMB No. 1545-0115
+      $ Form 1099-MISC Miscellaneous
+      Street address Room or suite no. 2   Royalties (Rev. December 2026) Information
+      For calendar year
+      City or town Telephone number $
+      3   Other income 4   Federal income tax Copy 1
+      withheld
+      State or province Country ZIP or foreign postal code For State Tax
+      $ $ Department
+      PAYER’S TIN RECIPIENT’S TIN 5   Fishing boat proceeds 6   Medical and health care
+      payments
+      $ $
+      RECIPIENT’S name 7   Payer made direct sales 8   Substitute payments in
+      totaling $5,000 or more of lieu of dividends or interest
+      consumer products to
+      recipient for resale $
+      Street address Apt. no. 9   Crop insurance proceeds 10   Gross proceeds paid to
+      an attorney
+      $ $
+      City or town 11   Fish purchased for resale 12   Section 409A deferrals
+      $ $
+      State or province Country ZIP or foreign postal code 13a Cash tips 13b TTOC
+      $
+      FATCA filing 14   Overtime compensation 15   Nonqualified deferred
+      requirement compensation
+      $ $
+      Account number (see instructions) 16   State tax withheld 17   State/Payer’s state no. 18   State income
+      $ $
+      $ $
+      Form 1099-MISC (Rev. 12-2026) www.irs.gov/Form1099MISC Department of the Treasury - Internal Revenue Service
+    text_sha256: "f2bb2f1373ae3e721b4828a57f876d735a0a729ad4db36ca00616598cd36f5ec"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1099msc.pdf"
+    pdf_sha256: "38051fe1cdce8fac5183a7e7b182b1a0de590dcfec3e4f66a156eba3f98943fa"
+  - chunk_id: "irs_form_1099_misc_dec2026_chunk_0004"
+    source_id: "irs_form_1099_misc_dec2026"
+    product_id: "f1099msc"
+    title: "Miscellaneous Information"
+    pages:
+      - 4
+    heading: "CORRECTED (if checked)"
+    text: |
+      CORRECTED (if checked)
+      PAYER’S name 1   Rents OMB No. 1545-0115
+      $ Form 1099-MISC Miscellaneous
+      Street address Room or suite no. 2   Royalties (Rev. December 2026) Information
+      For calendar year
+      City or town Telephone number $
+      3   Other income 4   Federal income tax Copy B
+      withheld
+      State or province Country ZIP or foreign postal code For Recipient
+      $ $
+      PAYER’S TIN RECIPIENT’S TIN 5   Fishing boat proceeds 6   Medical and health care
+      payments
+      $ $
+      RECIPIENT’S name 7   Payer made direct sales 8   Substitute payments in
+      totaling $5,000 or more of lieu of dividends or interest
+      consumer products to This is important tax
+      recipient for resale $ information and is
+      being furnished to
+      Street address Apt. no. 9   Crop insurance proceeds 10   Gross proceeds paid to
+      an attorney the IRS. If you are
+      $ $ required to file a
+      return, a negligence
+      City or town 11   Fish purchased for resale 12   Section 409A deferrals penalty or other
+      $ $ sanction may be
+      imposed on you if
+      State or province Country ZIP or foreign postal code 13a Cash tips 13b TTOC this income is
+      $ taxable and the IRS
+      FATCA filing 14   Overtime compensation 15   Nonqualified deferred determines that it
+      requirement compensation has not been
+      reported.
+      $ $
+      Account number (see instructions) 16   State tax withheld 17   State/Payer’s state no. 18   State income
+      $ $
+      $ $
+      Form 1099-MISC (Rev. 12-2026) (keep for your records) www.irs.gov/Form1099MISC Department of the Treasury - Internal Revenue Service
+    text_sha256: "4a3e69a76c067e13fbbe1113dd0fe26b9228a3025c5688a68619270f3ec14ab0"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1099msc.pdf"
+    pdf_sha256: "38051fe1cdce8fac5183a7e7b182b1a0de590dcfec3e4f66a156eba3f98943fa"
+  - chunk_id: "irs_form_1099_misc_dec2026_chunk_0005"
+    source_id: "irs_form_1099_misc_dec2026"
+    product_id: "f1099msc"
+    title: "Miscellaneous Information"
+    pages:
+      - 5
+    heading: null
+    text: |
+      Instructions for Recipient for resale on a buy-sell, a deposit-commission, or another basis. Generally,
+      report any income from your sale of these products on Schedule C (Form 1040).
+      Recipient’s taxpayer identification number (TIN). For your protection, this
+      form may show only the last four digits of your social security number (SSN), Box 8. Shows substitute payments in lieu of dividends or tax-exempt interest
+      individual taxpayer identification number (ITIN), adoption taxpayer identification received by your broker on your behalf as a result of a loan of your securities.
+      number (ATIN), or employer identification number (EIN). However, the payer has Report on the “Other income” line of Schedule 1 (Form 1040).
+      reported your complete TIN to the IRS. Box 9. Report this amount on Schedule F (Form 1040).
+      Account number. May show an account or other unique number the payer Box 10. Shows gross proceeds paid to an attorney in connection with legal
+      assigned to distinguish your account. services. Report only the taxable part as income on your return.
+      FATCA filing requirement. If the FATCA filing requirement box is checked, the Box 11. Shows the amount of cash you received for the sale of fish if you are in
+      payer is reporting on this Form 1099 to satisfy its account reporting requirement the trade or business of catching fish.
+      under chapter 4 of the Internal Revenue Code. You may also have a filing Box 12. May show current-year deferrals as a nonemployee under a
+      requirement. See the Instructions for Form 8938. nonqualified deferred compensation (NQDC) plan that is subject to the
+      Amounts shown may be subject to self-employment (SE) tax. Individuals requirements of section 409A plus any earnings on current- and prior-year
+      should see the Instructions for Schedule SE (Form 1040). Corporations, deferrals.
+      fiduciaries, or partnerships must report the amounts on the appropriate lines of Box 13a. Shows the total amount of cash tips. “Cash tips” include tips received
+      their tax returns. in cash or charged. This amount has been included in the amount reported in
+      Form 1099-MISC incorrect? If this form is incorrect or has been issued in error, box 3. Use the amount in box 13a when determining the qualified tip deduction
+      contact the payer. If you cannot get this form corrected, attach an explanation in Part II of Schedule 1-A (Form 1040).
+      to your tax return and report your information correctly.
+      Box 13b. Shows up to two Treasury Tipped Occupation Code(s) (TTOC) for your
+      Box 1. Report rents from real estate on Schedule E (Form 1040). However,
+      report rents on Schedule C (Form 1040) if you provided significant services to tipped occupation(s). Use this code(s) in determining the deduction for qualified
+      the tenant, sold real estate as a business, or rented personal property as a tips in Part II of Schedule 1-A (Form 1040). If the occupation code 000 is used,
+      business. See Pub. 527. and no other code is included in box 13b, your cash tips are not qualified tips;
+      Box 2. Report royalties from oil, gas, or mineral properties; copyrights; and do not use the amount reported in box 13a for the deduction for qualified tips.
+      patents on Schedule E (Form 1040). However, report payments for a working Box 14. Shows the total amount of qualified overtime compensation. This
+      interest as explained in the Schedule E (Form 1040) instructions. For royalties on amount has been included in the amount reported in box 3. Use the amount in
+      timber, coal, and iron ore, see Pub. 544. box 14 when determining the qualified overtime compensation deduction in Part
+      Box 3. Generally, report this amount on the “Other income” line of Schedule 1 III of Schedule 1-A (Form 1040).
+      (Form 1040) and identify the payment. The amount shown may be payments Box 15. Shows income as a nonemployee under an NQDC plan that does not
+      received as the beneficiary of a deceased employee, prizes, awards, taxable meet the requirements of section 409A. Any amount included in box 12 that is
+      damages, Indian gaming profits, or other taxable income. See Pub. 525. If it is currently taxable is also included in this box. Report this amount as income on
+      trade or business income, report this amount on Schedule C or F (Form 1040). your tax return. This income is also subject to a substantial additional tax to be
+      Box 4. Shows backup withholding or withholding on Indian gaming profits. reported on Form 1040, 1040-SR, or 1040-NR. See the instructions for your tax
+      Generally, a payer must backup withhold if you did not furnish your TIN. See return.
+      Form W-9 and Pub. 505 for more information. Report this amount on your Boxes 16–18. Show state or local income tax withheld from the payments.
+      income tax return as tax withheld.
+      Box 5. Shows the amount paid to you as a fishing boat crew member by the Future developments. For the latest information about developments related to
+      operator, who considers you to be self-employed. Self-employed individuals Form 1099-MISC and its instructions, such as legislation enacted after they
+      must report this amount on Schedule C (Form 1040). See Pub. 334. were published, go to www.irs.gov/Form1099MISC.
+      Box 6. For individuals, report on Schedule C (Form 1040). Free File Program. Go to www.irs.gov/FreeFile to see if you qualify for no-cost
+      online federal tax preparation, e-filing, and direct deposit or payment options.
+      Box 7. If checked, consumer products totaling $5,000 or more were sold to you
+    text_sha256: "e81b53c185e06a2aea3b2b3e02a57c37590e198b450277e002ee33e34669bcf8"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1099msc.pdf"
+    pdf_sha256: "38051fe1cdce8fac5183a7e7b182b1a0de590dcfec3e4f66a156eba3f98943fa"
+  - chunk_id: "irs_form_1099_misc_dec2026_chunk_0006"
+    source_id: "irs_form_1099_misc_dec2026"
+    product_id: "f1099msc"
+    title: "Miscellaneous Information"
+    pages:
+      - 6
+    heading: "CORRECTED (if checked)"
+    text: |
+      CORRECTED (if checked)
+      PAYER’S name 1   Rents OMB No. 1545-0115
+      $ Form 1099-MISC Miscellaneous
+      Street address Room or suite no. 2   Royalties (Rev. December 2026) Information
+      For calendar year
+      City or town Telephone number $
+      3   Other income 4   Federal income tax Copy 2
+      withheld
+      State or province Country ZIP or foreign postal code To be filed with
+      $ $ recipient’s state
+      PAYER’S TIN RECIPIENT’S TIN 5   Fishing boat proceeds 6   Medical and health care income tax return,
+      payments when required.
+      $ $
+      RECIPIENT’S name 7   Payer made direct sales 8   Substitute payments in
+      totaling $5,000 or more of lieu of dividends or interest
+      consumer products to
+      recipient for resale $
+      Street address Apt. no. 9   Crop insurance proceeds 10   Gross proceeds paid to
+      an attorney
+      $ $
+      City or town 11   Fish purchased for resale 12   Section 409A deferrals
+      $ $
+      State or province Country ZIP or foreign postal code 13a Cash tips 13b TTOC
+      $
+      FATCA filing 14   Overtime compensation 15   Nonqualified deferred
+      requirement compensation
+      $ $
+      Account number (see instructions) 16   State tax withheld 17   State/Payer’s state no. 18   State income
+      $ $
+      $ $
+      Form 1099-MISC (Rev. 12-2026) www.irs.gov/Form1099MISC Department of the Treasury - Internal Revenue Service
+    text_sha256: "c25e5c71b7fa246352f32a6dc919ced073256ce9baa8361572bbf09f4bc0cb61"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1099msc.pdf"
+    pdf_sha256: "38051fe1cdce8fac5183a7e7b182b1a0de590dcfec3e4f66a156eba3f98943fa"

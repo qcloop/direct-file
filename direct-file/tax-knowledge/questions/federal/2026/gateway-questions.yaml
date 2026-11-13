@@ -1,6 +1,21 @@
 jurisdiction: "federal"
 questions:
   - asks_when:
+      all:
+        - fact: "/planning/mileageAllocationPending"
+          equals: true
+    help_text: "Your total and the date it covers are saved. Enter the actual miles before July 1, including 0 if none. The tool subtracts this from your total to obtain the remaining period. If you do not know, leave the allocation pending."
+    priority: "detail"
+    prompt: "Of your total business miles, how many were driven before July 1, 2026?"
+    question_id: "se_vehicle_business_miles_before_rate_change"
+    skip_when: {}
+    source_ids:
+      - "irs_announcement_2026_11"
+    topic_id: "self_employment"
+    why_we_ask: "Your figures span two mileage rates. One period amount is enough to allocate the total accurately."
+    writes:
+      - "/seVehicleBusinessMilesBeforeChange"
+  - asks_when:
       all: []
     priority: "gateway"
     prompt: "Have you earned, or do you expect to earn, wages or salary in income year 2026?"
@@ -56,10 +71,10 @@ questions:
           fact: "/hasSelfEmploymentIncome"
         - equals: true
           fact: "/usesVehicleForBusiness"
-    help_text: "Enter 0 if none. Exclude commuting and personal miles. Keep the two date periods separate because the 2026 mileage rate changes on July 1. The projection tool estimates future mileage from these actual amounts."
+    help_text: "Exclude commuting and personal miles. Start with one total. If the period split is unknown, the tool returns a labeled planning estimate assuming even mileage over covered calendar days. Actual period miles can refine it later. A breakdown question is required only in exact-only mode. Keep actual, estimated, and projected miles distinct."
     priority: "detail"
-    prompt: "How many actual business miles have you driven before July 1, 2026, through the date your figures cover?"
-    question_id: "se_vehicle_business_miles_before_rate_change"
+    prompt: "How many actual business miles have you driven so far in 2026, through the date your figures cover?"
+    question_id: "se_vehicle_business_miles"
     skip_when:
       any:
         - equals: false
@@ -67,33 +82,12 @@ questions:
         - equals: false
           fact: "/usesVehicleForBusiness"
     source_ids:
+      - "irs_notice_2026_10"
       - "irs_announcement_2026_11"
     topic_id: "self_employment"
-    why_we_ask: "Each period has its own standard mileage rate. The deterministic graph applies both rates and projects remaining mileage when needed."
+    why_we_ask: "Business mileage can reduce Schedule C profit. The applicable rates depend on the income year and when the miles were driven."
     writes:
-      - "/seVehicleBusinessMilesBeforeChange"
-  - asks_when:
-      all:
-        - equals: true
-          fact: "/hasSelfEmploymentIncome"
-        - equals: true
-          fact: "/usesVehicleForBusiness"
-    help_text: "Enter 0 if none. Exclude commuting and personal miles. Keep the two date periods separate because the 2026 mileage rate changes on July 1. The projection tool estimates future mileage from these actual amounts."
-    priority: "detail"
-    prompt: "How many actual business miles have you driven from July 1, 2026 onward, through the date your figures cover?"
-    question_id: "se_vehicle_business_miles_after_rate_change"
-    skip_when:
-      any:
-        - equals: false
-          fact: "/hasSelfEmploymentIncome"
-        - equals: false
-          fact: "/usesVehicleForBusiness"
-    source_ids:
-      - "irs_announcement_2026_11"
-    topic_id: "self_employment"
-    why_we_ask: "Each period has its own standard mileage rate. The deterministic graph applies both rates and projects remaining mileage when needed."
-    writes:
-      - "/seVehicleBusinessMilesAfterChange"
+      - "/seVehicleBusinessMiles"
   - asks_when:
       all:
         - equals: true

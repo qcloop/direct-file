@@ -258,6 +258,9 @@ def segment_manifest(args: argparse.Namespace) -> list[pathlib.Path]:
                 "tax_year": args.tax_year,
                 "source_revision_year": enriched.get("revision_year"),
                 "document_status": enriched.get("document_status", "unverified"),
+                **{key: enriched[key] for key in (
+                    "disposition", "revision_label", "processing_year", "corrects_source_ids", "applicability_review"
+                ) if key in enriched},
                 "applicable_tax_years": enriched.get("applicable_tax_years", [args.tax_year]),
                 "title": enriched.get("description"),
                 "source_url": enriched["url"],

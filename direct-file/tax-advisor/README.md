@@ -109,13 +109,34 @@ against agent overrides. Parameters and citations are loaded once; sessions and 
 carry a combined knowledge/XML hash. A retained Redis session from a different version
 is rejected with instructions to recreate it.
 
-For 2026 mileage, full-year calculations require `businessMilesBeforeRateChange` and
-`businessMilesAfterRateChange` (January–June and July–December). Enter zero for an empty
-period. YTD projections use the corresponding `ytdBusinessMilesBeforeRateChange` and
-`ytdBusinessMilesAfterRateChange` fields. Before July, a combined YTD total can be assigned
-to the first period; from July onward the tool requires both period totals rather than
-guessing. Results expose both rates and the change date. Projections retain the completed
-first period and project the second from its own observed pace.
+Collect one actual mileage total first: `businessMiles` for full-year figures or
+`ytdBusinessMiles` with `asOfDate` for a YTD projection. When figures span a rate
+change and the split is unknown, the default is a labeled planning estimate:
+`mileageAllocationStatus: estimated`, `mileageAllocationNote`, and no required
+follow-up. An empty `0/0` period pair is treated as no allocation of a supplied
+total; it never creates actual period records for positive mileage. Other invalid
+period sums are rejected before any saved inputs change. The graph allocates the total evenly by calendar day from January 1
+through the coverage date. This is a planning assumption, not an IRS allocation
+rule. It may be unsuitable for seasonal driving or a business started midyear.
+
+Dated `mileagePeriods` keep `actualBusinessMiles`, `estimatedBusinessMiles`, and
+`projectedBusinessMiles` separate. Assumed counts never enter actual-mile facts.
+Exports disclose the assumption. Projection results also return authoritative
+`projectedBusinessMiles`; clients must not apply the income annualization factor
+to mileage. `recordedInputs` preserves the scenario baseline after partial replies.
+
+Supply either period's actual miles to refine an estimated calculation; the
+remaining period is derived from the retained total. The two-period input pair
+also remains supported. A reply for the same date and calculation mode can omit
+receipts, expenses, wages, total, and date. Changing date or mode requires fresh
+inputs. An invalid reply leaves the saved estimate intact.
+
+For an exact-only request, set `/planning/requireExactMileageAllocation` to
+`true` with `set_fact` (type `boolean`) before calculating. Unallocated totals then
+return `needs_facts` and one authored question; dependent tax facts are incomplete.
+`mileageAllocationStatus` is `actual`, `estimated`, or `pending`. Inputs are replaced
+atomically so prior actual allocations cannot leak into a new estimate.
+
 
 The 2026 QBI minimum can require a taxpayer-confirmed `materiallyParticipates` answer on
 `estimate_qbi_deduction`. Unknown eligibility produces `needs_facts`; it is not inferred

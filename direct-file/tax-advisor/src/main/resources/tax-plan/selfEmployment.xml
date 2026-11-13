@@ -156,6 +156,114 @@
     </Fact>
 
     <!-- Period-specific mileage remains in the graph so citations follow both rates. -->
+    <Fact path="/planning/requireExactMileageAllocation">
+      <Name>Require actual recorded mileage for both rate periods</Name>
+      <Writable>
+        <Boolean />
+      </Writable>
+    </Fact>
+    <Fact path="/planning/mileageAllocationEstimated">
+      <Name>Mileage period allocation is a planning assumption</Name>
+      <Writable>
+        <Boolean />
+      </Writable>
+    </Fact>
+    <Fact path="/planning/mileageAllocationAssumption">
+      <Name>Disclosed mileage planning assumption</Name>
+      <Writable>
+        <String />
+      </Writable>
+    </Fact>
+    <Fact path="/seMileageFirstPeriodShare">
+      <Name>Estimated share of observed miles before the rate change</Name>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+    <Fact path="/seMileageSecondPeriodShare">
+      <Name>Estimated share of observed miles from the rate change</Name>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+    <Fact path="/seMileageCalculatedMilesBeforeChange">
+      <Name>First-period miles used for planning</Name>
+      <Description>Keep estimated allocation separate from actual recorded period miles.</Description>
+      <Derived>
+        <Switch>
+          <Case>
+            <When>
+              <Dependency path="/planning/mileageAllocationEstimated" />
+            </When>
+            <Then>
+              <Multiply>
+                <Dependency path="/seVehicleBusinessMiles" />
+                <Dependency path="/seMileageFirstPeriodShare" />
+              </Multiply>
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <True />
+            </When>
+            <Then>
+              <Multiply>
+                <Dependency path="/seVehicleBusinessMilesBeforeChange" />
+                <Rational>1/1</Rational>
+              </Multiply>
+            </Then>
+          </Case>
+        </Switch>
+      </Derived>
+    </Fact>
+    <Fact path="/seMileageCalculatedMilesAfterChange">
+      <Name>Second-period miles used for planning</Name>
+      <Description>Keep estimated allocation separate from actual recorded period miles.</Description>
+      <Derived>
+        <Switch>
+          <Case>
+            <When>
+              <Dependency path="/planning/mileageAllocationEstimated" />
+            </When>
+            <Then>
+              <Multiply>
+                <Dependency path="/seVehicleBusinessMiles" />
+                <Dependency path="/seMileageSecondPeriodShare" />
+              </Multiply>
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <True />
+            </When>
+            <Then>
+              <Multiply>
+                <Dependency path="/seVehicleBusinessMilesAfterChange" />
+                <Rational>1/1</Rational>
+              </Multiply>
+            </Then>
+          </Case>
+        </Switch>
+      </Derived>
+    </Fact>
+    <Fact path="/planning/mileageAllocationPending">
+      <Name>Mileage total needs a rate-period allocation</Name>
+      <Writable>
+        <Boolean />
+      </Writable>
+    </Fact>
+    <Fact path="/planning/mileageAsOfDate">
+      <Name>Date the actual mileage figures cover</Name>
+      <Writable>
+        <String />
+      </Writable>
+    </Fact>
+    <Fact path="/planning/mileageIsProjection">
+      <Name>Mileage inputs are year-to-date actuals used for projection</Name>
+      <Writable>
+        <Boolean />
+      </Writable>
+    </Fact>
     <Fact path="/seMileageSplitRate">
       <Name>Mileage rate changes within this income year</Name>
       <Description>Mileage rate changes within this income year</Description>
@@ -231,7 +339,7 @@
               </LessThan>
             </When>
             <Then>
-              <Dependency path="/seVehicleBusinessMilesBeforeChange" />
+              <Dependency path="/seMileageCalculatedMilesBeforeChange" />
             </Then>
           </Case>
           <Case>
@@ -239,13 +347,62 @@
               <True />
             </When>
             <Then>
-              <Dependency path="/seVehicleBusinessMilesAfterChange" />
+              <Dependency path="/seMileageCalculatedMilesAfterChange" />
             </Then>
           </Case>
         </Switch>
       </Derived>
     </Fact>
 
+    <Fact path="/seMileageProjectedMilesBeforeChange">
+      <Name>Projected business miles before the rate change</Name>
+      <Derived>
+        <Multiply>
+          <Dependency path="/seMileageCalculatedMilesBeforeChange" />
+          <Dependency path="/seMileageFirstPeriodFactor" />
+        </Multiply>
+      </Derived>
+    </Fact>
+    <Fact path="/seMileageProjectedMilesAfterChange">
+      <Name>Projected business miles from the rate change</Name>
+      <Derived>
+        <Multiply>
+          <Dependency path="/seMileageSecondPeriodBase" />
+          <Dependency path="/seMileageSecondPeriodFactor" />
+        </Multiply>
+      </Derived>
+    </Fact>
+    <Fact path="/seProjectedBusinessMiles">
+      <Name>Projected full-year business mileage</Name>
+      <Description>Mileage projection is independent of the income annualization factor when its allocation uses elapsed
+        days.</Description>
+      <Derived>
+        <Switch>
+          <Case>
+            <When>
+              <Dependency path="/seMileageSplitRate" />
+            </When>
+            <Then>
+              <Add>
+                <Dependency path="/seMileageProjectedMilesBeforeChange" />
+                <Dependency path="/seMileageProjectedMilesAfterChange" />
+              </Add>
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <True />
+            </When>
+            <Then>
+              <Multiply>
+                <Dependency path="/seVehicleBusinessMiles" />
+                <Dependency path="/seAnnualizationFactor" />
+              </Multiply>
+            </Then>
+          </Case>
+        </Switch>
+      </Derived>
+    </Fact>
     <Fact path="/seSplitRateVehicleDeduction">
       <Name>Vehicle deduction across both mileage-rate periods</Name>
       <Description>Sum each period's miles times its exact rate and projection factor, rounding once.</Description>
@@ -253,7 +410,7 @@
         <Round>
           <Add>
             <Multiply>
-              <Dependency path="/seVehicleBusinessMilesBeforeChange" />
+              <Dependency path="/seMileageCalculatedMilesBeforeChange" />
               <Dependency path="/standardMileageRate" />
               <Dependency path="/seMileageFirstPeriodFactor" />
               <Dollar>1</Dollar>

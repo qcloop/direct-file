@@ -1,0 +1,36 @@
+source_id: "irs_8995a_qbi_correction_posted_2026"
+product_id: "8995a_qbi_correction"
+tax_year: 2026
+source_revision_year: 2026
+document_status: "final"
+disposition: "source_review_required"
+corrects_source_ids: []
+applicable_tax_years:
+  - 2025
+title: "Form 8995-A taxable income before QBI correction"
+source_url: "https://www.irs.gov/forms-pubs/corrections-to-the-instructions-on-how-to-calculate-the-taxable-income-before-qbi-deduction-for-form-8995-a"
+pdf_sha256: null
+source_sha256: "368da758115694b240c46fb9297a2a7b4172718f42ed793688f02b1a62fe82ca"
+document_format: "html"
+agency: "IRS"
+text_path: "direct-file/tax-knowledge/corpora/irs-2026/text/8995a-qbi-correction.txt"
+generated_at: "2026-11-12T20:10:18.889770+00:00"
+chunking:
+  max_words: 450
+chunks:
+  - chunk_id: "irs_8995a_qbi_correction_posted_2026_chunk_0001"
+    source_id: "irs_8995a_qbi_correction_posted_2026"
+    product_id: "8995a_qbi_correction"
+    title: "Form 8995-A taxable income before QBI correction"
+    pages:
+      - 1
+    heading: null
+    text: |
+      If you viewed, printed, or downloaded the 2025 Instructions for Form 8995-A prior to Jan. 27, 2026, please note the following corrections to page 5.
+      Under Specific Instructions, the language on how to calculate taxable income before QBI deduction was incorrect for the first two bullets. The corrected instructions are below.
+      Taxable income before QBI deduction. Form 8995-A, Part III, Part IV, and Schedule A (Form 8995-A) each ask for your taxable income figured without regard to the QBI deduction. Enter your taxable income figured before any QBI deduction, computed as follows.
+      Form 1040 or 1040-SR filers: Form 1040 or 1040-SR, line 11a, minus lines 12e and 13b.
+      1040-NR filers: 1040-NR, line 11a, minus lines 12, 13b, and 13c.
+    text_sha256: "746972c538e0375ec013837f73736366c79c1320158c566d8edc8f2cab4efdfb"
+    source_url: "https://www.irs.gov/forms-pubs/corrections-to-the-instructions-on-how-to-calculate-the-taxable-income-before-qbi-deduction-for-form-8995-a"
+    pdf_sha256: "368da758115694b240c46fb9297a2a7b4172718f42ed793688f02b1a62fe82ca"

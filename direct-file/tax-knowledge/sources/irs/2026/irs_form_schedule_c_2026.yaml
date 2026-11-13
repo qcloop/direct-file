@@ -1,0 +1,134 @@
+source_id: "irs_form_schedule_c_2026"
+product_id: "f1040sc"
+tax_year: 2026
+source_revision_year: 2026
+document_status: "final"
+disposition: "source_review_required"
+revision_label: "2026"
+applicability_review: "Verify printed revision and effective dates before artifact promotion."
+applicable_tax_years:
+  - 2026
+title: "Profit or Loss From Business (Schedule C)"
+source_url: "https://www.irs.gov/pub/irs-pdf/f1040sc.pdf"
+pdf_sha256: "cc44e7d1150e54d991835814c1191f60a32617730ca9e50e6f532b51293a86b4"
+source_sha256: "cc44e7d1150e54d991835814c1191f60a32617730ca9e50e6f532b51293a86b4"
+document_format: "pdf"
+agency: "IRS"
+text_path: "direct-file/tax-knowledge/corpora/irs-2026/text/f1040sc.txt"
+generated_at: "2026-11-12T20:10:18.864789+00:00"
+chunking:
+  max_words: 450
+chunks:
+  - chunk_id: "irs_form_schedule_c_2026_chunk_0001"
+    source_id: "irs_form_schedule_c_2026"
+    product_id: "f1040sc"
+    title: "Profit or Loss From Business (Schedule C)"
+    pages:
+      - 1
+    heading: null
+    text: |
+      SCHEDULE C  Profit or Loss From Business OMB No. 1545-0074
+      (Form 1040) (Sole Proprietorship) 2026
+      Department of the Treasury  Attach to Form 1040, 1040-SR, 1040-SS, 1040-NR, or 1041; partnerships must generally file Form 1065.
+      Attachment
+      Internal Revenue Service  Go to www.irs.gov/ScheduleC for instructions and the latest information. Sequence No. 09
+      Name of proprietor Social security number (SSN)
+      A   Principal business or profession, including product or service (see instructions) B  Enter code from instructions
+      C   Business name. If no separate business name, leave blank. D  Employer ID number (EIN) (see instr.)
+      E   Business address. Number and street. If you have a post office box, see instructions. Apt. no.
+      City, town, or post office State ZIP code
+      F Accounting method: (1) Cash (2) Accrual (3) Other (specify)
+      G Did you “materially participate” in the operation of this business during 2026? If “No,” see instructions for limit on losses . .  Yes No
+      H If you started or acquired this business during 2026, check here . . . . . . . . . . . . . . . . . . .
+      I Did you make any payments in 2026 that would require you to file Form(s) 1099? See instructions . . . . . . . . . Yes No
+      J If “Yes,” did you or will you file required Form(s) 1099? . . . . . . . . . . . . . . . . . . . . . Yes No
+      Part I Income
+      1 Gross receipts or sales. See instructions for line 1 and check the box if this income was reported to you on
+      Form W-2 and the “Statutory employee” box on that form was checked . . . . . . . . . . . 1
+      2 Returns and allowances . . . . . . . . . . . . . . . . . . . . . . . . . . 2
+      3 Subtract line 2 from line 1 . . . . . . . . . . . . . . . . . . . . . . . . . 3
+      4 Cost of goods sold (from line 42) . . . . . . . . . . . . . . . . . . . . . . . 4
+      5 Gross profit. Subtract line 4 from line 3 . . . . . . . . . . . . . . . . . . . . . 5
+      6 Other income, including federal and state gasoline or fuel tax credit or refund (see instructions) . . . . . 6
+      7 Gross income. Add lines 5 and 6 . . . . . . . . . . . . . . . . . . . . . . . 7
+      Part II Expenses. Enter expenses for business use of your home only on line 30.
+      8 Advertising . . . . . . . 8 18 Office expense (see instructions)  18
+      9 Car and truck expenses (see 19 Pension and profit-sharing plans  19
+      instructions) . . . . . . 9 20 Rent or lease (see instructions):
+      10 Commissions and fees . . . 10 20 a Vehicles, machinery, and equipment 20a
+      11 Contract labor (see instructions)  11 20 b Other business property . . . 20b
+      12 Depletion . . . . . . . 12 21 Repairs and maintenance . . . 21
+      13 Depreciation and section 179 22 Supplies (not included in Part III)   22
+      expense deduction (not  included 23 Taxes and licenses . . . . 23
+      in Part III) (see instructions) . . 13
+      24 Travel and meals:
+      14 Employee benefit programs (other
+      24 a Travel . . . . . . . . 24a
+      than on line 19) . . . . . 14
+      24 b Deductible meals (see instructions) 24b
+      15 Insurance (other than health) . 15
+      25 Utilities . . . . . . . . 25
+      16 Interest (see instructions):
+      26 Wages (less employment credits)  26
+      16 a Mortgage (paid to banks, etc.) . 16a 27a Energy efficient commercial
+      16 b Vehicle loan . . . . . . 16b buildings deduction (attach Form
+      16 c Other . . . . . . . . 16c 7205) . . . . . . . . 27a
+      17 Legal and professional services 17 27b Other expenses (from line 48) . 27b
+      28 Total expenses before expenses for business use of home. Add lines 8 through 27b . . . . . . . . 28
+      29 Tentative profit or (loss). Subtract line 28 from line 7 . . . . . . . . . . . . . . . . . . 29
+      30 Expenses for business use of your home. Do not report these expenses elsewhere. Attach Form 8829 unless
+      using the simplified method. See instructions.
+      Simplified method filers only: Enter the total square footage of (a) your home: and
+      (b) the part of your home used for business: . Use the Simplified Method Worksheet
+      in the instructions to figure the amount to enter on line 30 . . . . . . . . . . . . . . . . 30
+      31 Net profit or (loss). Subtract line 30 from line 29.
+      • If a profit, enter on both Schedule 1 (Form 1040), line 3, and on Schedule SE, line 2. (If you
+      checked the box on line 1, see instructions.) Estates and trusts, enter on Form 1041, line 3. }
+      • If a loss, you must go to line 32. 31
+      32 If you have a loss, check the box that describes your investment in this activity. See instructions.
+      • If you checked box 32a, enter the loss on both Schedule 1 (Form 1040), line 3, and on Schedule SE, line 2.
+      (If you checked the box on line 1, see the line 31 instructions.) Estates and trusts, enter on Form 1041, line 3. } 32a  All investment is
+      at risk.
+      32b  Some investment
+      • If you checked box 32b, you must attach Form 6198. Your loss may be limited. is not at risk.
+      For Paperwork Reduction Act Notice, see the separate instructions. Cat. No. 11334P Schedule C (Form 1040) 2026 Created 5/15/26
+    text_sha256: "224623e70b16ee6ef729d24e712ac2c6c700432fed5fc6fe19b85b0126744489"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1040sc.pdf"
+    pdf_sha256: "cc44e7d1150e54d991835814c1191f60a32617730ca9e50e6f532b51293a86b4"
+  - chunk_id: "irs_form_schedule_c_2026_chunk_0002"
+    source_id: "irs_form_schedule_c_2026"
+    product_id: "f1040sc"
+    title: "Profit or Loss From Business (Schedule C)"
+    pages:
+      - 2
+    heading: "Schedule C (Form 1040) 2026 Page 2"
+    text: |
+      Schedule C (Form 1040) 2026 Page 2
+      Part III Cost of Goods Sold (see instructions)
+      33 Method(s) used to value closing inventory: 33 a Cost 33 b Lower of cost or market 33 c Other (attach explanation)
+      34 Was there any change in determining quantities, costs, or valuations between opening and closing inventory?
+      If “Yes,” attach explanation . . . . . . . . . . . . . . . . . . . . . . . . . . . Yes No
+      35 Inventory at beginning of year. If different from last year’s closing inventory, attach explanation . . . . . 35
+      36 Purchases less cost of items withdrawn for personal use . . . . . . . . . . . . . . . . 36
+      37 Cost of labor. Do not include any amounts paid to yourself . . . . . . . . . . . . . . . .  37
+      38 Materials and supplies . . . . . . . . . . . . . . . . . . . . . . . . . . 38
+      39 Other costs . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 39
+      40 Add lines 35 through 39 . . . . . . . . . . . . . . . . . . . . . . . . . . 40
+      41 Inventory at end of year . . . . . . . . . . . . . . . . . . . . . . . . . . 41
+      42 Cost of goods sold. Subtract line 41 from line 40. Enter the result here and on line 4 . . . . . . . . 42
+      Part IV Information on Your Vehicle. Complete this part only if you are claiming car or truck expenses on line 9 and
+      are not required to file Form 4562 for this business. See the instructions for line 13 to find out if you must file
+      Form 4562.
+      43 When did you place your vehicle in service for business purposes? (month/day/year) / /
+      44 Of the total number of miles you drove your vehicle during 2026, enter the number of miles you used your vehicle for:
+      44 a Business 44 b Commuting (see instructions) 44 c Other
+      45 Was your vehicle available for personal use during off-duty hours? . . . . . . . . . . . . . . . Yes No
+      46 Do you (or your spouse) have another vehicle available for personal use? . . . . . . . . . . . . . Yes No
+      47a Do you have evidence to support your deduction? . . . . . . . . . . . . . . . . . . . . Yes No
+      47b If “Yes,” is the evidence written? . . . . . . . . . . . . . . . . . . . . . . . . . Yes No
+      Part V Other Expenses. List below business expenses not included on lines 8–27a, or line 30.
+      48 Total other expenses. Enter here and on line 27b . . . . . . . . . . . . . . . . . . 48
+      Schedule C (Form 1040) 2026
+    text_sha256: "dea4c3d8e68a25b9170a90aef9b61acbf6751add94ee2ae6e8b2f48448298ea8"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1040sc.pdf"
+    pdf_sha256: "cc44e7d1150e54d991835814c1191f60a32617730ca9e50e6f532b51293a86b4"

@@ -1,0 +1,857 @@
+{
+  "compared_at": "2026-11-12T20:08:29.139661+00:00",
+  "documents": [
+    {
+      "document_id": "f1040sc",
+      "page_comparisons": [
+        {
+          "length_ratio": 0.9963,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 297,
+          "secondary_words": 297,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 151,
+          "secondary_words": 151,
+          "word_jaccard": 1.0
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/f1040sc.txt",
+      "secondary_file": "/tmp/irs-2026-additions-secondary-text/f1040sc.txt",
+      "summary": {
+        "pages_compared": 2,
+        "pages_needing_review": 0
+      }
+    },
+    {
+      "document_id": "f1040sse",
+      "page_comparisons": [
+        {
+          "length_ratio": 0.9993,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 205,
+          "secondary_words": 205,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.998,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 106,
+          "secondary_words": 106,
+          "word_jaccard": 1.0
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/f1040sse.txt",
+      "secondary_file": "/tmp/irs-2026-additions-secondary-text/f1040sse.txt",
+      "summary": {
+        "pages_compared": 2,
+        "pages_needing_review": 0
+      }
+    },
+    {
+      "document_id": "f1099k",
+      "page_comparisons": [
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 204,
+          "secondary_words": 204,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9845,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 149,
+          "secondary_words": 149,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9852,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 124,
+          "secondary_words": 124,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9854,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 151,
+          "secondary_words": 151,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9933,
+          "needs_review": false,
+          "page": 5,
+          "primary_words": 262,
+          "secondary_words": 262,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.985,
+          "needs_review": false,
+          "page": 6,
+          "primary_words": 130,
+          "secondary_words": 130,
+          "word_jaccard": 1.0
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/f1099k.txt",
+      "secondary_file": "/tmp/irs-2026-additions-secondary-text/f1099k.txt",
+      "summary": {
+        "pages_compared": 6,
+        "pages_needing_review": 0
+      }
+    },
+    {
+      "document_id": "f1099msc",
+      "page_comparisons": [
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 204,
+          "secondary_words": 204,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9921,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 149,
+          "secondary_words": 149,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9942,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 124,
+          "secondary_words": 124,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9933,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 155,
+          "secondary_words": 155,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9951,
+          "needs_review": false,
+          "page": 5,
+          "primary_words": 308,
+          "secondary_words": 308,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9937,
+          "needs_review": false,
+          "page": 6,
+          "primary_words": 131,
+          "secondary_words": 131,
+          "word_jaccard": 1.0
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/f1099msc.txt",
+      "secondary_file": "/tmp/irs-2026-additions-secondary-text/f1099msc.txt",
+      "summary": {
+        "pages_compared": 6,
+        "pages_needing_review": 0
+      }
+    },
+    {
+      "document_id": "f1099nec",
+      "page_comparisons": [
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 204,
+          "secondary_words": 204,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9983,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 115,
+          "secondary_words": 115,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 88,
+          "secondary_words": 88,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9974,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 121,
+          "secondary_words": 121,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9932,
+          "needs_review": false,
+          "page": 5,
+          "primary_words": 239,
+          "secondary_words": 239,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9989,
+          "needs_review": false,
+          "page": 6,
+          "primary_words": 93,
+          "secondary_words": 93,
+          "word_jaccard": 1.0
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/f1099nec.txt",
+      "secondary_file": "/tmp/irs-2026-additions-secondary-text/f1099nec.txt",
+      "summary": {
+        "pages_compared": 6,
+        "pages_needing_review": 0
+      }
+    },
+    {
+      "document_id": "i1099k",
+      "page_comparisons": [
+        {
+          "length_ratio": 0.9937,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 326,
+          "secondary_words": 331,
+          "word_jaccard": 0.9671
+        },
+        {
+          "length_ratio": 0.9932,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 309,
+          "secondary_words": 311,
+          "word_jaccard": 0.9936
+        },
+        {
+          "length_ratio": 0.9929,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 319,
+          "secondary_words": 322,
+          "word_jaccard": 0.9845
+        },
+        {
+          "length_ratio": 0.9936,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 282,
+          "secondary_words": 283,
+          "word_jaccard": 0.9894
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/i1099k.txt",
+      "secondary_file": "/tmp/irs-2026-additions-secondary-text/i1099k.txt",
+      "summary": {
+        "pages_compared": 4,
+        "pages_needing_review": 0
+      }
+    },
+    {
+      "document_id": "i1099mec",
+      "page_comparisons": [
+        {
+          "length_ratio": 0.9915,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 355,
+          "secondary_words": 357,
+          "word_jaccard": 0.9778
+        },
+        {
+          "length_ratio": 0.9934,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 325,
+          "secondary_words": 330,
+          "word_jaccard": 0.9789
+        },
+        {
+          "length_ratio": 0.9919,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 315,
+          "secondary_words": 319,
+          "word_jaccard": 0.9812
+        },
+        {
+          "length_ratio": 0.9915,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 387,
+          "secondary_words": 391,
+          "word_jaccard": 0.9847
+        },
+        {
+          "length_ratio": 0.9927,
+          "needs_review": false,
+          "page": 5,
+          "primary_words": 391,
+          "secondary_words": 392,
+          "word_jaccard": 0.9924
+        },
+        {
+          "length_ratio": 0.9937,
+          "needs_review": false,
+          "page": 6,
+          "primary_words": 381,
+          "secondary_words": 385,
+          "word_jaccard": 0.9896
+        },
+        {
+          "length_ratio": 0.9925,
+          "needs_review": false,
+          "page": 7,
+          "primary_words": 340,
+          "secondary_words": 345,
+          "word_jaccard": 0.9855
+        },
+        {
+          "length_ratio": 0.9929,
+          "needs_review": false,
+          "page": 8,
+          "primary_words": 363,
+          "secondary_words": 367,
+          "word_jaccard": 0.9783
+        },
+        {
+          "length_ratio": 0.9921,
+          "needs_review": false,
+          "page": 9,
+          "primary_words": 386,
+          "secondary_words": 389,
+          "word_jaccard": 0.9923
+        },
+        {
+          "length_ratio": 0.9934,
+          "needs_review": false,
+          "page": 10,
+          "primary_words": 355,
+          "secondary_words": 359,
+          "word_jaccard": 0.9833
+        },
+        {
+          "length_ratio": 0.9938,
+          "needs_review": false,
+          "page": 11,
+          "primary_words": 341,
+          "secondary_words": 345,
+          "word_jaccard": 0.9884
+        },
+        {
+          "length_ratio": 0.9973,
+          "needs_review": false,
+          "page": 12,
+          "primary_words": 187,
+          "secondary_words": 187,
+          "word_jaccard": 0.9894
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/i1099mec.txt",
+      "secondary_file": "/tmp/irs-2026-additions-secondary-text/i1099mec.txt",
+      "summary": {
+        "pages_compared": 12,
+        "pages_needing_review": 0
+      }
+    },
+    {
+      "document_id": "i8829",
+      "page_comparisons": [
+        {
+          "length_ratio": 0.9918,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 315,
+          "secondary_words": 319,
+          "word_jaccard": 0.9812
+        },
+        {
+          "length_ratio": 0.9943,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 327,
+          "secondary_words": 332,
+          "word_jaccard": 0.9849
+        },
+        {
+          "length_ratio": 0.9933,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 223,
+          "secondary_words": 226,
+          "word_jaccard": 0.978
+        },
+        {
+          "length_ratio": 0.9794,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 248,
+          "secondary_words": 250,
+          "word_jaccard": 0.992
+        },
+        {
+          "length_ratio": 0.9925,
+          "needs_review": false,
+          "page": 5,
+          "primary_words": 254,
+          "secondary_words": 256,
+          "word_jaccard": 0.9922
+        },
+        {
+          "length_ratio": 0.9921,
+          "needs_review": false,
+          "page": 6,
+          "primary_words": 184,
+          "secondary_words": 186,
+          "word_jaccard": 0.9892
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/i8829.txt",
+      "secondary_file": "/tmp/irs-2026-additions-secondary-text/i8829.txt",
+      "summary": {
+        "pages_compared": 6,
+        "pages_needing_review": 0
+      }
+    },
+    {
+      "document_id": "p1099",
+      "page_comparisons": [
+        {
+          "length_ratio": 0.9932,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 280,
+          "secondary_words": 283,
+          "word_jaccard": 0.9754
+        },
+        {
+          "length_ratio": 0.99,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 345,
+          "secondary_words": 347,
+          "word_jaccard": 0.9715
+        },
+        {
+          "length_ratio": 0.9902,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 271,
+          "secondary_words": 274,
+          "word_jaccard": 0.9891
+        },
+        {
+          "length_ratio": 0.9923,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 339,
+          "secondary_words": 342,
+          "word_jaccard": 0.9854
+        },
+        {
+          "length_ratio": 0.9906,
+          "needs_review": false,
+          "page": 5,
+          "primary_words": 362,
+          "secondary_words": 363,
+          "word_jaccard": 0.9918
+        },
+        {
+          "length_ratio": 0.9935,
+          "needs_review": false,
+          "page": 6,
+          "primary_words": 267,
+          "secondary_words": 269,
+          "word_jaccard": 0.9926
+        },
+        {
+          "length_ratio": 0.9928,
+          "needs_review": false,
+          "page": 7,
+          "primary_words": 316,
+          "secondary_words": 317,
+          "word_jaccard": 0.9906
+        },
+        {
+          "length_ratio": 0.9922,
+          "needs_review": false,
+          "page": 8,
+          "primary_words": 319,
+          "secondary_words": 321,
+          "word_jaccard": 0.9876
+        },
+        {
+          "length_ratio": 0.9889,
+          "needs_review": false,
+          "page": 9,
+          "primary_words": 380,
+          "secondary_words": 383,
+          "word_jaccard": 0.9716
+        },
+        {
+          "length_ratio": 0.9919,
+          "needs_review": false,
+          "page": 10,
+          "primary_words": 337,
+          "secondary_words": 342,
+          "word_jaccard": 0.9738
+        },
+        {
+          "length_ratio": 0.9937,
+          "needs_review": false,
+          "page": 11,
+          "primary_words": 365,
+          "secondary_words": 369,
+          "word_jaccard": 0.9892
+        },
+        {
+          "length_ratio": 0.9923,
+          "needs_review": false,
+          "page": 12,
+          "primary_words": 302,
+          "secondary_words": 307,
+          "word_jaccard": 0.9837
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 13,
+          "primary_words": 62,
+          "secondary_words": 62,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9941,
+          "needs_review": false,
+          "page": 14,
+          "primary_words": 171,
+          "secondary_words": 174,
+          "word_jaccard": 0.9714
+        },
+        {
+          "length_ratio": 0.9883,
+          "needs_review": false,
+          "page": 15,
+          "primary_words": 356,
+          "secondary_words": 361,
+          "word_jaccard": 0.9861
+        },
+        {
+          "length_ratio": 0.9925,
+          "needs_review": false,
+          "page": 16,
+          "primary_words": 360,
+          "secondary_words": 363,
+          "word_jaccard": 0.9917
+        },
+        {
+          "length_ratio": 0.9868,
+          "needs_review": false,
+          "page": 17,
+          "primary_words": 348,
+          "secondary_words": 350,
+          "word_jaccard": 0.9943
+        },
+        {
+          "length_ratio": 0.9856,
+          "needs_review": false,
+          "page": 18,
+          "primary_words": 345,
+          "secondary_words": 348,
+          "word_jaccard": 0.9857
+        },
+        {
+          "length_ratio": 0.9892,
+          "needs_review": false,
+          "page": 19,
+          "primary_words": 357,
+          "secondary_words": 357,
+          "word_jaccard": 0.9889
+        },
+        {
+          "length_ratio": 0.9932,
+          "needs_review": false,
+          "page": 20,
+          "primary_words": 353,
+          "secondary_words": 357,
+          "word_jaccard": 0.9832
+        },
+        {
+          "length_ratio": 0.9944,
+          "needs_review": false,
+          "page": 21,
+          "primary_words": 332,
+          "secondary_words": 334,
+          "word_jaccard": 0.994
+        },
+        {
+          "length_ratio": 0.9919,
+          "needs_review": false,
+          "page": 22,
+          "primary_words": 314,
+          "secondary_words": 318,
+          "word_jaccard": 0.9874
+        },
+        {
+          "length_ratio": 0.9954,
+          "needs_review": false,
+          "page": 23,
+          "primary_words": 281,
+          "secondary_words": 281,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9901,
+          "needs_review": false,
+          "page": 24,
+          "primary_words": 305,
+          "secondary_words": 311,
+          "word_jaccard": 0.9744
+        },
+        {
+          "length_ratio": 0.9924,
+          "needs_review": false,
+          "page": 25,
+          "primary_words": 315,
+          "secondary_words": 316,
+          "word_jaccard": 0.9905
+        },
+        {
+          "length_ratio": 0.9938,
+          "needs_review": false,
+          "page": 26,
+          "primary_words": 279,
+          "secondary_words": 279,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.99,
+          "needs_review": false,
+          "page": 27,
+          "primary_words": 349,
+          "secondary_words": 354,
+          "word_jaccard": 0.9803
+        },
+        {
+          "length_ratio": 0.8541,
+          "needs_review": false,
+          "page": 28,
+          "primary_words": 396,
+          "secondary_words": 401,
+          "word_jaccard": 0.9826
+        },
+        {
+          "length_ratio": 0.9934,
+          "needs_review": false,
+          "page": 29,
+          "primary_words": 349,
+          "secondary_words": 353,
+          "word_jaccard": 0.9831
+        },
+        {
+          "length_ratio": 0.9909,
+          "needs_review": false,
+          "page": 30,
+          "primary_words": 214,
+          "secondary_words": 219,
+          "word_jaccard": 0.9593
+        },
+        {
+          "length_ratio": 0.9937,
+          "needs_review": false,
+          "page": 31,
+          "primary_words": 260,
+          "secondary_words": 261,
+          "word_jaccard": 0.9735
+        },
+        {
+          "length_ratio": 0.9883,
+          "needs_review": false,
+          "page": 32,
+          "primary_words": 197,
+          "secondary_words": 199,
+          "word_jaccard": 0.9701
+        },
+        {
+          "length_ratio": 0.7575,
+          "needs_review": false,
+          "page": 33,
+          "primary_words": 334,
+          "secondary_words": 336,
+          "word_jaccard": 0.9822
+        },
+        {
+          "length_ratio": 0.9989,
+          "needs_review": false,
+          "page": 34,
+          "primary_words": 186,
+          "secondary_words": 185,
+          "word_jaccard": 0.9946
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/p1099.txt",
+      "secondary_file": "/tmp/irs-2026-additions-secondary-text/p1099.txt",
+      "summary": {
+        "pages_compared": 34,
+        "pages_needing_review": 0
+      }
+    },
+    {
+      "document_id": "p509",
+      "page_comparisons": [
+        {
+          "length_ratio": 0.9264,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 211,
+          "secondary_words": 214,
+          "word_jaccard": 0.9585
+        },
+        {
+          "length_ratio": 0.9872,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 393,
+          "secondary_words": 399,
+          "word_jaccard": 0.9751
+        },
+        {
+          "length_ratio": 0.989,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 477,
+          "secondary_words": 482,
+          "word_jaccard": 0.9814
+        },
+        {
+          "length_ratio": 0.9867,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 316,
+          "secondary_words": 320,
+          "word_jaccard": 0.9752
+        },
+        {
+          "length_ratio": 0.9889,
+          "needs_review": false,
+          "page": 5,
+          "primary_words": 271,
+          "secondary_words": 272,
+          "word_jaccard": 0.9963
+        },
+        {
+          "length_ratio": 0.9904,
+          "needs_review": false,
+          "page": 6,
+          "primary_words": 324,
+          "secondary_words": 326,
+          "word_jaccard": 0.9757
+        },
+        {
+          "length_ratio": 0.988,
+          "needs_review": false,
+          "page": 7,
+          "primary_words": 247,
+          "secondary_words": 247,
+          "word_jaccard": 0.9919
+        },
+        {
+          "length_ratio": 0.9904,
+          "needs_review": false,
+          "page": 8,
+          "primary_words": 312,
+          "secondary_words": 315,
+          "word_jaccard": 0.9905
+        },
+        {
+          "length_ratio": 0.9951,
+          "needs_review": false,
+          "page": 9,
+          "primary_words": 110,
+          "secondary_words": 110,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9928,
+          "needs_review": false,
+          "page": 10,
+          "primary_words": 160,
+          "secondary_words": 160,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.998,
+          "needs_review": false,
+          "page": 11,
+          "primary_words": 134,
+          "secondary_words": 135,
+          "word_jaccard": 0.9779
+        },
+        {
+          "length_ratio": 0.9871,
+          "needs_review": false,
+          "page": 12,
+          "primary_words": 513,
+          "secondary_words": 521,
+          "word_jaccard": 0.9695
+        },
+        {
+          "length_ratio": 0.9905,
+          "needs_review": false,
+          "page": 13,
+          "primary_words": 555,
+          "secondary_words": 560,
+          "word_jaccard": 0.9875
+        },
+        {
+          "length_ratio": 0.9892,
+          "needs_review": false,
+          "page": 14,
+          "primary_words": 232,
+          "secondary_words": 237,
+          "word_jaccard": 0.9706
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/p509.txt",
+      "secondary_file": "/tmp/irs-2026-additions-secondary-text/p509.txt",
+      "summary": {
+        "pages_compared": 14,
+        "pages_needing_review": 0
+      }
+    }
+  ],
+  "primary_extraction": "pdfbox",
+  "secondary_extraction": "pypdf",
+  "summary": {
+    "documents_compared": 10,
+    "pages_needing_review": 0
+  }
+}

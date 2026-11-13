@@ -1,0 +1,1140 @@
+{
+  "compared_at": "2026-11-12T19:40:25.037009+00:00",
+  "documents": [
+    {
+      "document_id": "f1040es",
+      "page_comparisons": [
+        {
+          "length_ratio": 0.9917,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 287,
+          "secondary_words": 292,
+          "word_jaccard": 0.9761
+        },
+        {
+          "length_ratio": 0.982,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 265,
+          "secondary_words": 268,
+          "word_jaccard": 0.9888
+        },
+        {
+          "length_ratio": 0.9915,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 314,
+          "secondary_words": 319,
+          "word_jaccard": 0.9781
+        },
+        {
+          "length_ratio": 0.989,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 319,
+          "secondary_words": 324,
+          "word_jaccard": 0.9785
+        },
+        {
+          "length_ratio": 0.9974,
+          "needs_review": false,
+          "page": 5,
+          "primary_words": 302,
+          "secondary_words": 306,
+          "word_jaccard": 0.9869
+        },
+        {
+          "length_ratio": 0.9927,
+          "needs_review": false,
+          "page": 6,
+          "primary_words": 314,
+          "secondary_words": 318,
+          "word_jaccard": 0.975
+        },
+        {
+          "length_ratio": 0.9874,
+          "needs_review": false,
+          "page": 7,
+          "primary_words": 233,
+          "secondary_words": 236,
+          "word_jaccard": 0.9542
+        },
+        {
+          "length_ratio": 0.993,
+          "needs_review": false,
+          "page": 8,
+          "primary_words": 281,
+          "secondary_words": 284,
+          "word_jaccard": 0.9894
+        },
+        {
+          "length_ratio": 0.7934,
+          "needs_review": false,
+          "page": 9,
+          "primary_words": 110,
+          "secondary_words": 114,
+          "word_jaccard": 0.9649
+        },
+        {
+          "length_ratio": 0.995,
+          "needs_review": false,
+          "page": 10,
+          "primary_words": 113,
+          "secondary_words": 114,
+          "word_jaccard": 0.9912
+        },
+        {
+          "length_ratio": 0.8877,
+          "needs_review": false,
+          "page": 11,
+          "primary_words": 152,
+          "secondary_words": 157,
+          "word_jaccard": 0.9682
+        },
+        {
+          "length_ratio": 0.999,
+          "needs_review": false,
+          "page": 12,
+          "primary_words": 209,
+          "secondary_words": 209,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9919,
+          "needs_review": false,
+          "page": 13,
+          "primary_words": 223,
+          "secondary_words": 223,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9918,
+          "needs_review": false,
+          "page": 14,
+          "primary_words": 183,
+          "secondary_words": 183,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9948,
+          "needs_review": false,
+          "page": 15,
+          "primary_words": 116,
+          "secondary_words": 116,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 16,
+          "primary_words": 6,
+          "secondary_words": 6,
+          "word_jaccard": 1.0
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/f1040es.txt",
+      "secondary_file": "/tmp/irs-2026-secondary-text/f1040es.txt",
+      "summary": {
+        "pages_compared": 16,
+        "pages_needing_review": 0
+      }
+    },
+    {
+      "document_id": "i1040sse",
+      "page_comparisons": [
+        {
+          "length_ratio": 0.9942,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 286,
+          "secondary_words": 288,
+          "word_jaccard": 0.9862
+        },
+        {
+          "length_ratio": 0.9933,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 343,
+          "secondary_words": 345,
+          "word_jaccard": 0.9942
+        },
+        {
+          "length_ratio": 0.9935,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 284,
+          "secondary_words": 287,
+          "word_jaccard": 0.9895
+        },
+        {
+          "length_ratio": 0.9932,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 369,
+          "secondary_words": 374,
+          "word_jaccard": 0.9866
+        },
+        {
+          "length_ratio": 0.9931,
+          "needs_review": false,
+          "page": 5,
+          "primary_words": 367,
+          "secondary_words": 370,
+          "word_jaccard": 0.9919
+        },
+        {
+          "length_ratio": 0.9912,
+          "needs_review": false,
+          "page": 6,
+          "primary_words": 198,
+          "secondary_words": 201,
+          "word_jaccard": 0.9851
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/i1040sse.txt",
+      "secondary_file": "/tmp/irs-2026-secondary-text/i1040sse.txt",
+      "summary": {
+        "pages_compared": 6,
+        "pages_needing_review": 0
+      }
+    },
+    {
+      "document_id": "irb26-29",
+      "page_comparisons": [
+        {
+          "length_ratio": 0.9938,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 210,
+          "secondary_words": 210,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9951,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 238,
+          "secondary_words": 238,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.985,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 232,
+          "secondary_words": 232,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9841,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 276,
+          "secondary_words": 276,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9847,
+          "needs_review": false,
+          "page": 5,
+          "primary_words": 273,
+          "secondary_words": 273,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9877,
+          "needs_review": false,
+          "page": 6,
+          "primary_words": 310,
+          "secondary_words": 310,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9849,
+          "needs_review": false,
+          "page": 7,
+          "primary_words": 312,
+          "secondary_words": 312,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9817,
+          "needs_review": false,
+          "page": 8,
+          "primary_words": 294,
+          "secondary_words": 296,
+          "word_jaccard": 0.9932
+        },
+        {
+          "length_ratio": 0.9867,
+          "needs_review": false,
+          "page": 9,
+          "primary_words": 397,
+          "secondary_words": 397,
+          "word_jaccard": 0.995
+        },
+        {
+          "length_ratio": 0.9863,
+          "needs_review": false,
+          "page": 10,
+          "primary_words": 321,
+          "secondary_words": 320,
+          "word_jaccard": 0.9969
+        },
+        {
+          "length_ratio": 0.9839,
+          "needs_review": false,
+          "page": 11,
+          "primary_words": 215,
+          "secondary_words": 215,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9857,
+          "needs_review": false,
+          "page": 12,
+          "primary_words": 113,
+          "secondary_words": 113,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 13,
+          "primary_words": 133,
+          "secondary_words": 133,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9995,
+          "needs_review": false,
+          "page": 14,
+          "primary_words": 163,
+          "secondary_words": 163,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9899,
+          "needs_review": false,
+          "page": 15,
+          "primary_words": 347,
+          "secondary_words": 347,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 16,
+          "primary_words": 54,
+          "secondary_words": 54,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 17,
+          "primary_words": 37,
+          "secondary_words": 37,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9987,
+          "needs_review": false,
+          "page": 18,
+          "primary_words": 73,
+          "secondary_words": 73,
+          "word_jaccard": 1.0
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/irb26-29.txt",
+      "secondary_file": "/tmp/irs-2026-secondary-text/irb26-29.txt",
+      "summary": {
+        "pages_compared": 18,
+        "pages_needing_review": 0
+      }
+    },
+    {
+      "document_id": "n-26-10",
+      "page_comparisons": [
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 116,
+          "secondary_words": 116,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 169,
+          "secondary_words": 169,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 133,
+          "secondary_words": 133,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 133,
+          "secondary_words": 133,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 5,
+          "primary_words": 106,
+          "secondary_words": 106,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 6,
+          "primary_words": 49,
+          "secondary_words": 49,
+          "word_jaccard": 1.0
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/n-26-10.txt",
+      "secondary_file": "/tmp/irs-2026-secondary-text/n-26-10.txt",
+      "summary": {
+        "pages_compared": 6,
+        "pages_needing_review": 0
+      }
+    },
+    {
+      "document_id": "p505",
+      "page_comparisons": [
+        {
+          "length_ratio": 0.9954,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 283,
+          "secondary_words": 286,
+          "word_jaccard": 0.9826
+        },
+        {
+          "length_ratio": 0.9877,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 479,
+          "secondary_words": 483,
+          "word_jaccard": 0.9876
+        },
+        {
+          "length_ratio": 0.9854,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 483,
+          "secondary_words": 489,
+          "word_jaccard": 0.9796
+        },
+        {
+          "length_ratio": 0.9878,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 407,
+          "secondary_words": 412,
+          "word_jaccard": 0.9783
+        },
+        {
+          "length_ratio": 0.9857,
+          "needs_review": false,
+          "page": 5,
+          "primary_words": 365,
+          "secondary_words": 370,
+          "word_jaccard": 0.9758
+        },
+        {
+          "length_ratio": 0.9881,
+          "needs_review": false,
+          "page": 6,
+          "primary_words": 368,
+          "secondary_words": 372,
+          "word_jaccard": 0.9839
+        },
+        {
+          "length_ratio": 0.9858,
+          "needs_review": false,
+          "page": 7,
+          "primary_words": 391,
+          "secondary_words": 396,
+          "word_jaccard": 0.9874
+        },
+        {
+          "length_ratio": 0.9906,
+          "needs_review": false,
+          "page": 8,
+          "primary_words": 203,
+          "secondary_words": 207,
+          "word_jaccard": 0.9712
+        },
+        {
+          "length_ratio": 0.9887,
+          "needs_review": false,
+          "page": 9,
+          "primary_words": 416,
+          "secondary_words": 421,
+          "word_jaccard": 0.9881
+        },
+        {
+          "length_ratio": 0.9873,
+          "needs_review": false,
+          "page": 10,
+          "primary_words": 393,
+          "secondary_words": 398,
+          "word_jaccard": 0.9825
+        },
+        {
+          "length_ratio": 0.9875,
+          "needs_review": false,
+          "page": 11,
+          "primary_words": 390,
+          "secondary_words": 395,
+          "word_jaccard": 0.9873
+        },
+        {
+          "length_ratio": 0.9891,
+          "needs_review": false,
+          "page": 12,
+          "primary_words": 401,
+          "secondary_words": 407,
+          "word_jaccard": 0.9853
+        },
+        {
+          "length_ratio": 0.9934,
+          "needs_review": false,
+          "page": 13,
+          "primary_words": 236,
+          "secondary_words": 240,
+          "word_jaccard": 0.9833
+        },
+        {
+          "length_ratio": 0.8686,
+          "needs_review": false,
+          "page": 14,
+          "primary_words": 170,
+          "secondary_words": 173,
+          "word_jaccard": 0.9827
+        },
+        {
+          "length_ratio": 0.9117,
+          "needs_review": false,
+          "page": 15,
+          "primary_words": 215,
+          "secondary_words": 219,
+          "word_jaccard": 0.9727
+        },
+        {
+          "length_ratio": 0.9955,
+          "needs_review": false,
+          "page": 16,
+          "primary_words": 143,
+          "secondary_words": 148,
+          "word_jaccard": 0.9662
+        },
+        {
+          "length_ratio": 0.9956,
+          "needs_review": false,
+          "page": 17,
+          "primary_words": 138,
+          "secondary_words": 140,
+          "word_jaccard": 0.9857
+        },
+        {
+          "length_ratio": 0.9746,
+          "needs_review": false,
+          "page": 18,
+          "primary_words": 203,
+          "secondary_words": 208,
+          "word_jaccard": 0.976
+        },
+        {
+          "length_ratio": 0.7433,
+          "needs_review": true,
+          "page": 19,
+          "primary_words": 110,
+          "secondary_words": 115,
+          "word_jaccard": 0.9397
+        },
+        {
+          "length_ratio": 0.9858,
+          "needs_review": false,
+          "page": 20,
+          "primary_words": 207,
+          "secondary_words": 212,
+          "word_jaccard": 0.9671
+        },
+        {
+          "length_ratio": 0.9897,
+          "needs_review": false,
+          "page": 21,
+          "primary_words": 259,
+          "secondary_words": 265,
+          "word_jaccard": 0.9625
+        },
+        {
+          "length_ratio": 0.989,
+          "needs_review": false,
+          "page": 22,
+          "primary_words": 406,
+          "secondary_words": 404,
+          "word_jaccard": 0.9565
+        },
+        {
+          "length_ratio": 0.9922,
+          "needs_review": false,
+          "page": 23,
+          "primary_words": 409,
+          "secondary_words": 409,
+          "word_jaccard": 0.9616
+        },
+        {
+          "length_ratio": 0.9894,
+          "needs_review": false,
+          "page": 24,
+          "primary_words": 408,
+          "secondary_words": 413,
+          "word_jaccard": 0.9879
+        },
+        {
+          "length_ratio": 0.9907,
+          "needs_review": false,
+          "page": 25,
+          "primary_words": 277,
+          "secondary_words": 281,
+          "word_jaccard": 0.9787
+        },
+        {
+          "length_ratio": 0.8559,
+          "needs_review": false,
+          "page": 26,
+          "primary_words": 98,
+          "secondary_words": 102,
+          "word_jaccard": 0.9417
+        },
+        {
+          "length_ratio": 0.9935,
+          "needs_review": false,
+          "page": 27,
+          "primary_words": 415,
+          "secondary_words": 419,
+          "word_jaccard": 0.9905
+        },
+        {
+          "length_ratio": 0.9888,
+          "needs_review": false,
+          "page": 28,
+          "primary_words": 433,
+          "secondary_words": 439,
+          "word_jaccard": 0.9818
+        },
+        {
+          "length_ratio": 0.9875,
+          "needs_review": false,
+          "page": 29,
+          "primary_words": 290,
+          "secondary_words": 294,
+          "word_jaccard": 0.9797
+        },
+        {
+          "length_ratio": 0.9972,
+          "needs_review": false,
+          "page": 30,
+          "primary_words": 129,
+          "secondary_words": 131,
+          "word_jaccard": 0.9847
+        },
+        {
+          "length_ratio": 0.998,
+          "needs_review": false,
+          "page": 31,
+          "primary_words": 142,
+          "secondary_words": 143,
+          "word_jaccard": 0.993
+        },
+        {
+          "length_ratio": 0.8497,
+          "needs_review": false,
+          "page": 32,
+          "primary_words": 256,
+          "secondary_words": 260,
+          "word_jaccard": 0.962
+        },
+        {
+          "length_ratio": 0.8243,
+          "needs_review": false,
+          "page": 33,
+          "primary_words": 170,
+          "secondary_words": 171,
+          "word_jaccard": 0.9711
+        },
+        {
+          "length_ratio": 0.861,
+          "needs_review": false,
+          "page": 34,
+          "primary_words": 139,
+          "secondary_words": 142,
+          "word_jaccard": 0.9789
+        },
+        {
+          "length_ratio": 0.905,
+          "needs_review": false,
+          "page": 35,
+          "primary_words": 165,
+          "secondary_words": 168,
+          "word_jaccard": 0.9821
+        },
+        {
+          "length_ratio": 0.8104,
+          "needs_review": false,
+          "page": 36,
+          "primary_words": 90,
+          "secondary_words": 94,
+          "word_jaccard": 0.9574
+        },
+        {
+          "length_ratio": 0.7896,
+          "needs_review": false,
+          "page": 37,
+          "primary_words": 118,
+          "secondary_words": 121,
+          "word_jaccard": 0.9752
+        },
+        {
+          "length_ratio": 0.7898,
+          "needs_review": false,
+          "page": 38,
+          "primary_words": 166,
+          "secondary_words": 168,
+          "word_jaccard": 0.9647
+        },
+        {
+          "length_ratio": 0.8974,
+          "needs_review": false,
+          "page": 39,
+          "primary_words": 167,
+          "secondary_words": 171,
+          "word_jaccard": 0.9766
+        },
+        {
+          "length_ratio": 0.8443,
+          "needs_review": false,
+          "page": 40,
+          "primary_words": 203,
+          "secondary_words": 208,
+          "word_jaccard": 0.976
+        },
+        {
+          "length_ratio": 0.8665,
+          "needs_review": false,
+          "page": 41,
+          "primary_words": 145,
+          "secondary_words": 149,
+          "word_jaccard": 0.9732
+        },
+        {
+          "length_ratio": 0.7851,
+          "needs_review": false,
+          "page": 42,
+          "primary_words": 172,
+          "secondary_words": 175,
+          "word_jaccard": 0.9605
+        },
+        {
+          "length_ratio": 0.9019,
+          "needs_review": false,
+          "page": 43,
+          "primary_words": 183,
+          "secondary_words": 187,
+          "word_jaccard": 0.9786
+        },
+        {
+          "length_ratio": 0.9872,
+          "needs_review": false,
+          "page": 44,
+          "primary_words": 517,
+          "secondary_words": 525,
+          "word_jaccard": 0.9698
+        },
+        {
+          "length_ratio": 0.9897,
+          "needs_review": false,
+          "page": 45,
+          "primary_words": 551,
+          "secondary_words": 556,
+          "word_jaccard": 0.9874
+        },
+        {
+          "length_ratio": 0.9892,
+          "needs_review": false,
+          "page": 46,
+          "primary_words": 232,
+          "secondary_words": 237,
+          "word_jaccard": 0.9706
+        },
+        {
+          "length_ratio": 0.9953,
+          "needs_review": false,
+          "page": 47,
+          "primary_words": 305,
+          "secondary_words": 308,
+          "word_jaccard": 0.9585
+        },
+        {
+          "length_ratio": 0.9946,
+          "needs_review": false,
+          "page": 48,
+          "primary_words": 171,
+          "secondary_words": 173,
+          "word_jaccard": 0.9657
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/p505.txt",
+      "secondary_file": "/tmp/irs-2026-secondary-text/p505.txt",
+      "summary": {
+        "pages_compared": 48,
+        "pages_needing_review": 1
+      }
+    },
+    {
+      "document_id": "rp-25-32",
+      "page_comparisons": [
+        {
+          "length_ratio": 0.9978,
+          "needs_review": false,
+          "page": 1,
+          "primary_words": 114,
+          "secondary_words": 114,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9994,
+          "needs_review": false,
+          "page": 2,
+          "primary_words": 182,
+          "secondary_words": 182,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 3,
+          "primary_words": 197,
+          "secondary_words": 197,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 4,
+          "primary_words": 163,
+          "secondary_words": 163,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 5,
+          "primary_words": 125,
+          "secondary_words": 125,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 6,
+          "primary_words": 122,
+          "secondary_words": 122,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 7,
+          "primary_words": 121,
+          "secondary_words": 121,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 8,
+          "primary_words": 128,
+          "secondary_words": 128,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9976,
+          "needs_review": false,
+          "page": 9,
+          "primary_words": 119,
+          "secondary_words": 119,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9881,
+          "needs_review": false,
+          "page": 10,
+          "primary_words": 97,
+          "secondary_words": 101,
+          "word_jaccard": 0.9604
+        },
+        {
+          "length_ratio": 0.9856,
+          "needs_review": false,
+          "page": 11,
+          "primary_words": 74,
+          "secondary_words": 74,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9924,
+          "needs_review": false,
+          "page": 12,
+          "primary_words": 114,
+          "secondary_words": 116,
+          "word_jaccard": 0.9828
+        },
+        {
+          "length_ratio": 0.997,
+          "needs_review": false,
+          "page": 13,
+          "primary_words": 114,
+          "secondary_words": 115,
+          "word_jaccard": 0.9913
+        },
+        {
+          "length_ratio": 0.9971,
+          "needs_review": false,
+          "page": 14,
+          "primary_words": 89,
+          "secondary_words": 94,
+          "word_jaccard": 0.9263
+        },
+        {
+          "length_ratio": 0.9957,
+          "needs_review": false,
+          "page": 15,
+          "primary_words": 131,
+          "secondary_words": 133,
+          "word_jaccard": 0.9701
+        },
+        {
+          "length_ratio": 0.9991,
+          "needs_review": false,
+          "page": 16,
+          "primary_words": 87,
+          "secondary_words": 89,
+          "word_jaccard": 0.9775
+        },
+        {
+          "length_ratio": 0.9964,
+          "needs_review": false,
+          "page": 17,
+          "primary_words": 148,
+          "secondary_words": 151,
+          "word_jaccard": 0.9671
+        },
+        {
+          "length_ratio": 0.9966,
+          "needs_review": false,
+          "page": 18,
+          "primary_words": 117,
+          "secondary_words": 118,
+          "word_jaccard": 0.9748
+        },
+        {
+          "length_ratio": 0.9984,
+          "needs_review": false,
+          "page": 19,
+          "primary_words": 115,
+          "secondary_words": 118,
+          "word_jaccard": 0.9746
+        },
+        {
+          "length_ratio": 0.9979,
+          "needs_review": false,
+          "page": 20,
+          "primary_words": 147,
+          "secondary_words": 151,
+          "word_jaccard": 0.9477
+        },
+        {
+          "length_ratio": 0.9987,
+          "needs_review": false,
+          "page": 21,
+          "primary_words": 112,
+          "secondary_words": 114,
+          "word_jaccard": 0.9652
+        },
+        {
+          "length_ratio": 0.9964,
+          "needs_review": false,
+          "page": 22,
+          "primary_words": 110,
+          "secondary_words": 112,
+          "word_jaccard": 0.9821
+        },
+        {
+          "length_ratio": 0.9973,
+          "needs_review": false,
+          "page": 23,
+          "primary_words": 118,
+          "secondary_words": 121,
+          "word_jaccard": 0.9431
+        },
+        {
+          "length_ratio": 0.9965,
+          "needs_review": false,
+          "page": 24,
+          "primary_words": 139,
+          "secondary_words": 145,
+          "word_jaccard": 0.9452
+        },
+        {
+          "length_ratio": 0.9978,
+          "needs_review": false,
+          "page": 25,
+          "primary_words": 139,
+          "secondary_words": 144,
+          "word_jaccard": 0.9517
+        },
+        {
+          "length_ratio": 0.9989,
+          "needs_review": false,
+          "page": 26,
+          "primary_words": 137,
+          "secondary_words": 139,
+          "word_jaccard": 0.9856
+        },
+        {
+          "length_ratio": 0.9978,
+          "needs_review": false,
+          "page": 27,
+          "primary_words": 147,
+          "secondary_words": 152,
+          "word_jaccard": 0.9542
+        },
+        {
+          "length_ratio": 0.9955,
+          "needs_review": false,
+          "page": 28,
+          "primary_words": 123,
+          "secondary_words": 125,
+          "word_jaccard": 0.984
+        },
+        {
+          "length_ratio": 0.9915,
+          "needs_review": false,
+          "page": 29,
+          "primary_words": 74,
+          "secondary_words": 74,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9943,
+          "needs_review": false,
+          "page": 30,
+          "primary_words": 99,
+          "secondary_words": 100,
+          "word_jaccard": 0.99
+        },
+        {
+          "length_ratio": 0.9957,
+          "needs_review": false,
+          "page": 31,
+          "primary_words": 71,
+          "secondary_words": 71,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9869,
+          "needs_review": false,
+          "page": 32,
+          "primary_words": 114,
+          "secondary_words": 114,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9899,
+          "needs_review": false,
+          "page": 33,
+          "primary_words": 113,
+          "secondary_words": 113,
+          "word_jaccard": 1.0
+        },
+        {
+          "length_ratio": 0.9975,
+          "needs_review": false,
+          "page": 34,
+          "primary_words": 129,
+          "secondary_words": 134,
+          "word_jaccard": 0.9627
+        },
+        {
+          "length_ratio": 0.9984,
+          "needs_review": false,
+          "page": 35,
+          "primary_words": 175,
+          "secondary_words": 179,
+          "word_jaccard": 0.9777
+        },
+        {
+          "length_ratio": 1.0,
+          "needs_review": false,
+          "page": 36,
+          "primary_words": 56,
+          "secondary_words": 56,
+          "word_jaccard": 1.0
+        }
+      ],
+      "primary_file": "direct-file/tax-knowledge/corpora/irs-2026/text/rp-25-32.txt",
+      "secondary_file": "/tmp/irs-2026-secondary-text/rp-25-32.txt",
+      "summary": {
+        "pages_compared": 36,
+        "pages_needing_review": 0
+      }
+    }
+  ],
+  "extractor_versions": {
+    "primary": "PDFBox 3.0.3, sortByPosition=true",
+    "secondary": "pypdf 7.0.1"
+  },
+  "primary_extraction": "pdfbox",
+  "secondary_extraction": "pypdf",
+  "summary": {
+    "documents_compared": 6,
+    "pages_needing_review": 1
+  },
+  "visual_checks": [
+    {
+      "disposition": "layout_difference_only",
+      "document_id": "p505",
+      "notes": "Rendered and inspected Worksheet 1-6. The automated flag is length_ratio 0.7433, with word_jaccard 0.9397; dot leaders and header tokenization differ. No missing worksheet credit labels or instructions identified. Tax credits are outside this runtime model. This is an extraction check, not tax-specialist approval.",
+      "page": 19,
+      "reviewer": "coding_agent"
+    },
+    {
+      "disposition": "tables_checked_visually",
+      "document_id": "rp-25-32",
+      "notes": "Rendered and inspected the ordinary bracket and QBI threshold tables against extracted text.",
+      "pages": [
+        11,
+        22
+      ],
+      "reviewer": "coding_agent"
+    }
+  ]
+}

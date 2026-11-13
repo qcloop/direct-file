@@ -22,6 +22,19 @@ public final class FactPaths {
     public static final String SE_MILES_AFTER_CHANGE = "/seVehicleBusinessMilesAfterChange";
     public static final String SE_MILEAGE_FIRST_FACTOR = "/seMileageFirstPeriodFactor";
     public static final String SE_MILEAGE_SECOND_FACTOR = "/seMileageSecondPeriodFactor";
+    public static final String SE_MILEAGE_PENDING = "/planning/mileageAllocationPending";
+    public static final String SE_MILEAGE_AS_OF = "/planning/mileageAsOfDate";
+    public static final String SE_MILEAGE_PROJECTED = "/planning/mileageIsProjection";
+    public static final String SE_MILEAGE_ESTIMATED = "/planning/mileageAllocationEstimated";
+    public static final String SE_MILEAGE_REQUIRE_EXACT = "/planning/requireExactMileageAllocation";
+    public static final String SE_MILEAGE_ASSUMPTION = "/planning/mileageAllocationAssumption";
+    public static final String SE_MILEAGE_FIRST_SHARE = "/seMileageFirstPeriodShare";
+    public static final String SE_MILEAGE_SECOND_SHARE = "/seMileageSecondPeriodShare";
+    public static final String SE_MILEAGE_CALCULATED_BEFORE = "/seMileageCalculatedMilesBeforeChange";
+    public static final String SE_MILEAGE_CALCULATED_AFTER = "/seMileageCalculatedMilesAfterChange";
+    public static final String SE_PROJECTED_MILES = "/seProjectedBusinessMiles";
+    public static final String SE_PROJECTED_MILES_BEFORE = "/seMileageProjectedMilesBeforeChange";
+    public static final String SE_PROJECTED_MILES_AFTER = "/seMileageProjectedMilesAfterChange";
 
     // Schedule C / Schedule SE results
     public static final String STANDARD_MILEAGE_RATE = "/standardMileageRate";

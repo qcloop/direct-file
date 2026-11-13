@@ -56,7 +56,9 @@ class TaxYear2026IntegrationTest {
     }
 
     private String session() {
-        return sessions.createSession("2026", null).sessionId();
+        String id = sessions.createSession("2026", null).sessionId();
+        sessions.setFact(id, FactPaths.SE_MILEAGE_REQUIRE_EXACT, "boolean", null, "true", null);
+        return id;
     }
 
     private BigDecimal value(String id, String path) {
@@ -75,13 +77,21 @@ class TaxYear2026IntegrationTest {
     }
 
     @Test
-    void refusesUnallocatedMileageBeforeAnyTaxpayerFactsAreWritten() {
+    void retainsUnallocatedMileageAndAsksOneFollowUpWithoutReturningTax() {
         String id = session();
-        assertThatThrownBy(() -> selfEmployment.calculateSeTax(id, "50000", "10000", "0", "0", "0", null, null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("2026-07-01");
+        var pending = selfEmployment.calculateSeTax(id, "50000", "10000", "0", "0", "0", null, null);
+        assertThat(pending.status()).isEqualTo("needs_facts");
+        assertThat(pending.businessMiles()).isEqualTo(10000L);
+        assertThat(pending.selfEmploymentTax()).isNull();
+        assertThat(pending.followUpQuestions()).hasSize(1);
+        assertThat(pending.followUpQuestions().getFirst().argumentName()).isEqualTo("businessMilesBeforeRateChange");
         assertThat(graph.readFact(SessionId.of(id), FactPaths.SE_GROSS_RECEIPTS).complete())
+                .isTrue();
+        assertThat(graph.readFact(SessionId.of(id), FactPaths.SE_TAX).complete())
                 .isFalse();
+        var completed = selfEmployment.calculateSeTax(id, null, null, null, null, null, "4000", null);
+        assertThat(completed.status()).isEqualTo("ok");
+        assertThat(value(id, "/seVehicleDeduction")).isEqualByComparingTo("7460");
         assertThatThrownBy(() -> selfEmployment.calculateSeTax(id, "50000", "10000", "0", "0", "0", "4000", "5000"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("must equal");
@@ -110,10 +120,10 @@ class TaxYear2026IntegrationTest {
         String id = session();
         selfEmployment.projectNetProfit(id, "2026-06-30", "12000", "1000", "0", "0", "0", null, null);
         assertThat(value(id, "/seVehicleDeduction")).isEqualByComparingTo("1485");
-        assertThatThrownBy(() ->
-                        selfEmployment.projectNetProfit(id, "2026-07-01", "12000", "1000", "0", "0", "0", null, null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("two mileage rates");
+        assertThat(selfEmployment
+                        .projectNetProfit(id, "2026-07-01", "12000", "1000", "0", "0", "0", null, null)
+                        .status())
+                .isEqualTo("needs_facts");
         assertThatThrownBy(() ->
                         selfEmployment.projectNetProfit(id, "2026-06-30", "12000", null, "0", "0", "0", "1000", "1"))
                 .isInstanceOf(IllegalArgumentException.class)

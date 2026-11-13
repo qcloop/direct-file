@@ -1,0 +1,112 @@
+source_id: "irs_form_schedule_se_2026"
+product_id: "f1040sse"
+tax_year: 2026
+source_revision_year: 2026
+document_status: "final"
+disposition: "source_review_required"
+revision_label: "2026"
+applicability_review: "Verify printed revision and effective dates before artifact promotion."
+applicable_tax_years:
+  - 2026
+title: "Self-Employment Tax (Schedule SE)"
+source_url: "https://www.irs.gov/pub/irs-pdf/f1040sse.pdf"
+pdf_sha256: "a42f5a19c0e84a966a49b5f4ca021d3f49c4fda2e087da0b00bf2003525f8655"
+source_sha256: "a42f5a19c0e84a966a49b5f4ca021d3f49c4fda2e087da0b00bf2003525f8655"
+document_format: "pdf"
+agency: "IRS"
+text_path: "direct-file/tax-knowledge/corpora/irs-2026/text/f1040sse.txt"
+generated_at: "2026-11-12T20:10:18.867303+00:00"
+chunking:
+  max_words: 450
+chunks:
+  - chunk_id: "irs_form_schedule_se_2026_chunk_0001"
+    source_id: "irs_form_schedule_se_2026"
+    product_id: "f1040sse"
+    title: "Self-Employment Tax (Schedule SE)"
+    pages:
+      - 1
+    heading: "SCHEDULE SE"
+    text: |
+      SCHEDULE SE
+      (Form 1040) Self-Employment Tax OMB No. 1545-0074
+      Department of the Treasury   Attach to Form 1040, 1040-SR, 1040-SS, or 1040-NR.        2026
+      Attachment
+      Internal Revenue Service  Go to www.irs.gov/ScheduleSE for instructions and the latest information. Sequence No. 17
+      Name of person with self-employment income (as shown on Form 1040, 1040-SR, 1040-SS, or 1040-NR) Social security number of person
+      with self-employment income
+      Part I Self-Employment Tax
+      Note: If your only income subject to self-employment tax is church employee income, see instructions for how to report your income
+      and the definition of church employee income.
+      A If you are a minister, member of a religious order, or Christian Science practitioner and you filed Form 4361, but you had
+      $400 or more of other net earnings from self-employment, check here and continue with Part I . . . . . . . . .
+      Skip lines 1a and 1b if you use the farm optional method in Part II. See instructions.
+      1a Net farm profit or (loss) from Schedule F, line 34; and farm partnerships, Schedule K-1 (Form 1065),
+      box 14, code A  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1a
+      1b If you received social security retirement or disability benefits, enter the amount of Conservation Reserve
+      Program payments included on Schedule F, line 4b, or listed on Schedule K-1 (Form 1065), box 20, code AQ 1b (                            )
+      Skip line 2 if you use the nonfarm optional method in Part II. See instructions.
+      2 Net profit or (loss) from Schedule C, line 31; and Schedule K-1 (Form 1065), box 14, code A (other than
+      farming). See instructions for other income to report or if you are a minister or member of a religious order 2
+      3 Combine lines 1a, 1b, and 2 . . . . . . . . . . . . . . . . . . . . . . . . .  3
+      4 a If line 3 is more than zero, multiply line 3 by 92.35% (0.9235). Otherwise, enter amount from line 3 . 4a
+      Note: If line 4a is less than $400 due to Conservation Reserve Program payments on line 1b, see instructions.
+      4 b If you elect one or both of the optional methods, enter the total of lines 15 and 17 here . . . . . 4b
+      4 c Combine lines 4a and 4b. If less than $400, stop; you don’t owe self-employment tax. Exception: If
+      less than $400 and you had church employee income, enter -0- and continue . . . . . . . . 4c
+      5a Enter your church employee income from Form W-2. See instructions for
+      definition of church employee income . . . . . . . . . . . . . 5a
+      5b Multiply line 5a by 92.35% (0.9235). If less than $100, enter -0- . . . . . . . . . . . . . 5b
+      6 Add lines 4c and 5b . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+      7 Maximum amount of combined wages and self-employment earnings subject to social security tax or
+      the 6.2% portion of the 7.65% railroad retirement (tier 1) tax for 2026 . . . . . . . . . . . 7 $184,500
+      8a Total social security wages and tips (total of boxes 3 and 7 on Form(s) W-2)
+      and railroad retirement (tier 1) compensation. If $184,500 or more, skip lines
+      8b through 10, and go to line 11 . . . . . . . . . . . . . . .  8a
+      8b Unreported tips subject to social security tax from Form 4137, line 10 . . . 8b
+      8c Wages subject to social security tax from Form 8919, line 10 . . . . . . 8c
+      8d Add lines 8a, 8b, and 8c . . . . . . . . . . . . . . . . . . . . . . . . . . 8d
+      9 Subtract line 8d from line 7. If zero or less, enter -0- here and on line 10 and go to line 11 . . . . 9
+      10 Multiply the smaller of line 6 or line 9 by 12.4% (0.124) . . . . . . . . . . . . . . . . 10
+      11 Multiply line 6 by 2.9% (0.029) . . . . . . . . . . . . . . . . . . . . . . . . 11
+      12 Self-employment tax. Add lines 10 and 11. Enter here and on Schedule 2 (Form 1040), line 4, or
+      Form 1040-SS, Part I, line 3 . . . . . . . . . . . . . . . . . . . . . . . . 12
+      13 Deduction for one-half of self-employment tax.
+      Multiply line 12 by 50% (0.50). Enter here and on Schedule 1 (Form 1040),
+      line 15 . . . . . . . . . . . . . . . . . . . . . . . . 13
+      For Paperwork Reduction Act Notice, see your tax return instructions. Cat. No. 11358Z Schedule SE (Form 1040) 2026 Created 4/27/26
+    text_sha256: "7db8447319351c0d4138db90f9e34843daac7bb1ef65f58b1899fc7a1c253ec1"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1040sse.pdf"
+    pdf_sha256: "a42f5a19c0e84a966a49b5f4ca021d3f49c4fda2e087da0b00bf2003525f8655"
+  - chunk_id: "irs_form_schedule_se_2026_chunk_0002"
+    source_id: "irs_form_schedule_se_2026"
+    product_id: "f1040sse"
+    title: "Self-Employment Tax (Schedule SE)"
+    pages:
+      - 2
+    heading: "Schedule SE (Form 1040) 2026 Page 2"
+    text: |
+      Schedule SE (Form 1040) 2026 Page 2
+      Part II Optional Methods To Figure Net Earnings (see instructions)
+      Farm optional method. You may use this method only if (a) your gross farm income1
+      wasn’t more than
+      $11,340, or (b) your net farm profits2
+      were less than $8,186.
+      14 Maximum income for optional methods . . . . . . . . . . . . . . . . . . . . . 14 $7,560
+      15 Enter the smaller of: two-thirds (2/3) of gross farm income1 (not less than zero) or $7,560. Also, include
+      this amount on line 4b above . . . . . . . . . . . . . . . . . . . . . . . . 15
+      Nonfarm optional method. You may use this method only if (a) your net nonfarm profits3
+      were less than $8,186
+      and also less than 72.189% of your gross nonfarm income,4
+      and (b) you had net earnings from self-employment
+      of at least $400 in 2 of the prior 3 years. Caution: You may use this method no more than five times.
+      16 Subtract line 15 from line 14 . . . . . . . . . . . . . . . . . . . . . . . . . 16
+      17 Enter the smaller of: two-thirds (2/3) of gross nonfarm income4
+      (not less than zero) or the amount on
+      line 16. Also, include this amount on line 4b above . . . . . . . . . . . . . . . . . 17
+      1 From Sch. F, line 9; and Sch. K-1 (Form 1065), box 14, code B. 3 From Sch. C, line 31; and Sch. K-1 (Form 1065), box 14, code A.
+      2 From Sch. F, line 34; and Sch. K-1 (Form 1065), box 14, code A—minus the amount 4 From Sch. C, line 7; and Sch. K-1 (Form 1065), box 14, code C.
+      you would have entered on line 1b had you not used the optional method.
+      Schedule SE (Form 1040) 2026
+    text_sha256: "a4aefb33c0c97cc5c44e98cc0ed59a58e936f88a7206af544fcad7e750bcf05f"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1040sse.pdf"
+    pdf_sha256: "a42f5a19c0e84a966a49b5f4ca021d3f49c4fda2e087da0b00bf2003525f8655"

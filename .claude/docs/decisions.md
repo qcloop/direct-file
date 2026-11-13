@@ -145,3 +145,44 @@ Newest last. Each entry: the decision, the reason, and the alternative rejected.
   and IRS discovery pages. Structural provenance checks ownership/pages/actual text hashes, and
   deterministic packages retain raw snapshots and graph hashes. Monitoring and packaging cannot
   approve, commit, or deploy tax changes.
+
+## Total-first mileage collection
+
+- **Collect one mileage total and ask one conditional allocation follow-up.** The
+  income year's parameters determine dated rate periods. Actual YTD figures before
+  the change need no split, even when reported later. A total spanning the change
+  returns `needs_facts`; one period answer determines the other by subtraction.
+  This supersedes rejecting an unallocated total. Unknown allocations remain pending;
+  automatic allocation estimates are not enabled.
+- **Persist pending inputs in the session's fact map, atomically.** The total,
+  coverage date, calculation mode, and other Schedule C inputs survive the follow-up
+  and work with the existing Redis serialization. Clear old period facts in the same
+  update so the graph cannot produce a stale deduction/tax result. Resume only for
+  the same date and mode; omission of the date preserves its original value.
+- **Question wording remains in the knowledge artifacts.** The pending question is
+  prioritized by `plan_questions` and returned by the calculation tool. Actual period
+  miles remain distinct from future mileage projected by the existing graph factors.
+
+## Unknown mileage allocation: labeled estimate (2026-11-13)
+
+- **Default to a labeled planning estimate for total-only mileage.** The user selected
+  this behavior over a range or a blocked interview. This supersedes the default-pending
+  policy above. The graph distributes the total by elapsed calendar-day shares from
+  January 1 through the coverage date; for a YTD projection it extends the second-period
+  pace through year-end. Receipts/other expenses retain monthly annualization.
+  This distribution is a product assumption, not an IRS requirement. Seasonal driving
+  and midyear business starts require the user to refine with actual period mileage.
+- **Estimated allocations never become actual records.** Separate graph outputs and
+  result fields expose actual/estimated/projected miles. The assumption is visible in
+  tool results, client summaries, and exports. A period answer refines the saved estimate;
+  invalid answers leave the prior state intact. Exact-only mode remains available through
+  `/planning/requireExactMileageAllocation`; missing splits then remain `needs_facts`.
+- **A built jar is not evidence that the running client uses it.** The latest observed
+  client error still contained the obsolete split-rejection text. Verify the actual 8090
+  runtime after rebuilding. MCP transport recovery is limited to a rejected HTTP 404
+  session; timeouts and tool errors are not automatically replayed.
+- **Treat an empty 0/0 period pair as unallocated total mileage.** The live local-model
+  regression reproduced optional period fields filled with zero despite explicit total-only
+  guidance. A supplied total remains primary; the empty pair yields the disclosed estimate
+  or exact-only `needs_facts`, never fabricated actual records. Other inconsistent/negative
+  period values remain invalid and atomic. Client diagnostics explain how to correct them.

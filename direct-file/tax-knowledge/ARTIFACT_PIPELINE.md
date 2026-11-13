@@ -38,6 +38,16 @@ Human check:
 
 ## 2. Extraction QA
 
+For catalog-driven PDF and IRS HTML additions, first acquire observations and
+content-addressed snapshots with `tools/check_source_updates.py`. Then run
+`tools/ingest_source_observations.py` against a draft catalog. It validates the
+whole batch, refuses changed existing pins, checks source bytes, and extracts IRS
+`<main>` HTML as logical page 1. It updates draft inventory manifests without
+approving sources or changing calculation parameters. Changed pinned revisions
+still require a separate revision review. Preserve the observation report and
+repeat PDFBox extraction for acquired PDFs before segmentation. The
+[2026 expansion run](runs/irs-2026-source-expansion-20261112.md) records the commands.
+
 The `document-understanding-agent` verifies that source extraction is good enough for downstream citation and rule drafting.
 
 Output:
@@ -240,7 +250,9 @@ as a release status alongside reviewed/approved/compiled. The year-scoped gate m
 zero errors and warnings before packaging. Install `tools/requirements.txt` first.
 
 `tools/build_knowledge_release.py` packages a deterministic draft candidate with source,
-artifact, and executable graph hashes plus the exact raw source snapshots. Tax owners,
+artifact, executable graph, and matching service-jar hashes plus exact raw source snapshots.
+It inventories XML from the built service jar and checks that its source matches; backend
+modules are included only when they actually ship on that classpath. Tax owners,
 content owners, and engineers still perform the approvals described above. After approval,
 record the reviewed content identity, promote reviewed root and nested artifact statuses,
 repeat validation, and deploy the matching service build and knowledge directory together.

@@ -155,6 +155,7 @@ public class PlanningGraphService {
         Map<String, FactTypeWithItem> facts = new LinkedHashMap<>();
         addYearParameters(facts, params, status, taxYear);
         addZeroDefaultedOptionalIncome(facts);
+        facts.put(FactPaths.SE_MILEAGE_ESTIMATED, fact(PersisterTypes.BOOLEAN, false));
         buildGraph(id, facts).save();
         return new SessionSnapshot(taxYear, status, facts, Map.of(), knowledgeVersion);
     }
@@ -366,6 +367,38 @@ public class PlanningGraphService {
         } catch (UnsupportedOperationException e) {
             return new ReadResult(path, null, null, false, "Unknown fact path: " + path);
         }
+    }
+
+    /** Save related inputs together, clearing superseded inputs before evaluating the new graph. */
+    public void writeFacts(SessionId sessionId, Map<String, PersisterTypes.TypedValue> values, Set<String> removals) {
+        for (int attempt = 0; attempt < MAX_UPDATE_ATTEMPTS; attempt++) {
+            SessionStore.Stored current = require(sessionId);
+            Set<String> protectedPaths = taxKnowledge
+                    .taxParametersForYear(current.snapshot().taxYear())
+                    .stream()
+                    .map(TaxParameter::factPath)
+                    .collect(Collectors.toSet());
+            if (values.keySet().stream().anyMatch(protectedPaths::contains)
+                    || removals.stream().anyMatch(protectedPaths::contains)) {
+                throw new IllegalArgumentException("Tax parameters cannot be overwritten or removed.");
+            }
+            Map<String, FactTypeWithItem> facts =
+                    new LinkedHashMap<>(current.snapshot().facts());
+            removals.forEach(facts::remove);
+            values.forEach((path, value) -> facts.put(path, fact(value.typeCode(), value.value())));
+            buildGraph(sessionId, facts).save();
+            SessionSnapshot snapshot = current.snapshot();
+            SessionSnapshot updated = new SessionSnapshot(
+                    snapshot.taxYear(),
+                    snapshot.filingStatus(),
+                    facts,
+                    snapshot.sourceNotes(),
+                    snapshot.knowledgeVersion());
+            if (sessions.replace(sessionId, current, updated)) {
+                return;
+            }
+        }
+        throw contended(sessionId);
     }
 
     /**

@@ -1,0 +1,31 @@
+source_id: "irs_mileage_update_2026"
+product_id: "mileage_update_2026"
+tax_year: 2026
+source_revision_year: 2026
+document_status: "final"
+disposition: "source_review_required"
+corrects_source_ids: []
+applicable_tax_years:
+  - 2026
+title: "2026 mileage rates and automobile fair market values update"
+source_url: "https://www.irs.gov/forms-pubs/the-standard-mileage-rates-and-maximum-automobile-fair-market-values-have-been-updated-for-2026"
+pdf_sha256: null
+source_sha256: "611c013e7741635af1e831d366def3cb2575af31c50aac5cdadb90240b23006a"
+document_format: "html"
+agency: "IRS"
+text_path: "direct-file/tax-knowledge/corpora/irs-2026/text/mileage-update-2026.txt"
+generated_at: "2026-11-12T20:10:18.889945+00:00"
+chunking:
+  max_words: 450
+chunks:
+  - chunk_id: "irs_mileage_update_2026_chunk_0001"
+    source_id: "irs_mileage_update_2026"
+    product_id: "mileage_update_2026"
+    title: "2026 mileage rates and automobile fair market values update"
+    pages:
+      - 1
+    heading: null
+    text: "Notice 2026-10 published on Dec. 29, 2025 provides the optional 2026 standard mileage rates and the maximum fair market value of employer-provided automobiles first made available to employees for personal use in calendar year 2026. For 2026, the standard mileage rate is 72.5 cents per mile. You can't use the cents-per-mile rule for an automobile (including a truck or van) if its value when you first make it available to any employee for personal use in calendar year 2026 is more than $61,700. For more information, go to Notice 2026-10."
+    text_sha256: "d6ca1e156715af3bb1c95c985ad18d29c1d62cc1ffe83db8ed33548b0983f47a"
+    source_url: "https://www.irs.gov/forms-pubs/the-standard-mileage-rates-and-maximum-automobile-fair-market-values-have-been-updated-for-2026"
+    pdf_sha256: "611c013e7741635af1e831d366def3cb2575af31c50aac5cdadb90240b23006a"

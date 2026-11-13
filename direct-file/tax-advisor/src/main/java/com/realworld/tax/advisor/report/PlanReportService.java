@@ -49,6 +49,8 @@ import org.springframework.stereotype.Service;
 public class PlanReportService {
 
     /** Marks the start of the integrity section; the hash covers everything before it. */
+    private static final String PARAGRAPH_BREAK = "\n\n";
+
     static final String INTEGRITY_DELIMITER = "\n\n---\n\n## Integrity\n\n";
 
     /** Markdown table cell separator. */
@@ -108,6 +110,12 @@ public class PlanReportService {
         // Inputs are the facts written into the session that are not injected year-parameters.
         List<String> inputPaths = graph.sessionFacts(sessionId).keySet().stream()
                 .filter(path -> !paramPaths.contains(path))
+                .filter(path -> !Set.of(
+                                FactPaths.SE_MILEAGE_ESTIMATED,
+                                FactPaths.SE_MILEAGE_ASSUMPTION,
+                                FactPaths.SE_MILEAGE_FIRST_SHARE,
+                                FactPaths.SE_MILEAGE_SECOND_SHARE)
+                        .contains(path))
                 .toList();
 
         String generatedAt = Instant.now().truncatedTo(ChronoUnit.SECONDS).toString();
@@ -135,9 +143,16 @@ public class PlanReportService {
         if (releaseWarning != null && releaseWarning.startsWith("PREVIEW:")) {
             sb.append("> **Draft release awaiting tax review.** ")
                     .append(releaseWarning)
-                    .append("\n\n");
+                    .append(PARAGRAPH_BREAK);
         }
         appendProvisionalBanner(sb, ctx);
+        Object mileageAssumption =
+                graph.readFact(ctx.sessionId(), FactPaths.SE_MILEAGE_ASSUMPTION).value();
+        if (mileageAssumption instanceof String assumption && !assumption.isBlank()) {
+            sb.append("> **Mileage allocation is estimated.** ")
+                    .append(assumption)
+                    .append(PARAGRAPH_BREAK);
+        }
         appendInputs(sb, ctx);
         appendParameters(sb, ctx, citedSourceIds);
         appendResults(sb, ctx, citedSourceIds);
@@ -151,10 +166,10 @@ public class PlanReportService {
         sb.append("# Self-Employment Tax Planning Summary — Tax Year ")
                 .append(ctx.taxYear())
                 .append(" (federal)\n\n");
-        sb.append("Generated (UTC): ").append(ctx.generatedAt()).append("\n\n");
+        sb.append("Generated (UTC): ").append(ctx.generatedAt()).append(PARAGRAPH_BREAK);
         sb.append("Knowledge and graph version (SHA-256): ")
                 .append(ctx.knowledgeVersion())
-                .append("\n\n");
+                .append(PARAGRAPH_BREAK);
         sb.append("> **This is a planning estimate, not a filed tax return.** The figures below are\n")
                 .append("> based on values you provided. Those values are **self-reported and have not been\n")
                 .append("> verified** against source documents (1099s, bank records, mileage logs); this\n")

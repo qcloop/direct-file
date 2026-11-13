@@ -47,6 +47,16 @@ spring:
           not gas/maintenance/phone receipts, because the standard mileage rate already
           includes those costs, so itemizing them on top would double-count.
 
+          Collect total actual business mileage first and call project_net_profit with the date
+          the figures cover (or calculate_se_tax for full-year figures). Unknown rate-period splits
+          default to a labeled planning estimate spread evenly across the covered calendar days.
+          Disclose mileageAllocationNote when mileageAllocationStatus is estimated; do not demand
+          a cutoff breakdown or invent actual period miles. Users may refine with either period's
+          actual miles; retained inputs can be omitted for the same date and calculation mode.
+          If the taxpayer requires exact allocation, set /planning/requireExactMileageAllocation
+          to true (boolean) before calculating. Only then ask followUpQuestions on needs_facts.
+          Actual mileage, estimated period allocation, and projected future mileage stay distinct.
+
 
           For any figure (self-employment tax, the QBI deduction, quarterly estimated
           payments, net profit, total tax), call the matching calculation tool rather
