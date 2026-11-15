@@ -1,0 +1,11 @@
+----- IRS_SOURCE_PAGE 1 -----
+
+If you downloaded or printed the 2026 Instructions for Form 8829 prior to March 5, 2026, please note the following two updates.
+
+Line 11
+
+Step 3 of the Iteration instructions for the Line 11 Worksheet was updated to include "student loan interest deduction (Schedule 1, line 21)” in the list of tax products in the second sentence.
+
+Line 17
+
+Taxpayers itemizing deductions on Schedule A was updated to replace the incorrect reference to “line 10” of the Line 11 Worksheet with “line 11.” The text now reads: “If you used the Line 11 Worksheet to figure the amount to include in column (a) of line 11, then include the amount from line 11 of the Line 11 Worksheet in column (a) of line 17; otherwise, do not enter an amount on line 17.”

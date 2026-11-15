@@ -1,0 +1,13 @@
+----- IRS_SOURCE_PAGE 1 -----
+
+If you viewed, printed, or downloaded the 2025 Instructions for Form 8995 prior to Jan. 27, 2026, please note the following corrections to page 4.
+
+On page 4, line 11, of the Instructions for Form 8995, the language on how to calculate taxable income before QBI deduction was incorrect for the first two bullets. The corrected instructions are below.
+
+Line 11
+
+Enter your taxable income figured before any QBI deduction, computed as follows.
+
+Form 1040 or 1040-SR filers: Form 1040 or 1040-SR, line 11a, minus lines 12e and 13b.
+
+1040-NR filers: 1040-NR, line 11a, minus lines 12, 13b, and 13c.

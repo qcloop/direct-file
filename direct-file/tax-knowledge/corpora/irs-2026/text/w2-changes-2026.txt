@@ -1,0 +1,11 @@
+----- IRS_SOURCE_PAGE 1 -----
+
+The 2026 Forms W-2, W-2AS, W-2GU, and W-2VI posted to IRS.gov in January 2026 have been revised to a two-per-page format that matches the official printed IRS forms. There is no operational impact, and no other changes were made.
+
+The change was made to ease the burden for those completing and filing Copies 1, B, C, and 2 available on IRS.gov. You may continue to use forms that were downloaded before Aug. 4, 2026.
+
+Caution: Copy A of this form is provided for informational purposes only. Although Copy A appears in red, similar to the official IRS form, it does not meet SSA’s requirements for scanning and processing.
+
+Do not print and file Copy A downloaded from www.irs.gov with the SSA. You may be charged a penalty if you file forms that can’t be scanned.
+
+See the Penalties section in the current General Instructions for Forms W-2 and W-3, for more information.

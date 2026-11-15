@@ -1,0 +1,7 @@
+----- IRS_SOURCE_PAGE 1 -----
+
+If you downloaded or printed 2026 Form 1040-ES, please note the following correction to the Reminders section.
+
+The text for the Reminder, State and local income tax deduction increased should read: The overall limit on the deduction for state and local income, sales, and property taxes has increased. For 2026, the limit is $40,400 ($20,200 if married filing separately) and the overall limit is reduced if your modified adjusted gross income is more than $505,000 ($252,500 if married filing separately) but will not be reduced below $10,000 ($5,000 if married filing separately).
+
+The 2026 Form 1040-ES will not be revised.

@@ -1,0 +1,3 @@
+----- IRS_SOURCE_PAGE 1 -----
+
+The 2026 General Instructions for Forms W-2 and W-3, under Specific Instructions for Form W-2, Box 10—Dependent care benefits, states that the dependent care benefits exclusion is $5,000. P.L. 119-21, section 70404, increased the maximum amount of the exclusion to $7,500 beginning in 2026. All amounts paid or incurred (regardless of any employee forfeitures), including those in excess of the $7,500 exclusion, are reported in box 10.
