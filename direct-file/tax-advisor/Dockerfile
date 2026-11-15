@@ -1,7 +1,7 @@
 # Build context: the parent direct-file directory, after mvnw package in tax-advisor.
 FROM amazoncorretto:25-al2023-headless
 WORKDIR /app
-RUN yum install -y curl-minimal && yum clean all
+RUN yum --releasever=2023.12.20261112 update -y && yum install -y curl-minimal && yum clean all
 ENV SPRING_PROFILES_ACTIVE=redis \
     DF_TAX_KNOWLEDGE_ROOT=/app/tax-knowledge \
     LOGGING_LEVEL_ROOT=INFO \
