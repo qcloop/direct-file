@@ -11,6 +11,5 @@ import org.springframework.validation.annotation.Validated;
 @Getter
 @AllArgsConstructor
 public class LocalEncryptionConfigurationProperties {
-    @NotBlank
-    private final String localWrappingKey;
+    @NotBlank private final String localWrappingKey;
 }

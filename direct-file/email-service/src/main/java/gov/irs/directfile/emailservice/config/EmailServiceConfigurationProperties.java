@@ -20,12 +20,9 @@ public class EmailServiceConfigurationProperties {
      *
      * It will default to 0 if null is passed to the {@code @AllArgsConstructor} generated constructor
      */
-    @Min(0)
-    @Max(900)
-    private final int resendDelaySeconds;
+    @Min(0) @Max(900) private final int resendDelaySeconds;
 
-    @NotBlank
-    private final String environment;
+    @NotBlank private final String environment;
 
     @NotNull private final Sender sender;
 
@@ -34,29 +31,22 @@ public class EmailServiceConfigurationProperties {
     @AllArgsConstructor
     @Getter
     public static class Sender {
-        @NotBlank
-        private final String from;
+        @NotBlank private final String from;
     }
 
     @AllArgsConstructor
     @Getter
     public static class MessageQueue {
-        @NotBlank
-        private final String sendEmailQueue;
+        @NotBlank private final String sendEmailQueue;
 
-        @NotBlank
-        private final String dlqSendEmailQueue;
+        @NotBlank private final String dlqSendEmailQueue;
 
-        @NotBlank
-        private final String endpoint;
+        @NotBlank private final String endpoint;
 
-        @NotBlank
-        private final String region;
+        @NotBlank private final String region;
 
-        @NotBlank
-        private final String accessKey;
+        @NotBlank private final String accessKey;
 
-        @NotBlank
-        private final String secretKey;
+        @NotBlank private final String secretKey;
     }
 }

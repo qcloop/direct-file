@@ -130,8 +130,7 @@ public class EncryptionAutoConfiguration {
                         new SecretKeySpec(Base64.getDecoder().decode(key), "AES");
                 return JceMasterKey.getInstance(secretKeySpec, "local", "local", "AES/GCM/NoPadding");
             } catch (IllegalArgumentException e) {
-                String message =
-                        """
+                String message = """
                         LOCAL WRAPPING KEY NOT SET: \
                         Can't run the application because the local wrapping key isn't set or isn't a valid base64 String. \
                         See ONBOARDING.md for more instructions on setting up your local environment variables.

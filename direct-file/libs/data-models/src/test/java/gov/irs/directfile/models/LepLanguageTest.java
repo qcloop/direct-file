@@ -20,8 +20,7 @@ import static org.mockito.Mockito.when;
 class LepLanguageTest {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final String DIRECT_FILE_LANGUAGE_PREFERENCE_PATH = "/directFileLanguagePreference";
-    private static final String FACTGRAPH_WITH_LEP_LANGUAGE_PREFERENCE_FORMAT =
-            """
+    private static final String FACTGRAPH_WITH_LEP_LANGUAGE_PREFERENCE_FORMAT = """
                 {
                     "facts": {
                         "/languagePreference": {
@@ -34,8 +33,7 @@ class LepLanguageTest {
                     }
                 }
             """;
-    private static final String FACTGRAPH_WITH_LEP_AND_DF_LANGUAGE_PREFERENCE_FORMAT =
-            """
+    private static final String FACTGRAPH_WITH_LEP_AND_DF_LANGUAGE_PREFERENCE_FORMAT = """
                 {
                     "facts": {
                         "/languagePreference": {
@@ -52,8 +50,7 @@ class LepLanguageTest {
                     }
                 }
             """;
-    private static final String FACTGRAPH_WITH_DF_LANGUAGE_PREFERENCE_FORMAT =
-            """
+    private static final String FACTGRAPH_WITH_DF_LANGUAGE_PREFERENCE_FORMAT = """
                 {
                     "facts": {
                         "/directFileLanguagePreference": {
@@ -63,8 +60,7 @@ class LepLanguageTest {
                     }
                 }
             """;
-    private static final String FACTGRAPH_WITH_NO_LANGUAGE_PREFERENCE =
-            """
+    private static final String FACTGRAPH_WITH_NO_LANGUAGE_PREFERENCE = """
                 {
                     "facts": {
                         }

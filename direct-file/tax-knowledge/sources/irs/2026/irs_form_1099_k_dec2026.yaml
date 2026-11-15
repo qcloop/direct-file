@@ -1,0 +1,323 @@
+source_id: "irs_form_1099_k_dec2026"
+product_id: "f1099k"
+tax_year: 2026
+source_revision_year: 2026
+document_status: "final"
+disposition: "source_review_required"
+revision_label: "December 2026"
+processing_year: 2027
+applicability_review: "Printed December 2026 revision verified. Form cover explains first use for calendar-year 2026 reporting, filed beginning January 2027; evidence mappings still require review."
+applicable_tax_years:
+  - 2026
+title: "Payment Card and Third Party Network Transactions"
+source_url: "https://www.irs.gov/pub/irs-pdf/f1099k.pdf"
+pdf_sha256: "fa3a2b659f7ee13d59ea6c66ad992a5ab55afa0060db275ad1ee122478189b89"
+source_sha256: "fa3a2b659f7ee13d59ea6c66ad992a5ab55afa0060db275ad1ee122478189b89"
+document_format: "pdf"
+agency: "IRS"
+text_path: "direct-file/tax-knowledge/corpora/irs-2026/text/f1099k.txt"
+generated_at: "2026-11-12T20:10:18.881211+00:00"
+chunking:
+  max_words: 450
+chunks:
+  - chunk_id: "irs_form_1099_k_dec2026_chunk_0001"
+    source_id: "irs_form_1099_k_dec2026"
+    product_id: "f1099k"
+    title: "Payment Card and Third Party Network Transactions"
+    pages:
+      - 1
+    heading: "Attention:"
+    text: |
+      Attention:
+      Which Revision To Use for Which Year. We issue information returns up to a year in
+      advance of when issuers will first file them. For all forms that we do not issue annually (such
+      as Form 1040), the year of the revision date is the first year for which issuers are to use the
+      form to report amounts. For example, we issued an April 2025 revision of Form 1099-NEC,
+      Nonemployee Compensation, to use first to report amounts for calendar year 2025. Filers will
+      first file the April 2025 revision with the IRS beginning in January 2026, to report amounts for
+      2025. Likewise, we are developing a December 2026 revision of Form 1099-NEC, to use first
+      to report amounts for calendar year 2026 with the first filings with the IRS beginning in
+      January 2027.
+      We release these and other information return forms and their instructions up to a year in
+      advance of when you, as an issuer, are required to file them with the IRS. We do this because
+      the information return forms have multiple uses. We also provide a copy of the form for the
+      form issuer to use to furnish a copy of the form to the recipient. We require filers of
+      information returns, including Forms 1099-NEC and 1099-S, to furnish a copy of what is or will
+      be filed with the IRS to the recipient. In many cases, issuers of 1099 forms prefer to furnish
+      the information return to the recipient at the time they know what they will have to report to the
+      IRS beginning the following January. For example, you cannot file the December 2026
+      revision of Form 1099-S with the IRS for a reportable home sale occurring in January 2026
+      until January 2027. However, you may want to furnish the recipient (the seller of the home)
+      their copy of Form 1099-S at the closing of the sale, to avoid issues with mailing the Form
+      1099-S the following January, a year later, when the recipient may have a new mailing
+      address. We therefore make the Form 1099-S for use in reporting 2026 sales available just
+      before 2026, so issuers can use it to meet their responsibility to furnish a copy to the recipient
+      for sales beginning in 2026, even though the form can’t be filed with the IRS until January
+      2027. We also post drafts and final revisions of information returns well in advance so that
+      issuers will know at the beginning of a year what information they need to collect during that
+      year so they can report it to the IRS beginning in January of the following year.
+      Note: We make available Copy A for informational purposes only. Copy A appears in red,
+      similar to the official printed form. However, official printed versions of Copy A are scannable,
+      but self-printed copies of Copy A from this PDF are not. Do not print and file copy A of this
+      PDF; we may impose a penalty for filing information return forms that we can’t scan. See part
+      O in Publication 1099, General Instructions for Certain Information Returns, at
+      IRS.gov/Form1099 for more information about penalties.
+      You may download and print Copy B and other copies of this form, which appear in black, to
+      satisfy the requirement to furnish the information to the recipient.
+      If you have 10 or more information returns, in the aggregate, to file, you may be required to
+      e-file information returns. You’ll find that it is easier and faster to e-file using our free
+      Information Return Intake System (IRIS). See IRS.gov/InfoReturn and IRS.gov/IRIS for details.
+      To order official IRS information returns, which include a scannable Copy A for filing with the
+      IRS and all other applicable copies of the form, go to IRS.gov/EmployerForms. We’ll mail you
+      the forms you request and their instructions, as well as any publications you may order.
+      Note: The order limit for most information returns is 10 due to the e-file requirement.
+      See IRS Publications 1141, 1167, and 1179 for more information about these tax forms.
+    text_sha256: "31f09cb946bdfff0f49f95afd8da8ee94bb59c7af2aaeb07400fd876c289dc61"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1099k.pdf"
+    pdf_sha256: "fa3a2b659f7ee13d59ea6c66ad992a5ab55afa0060db275ad1ee122478189b89"
+  - chunk_id: "irs_form_1099_k_dec2026_chunk_0002"
+    source_id: "irs_form_1099_k_dec2026"
+    product_id: "f1099k"
+    title: "Payment Card and Third Party Network Transactions"
+    pages:
+      - 2
+    heading: null
+    text: |
+      1010 VOID CORRECTED
+      FILER’S name 1a Gross amount of payment OMB No. 1545-2205
+      card/third party network Payment Card and
+      transactions Form 1099-K
+      Street address Room or suite no. $ Third Party
+      (Rev. December 2026)
+      1b Card Not Present Network
+      transactions For calendar year
+      City or town Telephone number Transactions
+      $
+      1c Cash tips 1d TTOC
+      State or province Country ZIP or foreign postal code Copy A
+      $ For
+      2   Merchant category code 3   Number of payment
+      Check to indicate if FILER is a (an): Check to indicate transactions transactions Internal Revenue
+      reported are: Service Center
+      Payment settlement entity (PSE) Payment card
+      4   Federal income tax withheld
+      Electronic payment facilitator
+      (EPF)/Other third party Third party network $ For filing
+      FILER’S TIN PAYEE’S TIN 5a January 5b February information,
+      $ $ Privacy Act, and
+      Paperwork
+      PAYEE’S name 5c March 5d April
+      Reduction Act
+      $ $ Notice, see the
+      5e May 5f  June General
+      Street address Apt. no. $ $ Instructions for
+      5g July 5h August Certain
+      City or town $ $ Information
+      5i  September 5j  October Returns.
+      State or province Country ZIP or foreign postal code $ $ www.irs.gov/Form1099
+      5k November 5l  December
+      2nd TIN not.
+      PSE’S name and telephone number $ $
+      6   State income tax withheld 7   State identification no. 8   State
+      Account number (see instructions) $
+      $
+      Form 1099-K (Rev. 12-2026) Created 4/30/26 Cat. No. 54118B www.irs.gov/Form1099K Department of the Treasury - Internal Revenue Service
+      Do  Not  Cut  or  Separate  Forms  on  This  Page    —    Do  Not  Cut  or  Separate  Forms  on  This  Page
+    text_sha256: "08c3c052787976cadc2ee201112b81a2ba166dc3ac7b49a8d803b12b80f93239"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1099k.pdf"
+    pdf_sha256: "fa3a2b659f7ee13d59ea6c66ad992a5ab55afa0060db275ad1ee122478189b89"
+  - chunk_id: "irs_form_1099_k_dec2026_chunk_0003"
+    source_id: "irs_form_1099_k_dec2026"
+    product_id: "f1099k"
+    title: "Payment Card and Third Party Network Transactions"
+    pages:
+      - 3
+    heading: "VOID CORRECTED"
+    text: |
+      VOID CORRECTED
+      FILER’S name 1a Gross amount of payment OMB No. 1545-2205
+      card/third party network Payment Card and
+      transactions Form 1099-K
+      Street address Room or suite no. $ Third Party
+      (Rev. December 2026)
+      1b Card Not Present Network
+      transactions For calendar year
+      City or town Telephone number Transactions
+      $
+      1c Cash tips 1d TTOC
+      State or province Country ZIP or foreign postal code Copy 1
+      $ For State Tax
+      2   Merchant category code 3   Number of payment
+      Check to indicate if FILER is a (an): Check to indicate transactions transactions Department
+      reported are:
+      Payment settlement entity (PSE) Payment card
+      4   Federal income tax withheld
+      Electronic payment facilitator
+      (EPF)/Other third party Third party network $
+      FILER’S TIN PAYEE’S TIN 5a January 5b February
+      $ $
+      PAYEE’S name 5c March 5d April
+      $ $
+      5e May 5f  June
+      Street address Apt. no. $ $
+      5g July 5h August
+      City or town $ $
+      5i  September 5j  October
+      State or province Country ZIP or foreign postal code $ $
+      5k November 5l  December
+      PSE’S name and telephone number $ $
+      6   State income tax withheld 7   State identification no. 8   State
+      Account number (see instructions) $
+      $
+      Form 1099-K (Rev. 12-2026) www.irs.gov/Form1099K  Department of the Treasury - Internal Revenue Service
+    text_sha256: "98631033c861494b7a469eb35113de9fed31936f560f3fd4c59236f58c02a4c0"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1099k.pdf"
+    pdf_sha256: "fa3a2b659f7ee13d59ea6c66ad992a5ab55afa0060db275ad1ee122478189b89"
+  - chunk_id: "irs_form_1099_k_dec2026_chunk_0004"
+    source_id: "irs_form_1099_k_dec2026"
+    product_id: "f1099k"
+    title: "Payment Card and Third Party Network Transactions"
+    pages:
+      - 4
+    heading: "CORRECTED (if checked)"
+    text: |
+      CORRECTED (if checked)
+      FILER’S name 1a Gross amount of payment OMB No. 1545-2205
+      card/third party network Payment Card and
+      transactions Form 1099-K
+      Street address Room or suite no. $ Third Party
+      (Rev. December 2026)
+      1b Card Not Present Network
+      transactions For calendar year
+      City or town Telephone number Transactions
+      $
+      1c Cash tips 1d TTOC
+      State or province Country ZIP or foreign postal code Copy B
+      $ For Payee
+      2   Merchant category code 3   Number of payment
+      Check to indicate if FILER is a (an): Check to indicate transactions transactions
+      reported are: This is important tax
+      Payment settlement entity (PSE) Payment card information and is
+      4   Federal income tax withheld being furnished to
+      Electronic payment facilitator
+      (EPF)/Other third party $ the IRS. If you are
+      Third party network
+      required to file a
+      FILER’S TIN PAYEE’S TIN 5a January 5b February return, a negligence
+      $ $ penalty or other
+      sanction may be
+      PAYEE’S name 5c March 5d April imposed on you if
+      $ $ taxable income
+      5e May 5f  June results from this
+      transaction and the
+      Street address Apt. no. $ $ IRS determines that it
+      5g July 5h August has not been
+      reported.
+      City or town $ $
+      5i  September 5j  October
+      State or province Country ZIP or foreign postal code $ $
+      5k November 5l  December
+      PSE’S name and telephone number $ $
+      6   State income tax withheld 7   State identification no. 8   State
+      Account number (see instructions) $
+      $
+      Form 1099-K (Rev. 12-2026) (Keep for your records) www.irs.gov/Form1099K Department of the Treasury - Internal Revenue Service
+    text_sha256: "7432e57e8a80722b4936c8ce6168e53e5d984106165fd8ff6b4e0c659bd8b7db"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1099k.pdf"
+    pdf_sha256: "fa3a2b659f7ee13d59ea6c66ad992a5ab55afa0060db275ad1ee122478189b89"
+  - chunk_id: "irs_form_1099_k_dec2026_chunk_0005"
+    source_id: "irs_form_1099_k_dec2026"
+    product_id: "f1099k"
+    title: "Payment Card and Third Party Network Transactions"
+    pages:
+      - 5
+    heading: "Instructions for Payee"
+    text: |
+      Instructions for Payee
+      You have received this form because you have either (a) accepted payment Box 1b. Shows the aggregate gross amount of all reportable payment
+      cards for payments, or (b) received payments through a third party network transactions made to you through the PSE during the calendar year where
+      in the calendar year reported on this form. Merchant acquirers and third the card was not present at the time of the transaction or the card number
+      party settlement organizations, as payment settlement entities (PSEs), was keyed into the terminal. Typically, this relates to online sales, phone
+      must report the proceeds of payment card and third party network sales, or catalogue sales. If the box for third party network is checked, or if
+      transactions made to you on Form 1099-K under Internal Revenue Code these are third party network transactions, Card Not Present transactions
+      section 6050W. The PSE may have contracted with an electronic payment will not be reported.
+      facilitator (EPF) or other third party payer to make payments to you. Box 1c. Shows the total amount of cash tips reported by the filer. “Cash
+      If you have questions about the amounts reported on this form, contact tips” include tips received in cash or charged. This amount is also included
+      the FILER whose information is shown in the upper-left corner on the front in the amount reported in box 1a. Use the amount in box 1c in determining
+      of this form. If you do not recognize the FILER shown in the upper-left the deduction for qualified tips in Part II of Schedule 1-A (Form 1040).
+      corner of the form, contact the PSE whose name and phone number are Box 1d. Shows up to two Treasury Tipped Occupation Code(s) (TTOC) for
+      shown in the lower-left corner of the form above your account number. your tipped occupation(s). Use this code(s) in determining the deduction
+      Note: For more information on why you received your Form 1099-K, go to for qualified tips in Part II of Schedule 1-A (Form 1040). If the occupation
+      www.irs.gov/KnowYour1099K. For information on what to do with your code 000 is used, and no other code is included in box 1d, your cash
+      Form 1099-K, go to www.irs.gov/businesses/what-to-do-with-form-1099-k. tips are not qualified tips; do not use the amount reported in box 1c for the
+      If the Form 1099-K is related to your business, see Pub. 334 for more deduction for qualified tips.
+      information. If the Form 1099-K is related to your work as part of the gig Box 2. Shows the merchant category code used for payment card/third
+      economy, go to www.irs.gov/GigEconomy. party network transactions (if available) reported on this form.
+      See the separate instructions for your income tax return for using the Box 3. Shows the number of payment transactions (not including refund
+      information reported on this form. transactions) processed through the payment card/third party network.
+      Payee’s taxpayer identification number (TIN). For your protection, this Box 4. Shows backup withholding. Generally, a payer must backup
+      form may show only the last four digits of your TIN (social security number withhold if you did not furnish your TIN or you did not furnish the correct
+      (SSN), individual taxpayer identification number (ITIN), adoption taxpayer TIN to the payer. See Form W-9, Request for Taxpayer Identification
+      identification number (ATIN), or employer identification number (EIN)). Number and Certification, and Pub. 505. Include this amount on your
+      However, the issuer has reported your complete TIN to the IRS. income tax return as tax withheld.
+      Account number. May show an account number or other unique number Boxes 5a–5l. Show the gross amount of payment card/third party network
+      the PSE assigned to distinguish your account. transactions made to you for each month of the calendar year.
+      Box 1a. Shows the aggregate gross amount of payment card/third party Boxes 6–8. Show state and local income tax withheld from the payments.
+      network transactions made to you through the PSE during the calendar Future developments. For the latest information about developments
+      year. related to Form 1099-K and its instructions, such as legislation enacted
+      Note: The gross amount is the total dollar amount of total reportable after they were published, go to www.irs.gov/Form1099K.
+      payment transactions without regard to any adjustments for credits, cash Free File Program. Go to www.irs.gov/FreeFile to see if you qualify for no-
+      equivalents, discount amounts, fees, refunded amounts, shipping cost online federal tax preparation, e-filing, and direct deposit or payment
+      amounts, or any other amounts. The dollar amount of each transaction is options.
+      determined on the date of the transaction.
+    text_sha256: "50b74e71b83736a279b8b38a8699ae0ff875715ac41344ae69742809ef534fa5"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1099k.pdf"
+    pdf_sha256: "fa3a2b659f7ee13d59ea6c66ad992a5ab55afa0060db275ad1ee122478189b89"
+  - chunk_id: "irs_form_1099_k_dec2026_chunk_0006"
+    source_id: "irs_form_1099_k_dec2026"
+    product_id: "f1099k"
+    title: "Payment Card and Third Party Network Transactions"
+    pages:
+      - 6
+    heading: "CORRECTED (if checked)"
+    text: |
+      CORRECTED (if checked)
+      FILER’S name 1a Gross amount of payment OMB No. 1545-2205
+      card/third party network Payment Card and
+      transactions Form 1099-K
+      Street address Room or suite no. $ Third Party
+      (Rev. December 2026)
+      1b Card Not Present Network
+      transactions For calendar year
+      City or town Telephone number Transactions
+      $
+      1c Cash tips 1d TTOC
+      State or province Country ZIP or foreign postal code Copy 2
+      $
+      2   Merchant category code 3   Number of payment
+      Check to indicate if FILER is a (an): Check to indicate transactions transactions
+      reported are:
+      Payment settlement entity (PSE) Payment card
+      4   Federal income tax withheld
+      Electronic payment facilitator
+      (EPF)/Other third party Third party network $
+      FILER’S TIN PAYEE’S TIN 5a January 5b February
+      $ $
+      PAYEE’S name 5c March 5d April To be filed with the
+      $ $ recipient’s state
+      income tax return,
+      5e May 5f  June when required.
+      Street address Apt. no. $ $
+      5g July 5h August
+      City or town $ $
+      5i  September 5j  October
+      State or province Country ZIP or foreign postal code $ $
+      5k November 5l  December
+      PSE’S name and telephone number $ $
+      6   State income tax withheld 7   State identification no. 8   State
+      Account number (see instructions) $
+      $
+      Form 1099-K (Rev. 12-2026) www.irs.gov/Form1099K Department of the Treasury - Internal Revenue Service
+    text_sha256: "d2237fec905113b07840702eac0e8c8d587ecbc9fa5fa43ad7fdf6c48b524c0a"
+    source_url: "https://www.irs.gov/pub/irs-pdf/f1099k.pdf"
+    pdf_sha256: "fa3a2b659f7ee13d59ea6c66ad992a5ab55afa0060db275ad1ee122478189b89"

@@ -158,7 +158,7 @@ Your app is ready to be deployed!
 
 ## Integrating changes from Scala
 
-1. Build your scala changes in `fact-graph-scala` with `sbt fastOptJS`
+1. Build your scala changes in the standalone fact-graph repo (`../../../fact-graph`) with `sbt fastOptJS`
 2. Copy those files over by running `npm run copy-transpiled-js` in `df-client-app` (TODO: this script should really move to the js-factgraph-scala package)
 
 ## API documentation
@@ -335,7 +335,7 @@ If there are other errors, you can try rebuilding with `npm run build` and try r
 Ensure that you have the following environment variables set.
 
 ```
-export FACTGRAPH="/path/to/fact-graph-scala"
+export FACTGRAPH="/path/to/fact-graph"
 
 # set the following to false:
 export DF_TIN_VALIDATION_ENABLED="false"

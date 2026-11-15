@@ -19,12 +19,10 @@ public class StateLanguage {
     /**
      * The language code that DF understands, e.g. `es` or `en`
      */
-    @NotBlank
-    private String dfLanguageCode;
+    @NotBlank private String dfLanguageCode;
 
     /**
      * The corresponding language code that the state uses, e.g. `en`, `eng`, `english`, etc
      */
-    @NotBlank
-    private String stateLanguageCode;
+    @NotBlank private String stateLanguageCode;
 }

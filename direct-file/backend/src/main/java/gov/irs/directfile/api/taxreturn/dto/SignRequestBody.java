@@ -10,8 +10,7 @@ import gov.irs.directfile.models.FactTypeWithItem;
 public record SignRequestBody(
         @NotNull(message = "No facts provided") Map<@NotEmpty String, @NotNull FactTypeWithItem> facts,
         @NotNull(message = "Missing intent statement") String intentStatement) {
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
    {
        "intentStatement": "I agree to the terms.",
        "facts": {

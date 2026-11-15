@@ -1,0 +1,30 @@
+parameter_set_id: estimated_tax_parameters_ty2026
+tax_year: 2026
+jurisdiction: federal
+topic_id: estimated_tax
+status: draft
+source_ids:
+  - irs_form_1040_es_2026
+  - irc_6654
+description: >
+  Statutory estimated-tax safe-harbor percentages verified against final 2026 Form 1040-ES.
+  Draft pending tax review together with the complete 2026 planning release.
+source_refs:
+- source_id: irs_form_1040_es_2026
+  chunk_id: irs_form_1040_es_2026_chunk_0001
+  pages:
+  - 1
+  text_sha256: 7cd45b5ef5ff0d5306ac070f94750011d7dbffe2dec8f47b0f37493da33c3f87
+parameters:
+  - fact_path: /planning/highIncomeSafeHarborRate
+    name: High-income prior-year safe-harbor rate
+    type: rational
+    value: "110/100"
+    source_id: irc_6654
+    note: 110% of prior-year tax when prior-year AGI exceeds the high-income threshold (IRC 6654(d)(1)(C)).
+  - fact_path: /planning/currentYearSafeHarborRate
+    name: Current-year safe-harbor rate
+    type: rational
+    value: "90/100"
+    source_id: irc_6654
+    note: 90% of projected current-year tax — the alternative safe-harbor leg (IRC 6654(d)(1)(B)).

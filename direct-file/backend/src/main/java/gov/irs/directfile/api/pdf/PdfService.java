@@ -5,7 +5,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
@@ -34,9 +33,6 @@ import gov.irs.directfile.models.FactEvaluationResult;
 @Service
 @Slf4j
 @EnableConfigurationProperties(PdfServiceProperties.class)
-@SuppressFBWarnings(
-        value = {"NP_NULL_ON_SOME_PATH_MIGHT_BE_INFEASIBLE"},
-        justification = "Initial Spotbugs setup")
 @SuppressWarnings(
         value = {
             "PMD.AssignmentInOperand",

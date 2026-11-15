@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FeatureFlags {
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
         {2
           "openEnrollment": {
             "newUsersAllowed": true,

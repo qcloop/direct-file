@@ -1,0 +1,1753 @@
+<?xml-model href="../../../../../backend/src/main/resources/tax/FactDictionaryModule.rng"?>
+<FactDictionaryModule>
+  <Facts>
+
+    <!-- ============================================================
+         SELF-EMPLOYMENT TAX RATES — year-indexed (FICA rates)
+
+         These are Rationals. The fact-graph engine supports writable Rationals
+         (WritableNode.defaultNodes registers RationalNode); the RNG schema's
+         WritableContent was just missing it (now added). So the rates are injected
+         per planning tax year from tax-knowledge like the dollar constants — the
+         dictionary now carries NO self-employment numeric constants, only structure.
+         ============================================================ -->
+    <Fact path="/seSocialSecurityRate">
+      <Name>Social Security portion of SE tax rate</Name>
+      <Description>Social Security rate component of SE tax (e.g. 12.4%); injected per planning tax year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seMedicareRate">
+      <Name>Medicare portion of SE tax rate</Name>
+      <Description>Medicare rate component of SE tax (e.g. 2.9%); injected per planning tax year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seWageMultiplier">
+      <Name>Net earnings multiplier</Name>
+      <Description>Net-earnings multiplier (e.g. 92.35%) removing employer-equivalent FICA; injected per planning tax
+        year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <!-- Year-indexed constants: NOT hardcoded to a tax year. The planning service injects
+         the value matching the session's tax year from tax-knowledge
+         (rules/federal/<year>/self-employment-tax-parameters.yaml) at session creation. -->
+    <Fact path="/socialSecurityWageBase">
+      <Name>Social Security wage base</Name>
+      <Description>Year-indexed Social Security taxable maximum; injected per planning tax year.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/standardMileageRate">
+      <Name>Business standard mileage rate</Name>
+      <Description>Year-indexed business standard mileage rate (dollars per mile); injected per planning tax year.
+        A
+        Rational, not a Dollar: the rate can carry a half-cent (e.g. 72.5¢ = 725/1000), which a
+        cents-precision Dollar
+        would silently round.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <!-- Year-indexed Dollar constants: injected per planning tax year from tax-knowledge
+         (rules/federal/<year>/self-employment-tax-parameters.yaml), like the wage base and
+         mileage rate above. The FICA component rates below stay structural because the
+         fact-graph type system does not allow Rational facts to be writable. -->
+    <Fact path="/seFilingThreshold">
+      <Name>Self-employment tax filing threshold</Name>
+      <Description>Net SE earnings at or above this trigger SE tax; injected per planning tax year.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/highIncomeSafeHarborThreshold">
+      <Name>High-income safe-harbor AGI threshold</Name>
+      <Description>Prior-year AGI above this requires 110% (not 100%) safe-harbor coverage; injected per planning tax
+        year.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+
+    <!-- ============================================================
+         SCHEDULE C — single trade or business (MVP simplification)
+
+         Real Schedule C is a Collection per filer, but for the
+         planning-agent MVP we model ONE consolidated SE business per
+         taxpayer. Most gig workers combining Uber/Lyft/DoorDash
+         legitimately file a single Schedule C since the activities are
+         related. Extending to multi-business is additive (add a
+         Collection wrapper and re-roll the sums).
+         ============================================================ -->
+
+    <!-- ============================================================
+         ANNUALIZATION (projected net profit from year-to-date)
+
+         The Schedule C inputs below (receipts, miles, fees, supplies) may be
+         either full-year actuals or year-to-date figures. The annualization
+         factor scales them to a projected full year: 12 ÷ months of data, so
+         1/1 = full-year actuals (no projection) and e.g. 12/7 = annualize from
+         seven months. The factor is supplied by the agent (the fact graph has
+         no clock); the projection multiply itself is in-graph so it shows up in
+         explain / cite / the export. Straight-line: assumes income is even
+         across the year — seasonal income will differ.
+         ============================================================ -->
+    <Fact path="/seMonthsElapsed">
+      <Name>Months of year-to-date data</Name>
+      <Description>How many months of this year the entered figures cover (1–12). Documents the
+        basis for the projection;
+        12 means the figures are full-year.</Description>
+      <Writable>
+        <Int />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seAnnualizationFactor">
+      <Name>Annualization factor (1 = full-year actuals)</Name>
+      <Description>Multiplier applied to the entered Schedule C figures to project a full year
+        (12 ÷ months of data). 1/1
+        leaves full-year actuals unchanged.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seGrossReceipts">
+      <Name>Gross receipts (Schedule C Line 1)</Name>
+      <Description>Total gross income from self-employment across all platforms
+        (1099-NEC + business portion of 1099-K +
+        cash). May be full-year or year-to-date; annualized by the factor above.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seEffectiveGrossReceipts">
+      <Name>Projected gross receipts</Name>
+      <Description>Entered gross receipts scaled to a full year by the annualization factor.</Description>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/seGrossReceipts" />
+            <Dependency path="/seAnnualizationFactor" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seVehicleBusinessMiles">
+      <Name>Business miles driven</Name>
+      <Description>Business miles for the year, standard-mileage method.</Description>
+      <Writable>
+        <Int />
+      </Writable>
+    </Fact>
+
+    <!-- Period-specific mileage remains in the graph so citations follow both rates. -->
+    <Fact path="/planning/requireExactMileageAllocation">
+      <Name>Require actual recorded mileage for both rate periods</Name>
+      <Writable>
+        <Boolean />
+      </Writable>
+    </Fact>
+    <Fact path="/planning/mileageAllocationEstimated">
+      <Name>Mileage period allocation is a planning assumption</Name>
+      <Writable>
+        <Boolean />
+      </Writable>
+    </Fact>
+    <Fact path="/planning/mileageAllocationAssumption">
+      <Name>Disclosed mileage planning assumption</Name>
+      <Writable>
+        <String />
+      </Writable>
+    </Fact>
+    <Fact path="/seMileageFirstPeriodShare">
+      <Name>Estimated share of observed miles before the rate change</Name>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+    <Fact path="/seMileageSecondPeriodShare">
+      <Name>Estimated share of observed miles from the rate change</Name>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+    <Fact path="/seMileageCalculatedMilesBeforeChange">
+      <Name>First-period miles used for planning</Name>
+      <Description>Keep estimated allocation separate from actual recorded period miles.</Description>
+      <Derived>
+        <Switch>
+          <Case>
+            <When>
+              <Dependency path="/planning/mileageAllocationEstimated" />
+            </When>
+            <Then>
+              <Multiply>
+                <Dependency path="/seVehicleBusinessMiles" />
+                <Dependency path="/seMileageFirstPeriodShare" />
+              </Multiply>
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <True />
+            </When>
+            <Then>
+              <Multiply>
+                <Dependency path="/seVehicleBusinessMilesBeforeChange" />
+                <Rational>1/1</Rational>
+              </Multiply>
+            </Then>
+          </Case>
+        </Switch>
+      </Derived>
+    </Fact>
+    <Fact path="/seMileageCalculatedMilesAfterChange">
+      <Name>Second-period miles used for planning</Name>
+      <Description>Keep estimated allocation separate from actual recorded period miles.</Description>
+      <Derived>
+        <Switch>
+          <Case>
+            <When>
+              <Dependency path="/planning/mileageAllocationEstimated" />
+            </When>
+            <Then>
+              <Multiply>
+                <Dependency path="/seVehicleBusinessMiles" />
+                <Dependency path="/seMileageSecondPeriodShare" />
+              </Multiply>
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <True />
+            </When>
+            <Then>
+              <Multiply>
+                <Dependency path="/seVehicleBusinessMilesAfterChange" />
+                <Rational>1/1</Rational>
+              </Multiply>
+            </Then>
+          </Case>
+        </Switch>
+      </Derived>
+    </Fact>
+    <Fact path="/planning/mileageAllocationPending">
+      <Name>Mileage total needs a rate-period allocation</Name>
+      <Writable>
+        <Boolean />
+      </Writable>
+    </Fact>
+    <Fact path="/planning/mileageAsOfDate">
+      <Name>Date the actual mileage figures cover</Name>
+      <Writable>
+        <String />
+      </Writable>
+    </Fact>
+    <Fact path="/planning/mileageIsProjection">
+      <Name>Mileage inputs are year-to-date actuals used for projection</Name>
+      <Writable>
+        <Boolean />
+      </Writable>
+    </Fact>
+    <Fact path="/seMileageSplitRate">
+      <Name>Mileage rate changes within this income year</Name>
+      <Description>Mileage rate changes within this income year</Description>
+      <Writable>
+        <Boolean />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seMileageChangeMonth">
+      <Name>Month the second mileage rate starts</Name>
+      <Description>Month the second mileage rate starts</Description>
+      <Writable>
+        <Int />
+      </Writable>
+    </Fact>
+
+    <Fact path="/standardMileageRateAfterChange">
+      <Name>Business mileage rate from the change date</Name>
+      <Description>Business mileage rate from the change date</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seVehicleBusinessMilesBeforeChange">
+      <Name>Actual business miles before the rate change</Name>
+      <Description>Actual business miles before the rate change</Description>
+      <Writable>
+        <Int />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seVehicleBusinessMilesAfterChange">
+      <Name>Actual business miles from the rate change</Name>
+      <Description>Actual business miles from the rate change</Description>
+      <Writable>
+        <Int />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seMileageFirstPeriodFactor">
+      <Name>Projection factor for first-period business miles</Name>
+      <Description>Projection factor for first-period business miles</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seMileageSecondPeriodFactor">
+      <Name>Projection factor for second-period business miles</Name>
+      <Description>Projection factor for second-period business miles</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seMileageSecondPeriodBase">
+      <Name>Miles used to project the second rate period</Name>
+      <Description>Before the change, project the second period from the observed first-period pace.
+        After the change,
+        use the observed second-period miles. Full-year inputs set months to 12.</Description>
+      <Derived>
+        <Switch>
+          <Case>
+            <When>
+              <LessThan>
+                <Left>
+                  <Dependency path="/seMonthsElapsed" />
+                </Left>
+                <Right>
+                  <Dependency path="/seMileageChangeMonth" />
+                </Right>
+              </LessThan>
+            </When>
+            <Then>
+              <Dependency path="/seMileageCalculatedMilesBeforeChange" />
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <True />
+            </When>
+            <Then>
+              <Dependency path="/seMileageCalculatedMilesAfterChange" />
+            </Then>
+          </Case>
+        </Switch>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seMileageProjectedMilesBeforeChange">
+      <Name>Projected business miles before the rate change</Name>
+      <Derived>
+        <Multiply>
+          <Dependency path="/seMileageCalculatedMilesBeforeChange" />
+          <Dependency path="/seMileageFirstPeriodFactor" />
+        </Multiply>
+      </Derived>
+    </Fact>
+    <Fact path="/seMileageProjectedMilesAfterChange">
+      <Name>Projected business miles from the rate change</Name>
+      <Derived>
+        <Multiply>
+          <Dependency path="/seMileageSecondPeriodBase" />
+          <Dependency path="/seMileageSecondPeriodFactor" />
+        </Multiply>
+      </Derived>
+    </Fact>
+    <Fact path="/seProjectedBusinessMiles">
+      <Name>Projected full-year business mileage</Name>
+      <Description>Mileage projection is independent of the income annualization factor when its allocation uses elapsed
+        days.</Description>
+      <Derived>
+        <Switch>
+          <Case>
+            <When>
+              <Dependency path="/seMileageSplitRate" />
+            </When>
+            <Then>
+              <Add>
+                <Dependency path="/seMileageProjectedMilesBeforeChange" />
+                <Dependency path="/seMileageProjectedMilesAfterChange" />
+              </Add>
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <True />
+            </When>
+            <Then>
+              <Multiply>
+                <Dependency path="/seVehicleBusinessMiles" />
+                <Dependency path="/seAnnualizationFactor" />
+              </Multiply>
+            </Then>
+          </Case>
+        </Switch>
+      </Derived>
+    </Fact>
+    <Fact path="/seSplitRateVehicleDeduction">
+      <Name>Vehicle deduction across both mileage-rate periods</Name>
+      <Description>Sum each period's miles times its exact rate and projection factor, rounding once.</Description>
+      <Derived>
+        <Round>
+          <Add>
+            <Multiply>
+              <Dependency path="/seMileageCalculatedMilesBeforeChange" />
+              <Dependency path="/standardMileageRate" />
+              <Dependency path="/seMileageFirstPeriodFactor" />
+              <Dollar>1</Dollar>
+            </Multiply>
+            <Multiply>
+              <Dependency path="/seMileageSecondPeriodBase" />
+              <Dependency path="/standardMileageRateAfterChange" />
+              <Dependency path="/seMileageSecondPeriodFactor" />
+              <Dollar>1</Dollar>
+            </Multiply>
+          </Add>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seVehicleDeduction">
+      <Name>Vehicle deduction (standard mileage method)</Name>
+      <Description>Apply the session year's one-rate or period-specific mileage calculation.</Description>
+      <Derived>
+        <Switch>
+          <Case>
+            <When>
+              <Dependency path="/seMileageSplitRate" />
+            </When>
+            <Then>
+              <Dependency path="/seSplitRateVehicleDeduction" />
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <True />
+            </When>
+            <Then>
+              <Round>
+                <Multiply>
+                  <Dependency path="/seVehicleBusinessMiles" />
+                  <Dependency path="/standardMileageRate" />
+                  <Dependency path="/seAnnualizationFactor" />
+            <!-- miles (Int) × rate (Rational) × factor (Rational) is a Rational; Round only accepts a
+                 Dollar. Multiplying by a $1 unit coerces the exact rational dollars-value to a Dollar
+                 (Rational × Dollar -> Dollar) without changing the amount, so the half-cent rate (e.g.
+                 72.5¢) is preserved through the multiply and only rounded once, at the end. -->
+                  <Dollar>1</Dollar>
+                </Multiply>
+              </Round>
+            </Then>
+          </Case>
+        </Switch>
+      </Derived>
+    </Fact>
+
+
+    <Fact path="/sePlatformFees">
+      <Name>Platform / commission fees</Name>
+      <Description>Service fees withheld by Uber/Lyft/DoorDash/Instacart, etc.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seSuppliesAndOther">
+      <Name>Supplies and other expenses</Name>
+      <Description>Catch-all for supplies, phone business portion, insurance, etc.
+        May be full-year or year-to-date;
+        annualized by the factor above.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/seEffectivePlatformFees">
+      <Name>Projected platform / commission fees</Name>
+      <Description>Entered platform fees scaled to a full year by the annualization factor.</Description>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/sePlatformFees" />
+            <Dependency path="/seAnnualizationFactor" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seEffectiveSuppliesAndOther">
+      <Name>Projected supplies and other expenses</Name>
+      <Description>Entered supplies/other scaled to a full year by the annualization factor.</Description>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/seSuppliesAndOther" />
+            <Dependency path="/seAnnualizationFactor" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seTotalExpenses">
+      <Name>Total business expenses</Name>
+      <Description>Projected full-year expenses: annualized vehicle deduction, platform fees,
+        and supplies.</Description>
+      <Derived>
+        <Add>
+          <Dependency path="/seVehicleDeduction" />
+          <Dependency path="/seEffectivePlatformFees" />
+          <Dependency path="/seEffectiveSuppliesAndOther" />
+        </Add>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seNetProfit">
+      <Name>Net profit (Schedule C Line 31)</Name>
+      <Description>Projected gross receipts minus projected total expenses. Negative values are
+        losses; for the planning
+        MVP we clip at zero for SE-tax purposes. With a 1/1 annualization
+        factor these are full-year actuals; otherwise
+        they are annualized from year-to-date.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/seEffectiveGrossReceipts" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/seTotalExpenses" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+
+    <!-- ============================================================
+         SCHEDULE SE — self-employment tax
+         ============================================================ -->
+
+    <Fact path="/seNetEarnings">
+      <Name>Net earnings from self-employment (Schedule SE Line 4a)</Name>
+      <Description>Net profit × 92.35% — removes employer-equivalent FICA from the SE base.</Description>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/seNetProfit" />
+            <Dependency path="/seWageMultiplier" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seTaxRequired">
+      <Name>SE tax applies (net earnings ≥ filing threshold)</Name>
+      <Description>True if net SE earnings are at or above the $400 SE-filing threshold.</Description>
+      <Derived>
+        <Not>
+          <LessThan>
+            <Left>
+              <Dependency path="/seNetEarnings" />
+            </Left>
+            <Right>
+              <Dependency path="/seFilingThreshold" />
+            </Right>
+          </LessThan>
+        </Not>
+      </Derived>
+    </Fact>
+
+    <!-- W-2 SS wages already paid this year, written by the agent (or imported).
+         Used to compute how much of the SS wage base is still subject to the
+         12.4% portion of SE tax. -->
+    <Fact path="/seSocialSecurityWagesFromW2">
+      <Name>Social Security wages already reported on W-2s</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/ssWageBaseRemaining">
+      <Name>Social Security wage base remaining</Name>
+      <Description>SS wage base minus W-2 SS wages already paid.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/socialSecurityWageBase" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/seSocialSecurityWagesFromW2" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seSocialSecurityTax">
+      <Name>Social Security portion of SE tax</Name>
+      <Derived>
+        <Multiply>
+          <LesserOf>
+            <Dependency path="/seNetEarnings" />
+            <Dependency path="/ssWageBaseRemaining" />
+          </LesserOf>
+          <Dependency path="/seSocialSecurityRate" />
+        </Multiply>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seMedicareTax">
+      <Name>Medicare portion of SE tax</Name>
+      <Description>Medicare portion of SE tax. Excludes the Additional Medicare
+        0.9% surtax that applies above $200K
+        (single) / $250K (MFJ) — that's
+        on Form 8959 and is out of scope for this MVP.</Description>
+      <Derived>
+        <Multiply>
+          <Dependency path="/seNetEarnings" />
+          <Dependency path="/seMedicareRate" />
+        </Multiply>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seTax">
+      <Name>Self-employment tax (Schedule 2 Line 4)</Name>
+      <Derived>
+        <Round>
+          <Switch>
+            <Case>
+              <When>
+                <Dependency path="/seTaxRequired" />
+              </When>
+              <Then>
+                <Add>
+                  <Dependency path="/seSocialSecurityTax" />
+                  <Dependency path="/seMedicareTax" />
+                </Add>
+              </Then>
+            </Case>
+            <Case>
+              <When>
+                <True />
+              </When>
+              <Then>
+                <Dollar>0</Dollar>
+              </Then>
+            </Case>
+          </Switch>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/deductibleHalfOfSETax">
+      <Name>Deductible half of SE tax (Schedule 1 adjustment)</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/seTax" />
+            <Rational>1/2</Rational>
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+
+    <!-- ============================================================
+         ADDITIONAL MEDICARE TAX — Form 8959 (IRC §1401(b)(2) / §3101(b)(2))
+
+         A 0.9% surtax on Medicare wages + self-employment income above a
+         filing-status threshold ($200K single / $250K MFJ / $125K MFS). The
+         threshold and the 0.9% rate are injected per planning tax year /
+         filing status from tax-knowledge. Form 8959 applies ONE combined
+         threshold: W-2 Medicare wages are counted first, reducing the
+         threshold left for SE income.
+         ============================================================ -->
+    <Fact path="/additionalMedicareThreshold">
+      <Name>Additional Medicare Tax threshold</Name>
+      <Description>Filing-status threshold above which the 0.9% Additional Medicare Tax applies; injected per
+        planning
+        tax year and filing status.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/additionalMedicareRate">
+      <Name>Additional Medicare Tax rate</Name>
+      <Description>The 0.9% Additional Medicare Tax rate (9/1000); injected per planning tax year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <!-- Medicare wages already reported on W-2s (box 5), written by the agent. Counted first
+         against the combined threshold, so they reduce the threshold remaining for SE income. -->
+    <Fact path="/medicareWagesFromW2">
+      <Name>Medicare wages already reported on W-2s (box 5)</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/additionalMedicareThresholdRemaining">
+      <Name>Threshold remaining for SE income after W-2 Medicare wages</Name>
+      <Description>Form 8959: the filing-status threshold reduced by W-2 Medicare wages, not below zero.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/additionalMedicareThreshold" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/medicareWagesFromW2" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/wagesSubjectToAdditionalMedicare">
+      <Name>W-2 Medicare wages over the threshold (Form 8959 Part I)</Name>
+      <Description>W-2 Medicare wages above the filing-status threshold, not below zero.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/medicareWagesFromW2" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/additionalMedicareThreshold" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/seIncomeSubjectToAdditionalMedicare">
+      <Name>SE earnings over the remaining threshold (Form 8959 Part II)</Name>
+      <Description>Net SE earnings above the threshold remaining after W-2 Medicare wages, not below zero.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/seNetEarnings" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/additionalMedicareThresholdRemaining" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/additionalMedicareTaxOnWages">
+      <Name>Additional Medicare Tax on wages (Form 8959 Line 7)</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/wagesSubjectToAdditionalMedicare" />
+            <Dependency path="/additionalMedicareRate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/additionalMedicareTaxOnSE">
+      <Name>Additional Medicare Tax on self-employment income (Form 8959 Line 13)</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/seIncomeSubjectToAdditionalMedicare" />
+            <Dependency path="/additionalMedicareRate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/additionalMedicareTax">
+      <Name>Additional Medicare Tax (Form 8959 Line 18)</Name>
+      <Description>Total 0.9% Additional Medicare Tax: the wage portion plus the self-employment portion.</Description>
+      <Derived>
+        <Add>
+          <Dependency path="/additionalMedicareTaxOnWages" />
+          <Dependency path="/additionalMedicareTaxOnSE" />
+        </Add>
+      </Derived>
+    </Fact>
+
+
+    <!-- ============================================================
+         QUALIFIED BUSINESS INCOME (QBI) DEDUCTION — Form 8995 (IRC §199A)
+
+         The 20% pass-through deduction. This models the SIMPLE method
+         (Form 8995), valid when taxable income is at or below the
+         filing-status threshold ($197,300 single / $394,600 MFJ for 2025).
+         Above the threshold the SSTB / W-2-wage / UBIA limits on Form
+         8995-A apply and this number is only an upper bound — the
+         estimate_qbi_deduction tool flags that via /qbiAboveThreshold.
+
+         For a sole proprietor, QBI = Schedule C net profit minus the
+         deductible half of SE tax. (A fuller model would also subtract the
+         self-employed health-insurance and retirement-plan deductions; those
+         aren't in this MVP, so QBI here is a slight overestimate when they
+         apply.) The deduction is the lesser of 20% of QBI and 20% of
+         (taxable income − net capital gains); the taxable-income figure is
+         agent-supplied, like the projected current-year tax.
+         ============================================================ -->
+    <Fact path="/qbiRate">
+      <Name>QBI deduction rate</Name>
+      <Description>The 20% qualified-business-income deduction rate (1/5); injected per planning tax year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/qbiThreshold">
+      <Name>QBI taxable-income threshold</Name>
+      <Description>Taxable income at or below this uses the simple Form 8995 method; above it, Form 8995-A limits
+        apply.
+        Filing-status-dependent; injected per planning tax year and filing status.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/qualifiedBusinessIncome">
+      <Name>Qualified business income (sole proprietor)</Name>
+      <Description>Schedule C net profit minus the deductible half of SE tax, not below zero.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/seNetProfit" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/deductibleHalfOfSETax" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/qbiComponent">
+      <Name>QBI component (20% of QBI, Form 8995 Line 5)</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/qualifiedBusinessIncome" />
+            <Dependency path="/qbiRate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <!-- Taxable income before the QBI deduction (Form 8995 Line 11) is now DERIVED from the income-tax
+         section below (AGI − standard deduction), not agent-supplied — so the QBI income cap binds on
+         the graph's own taxable income instead of a number the agent guessed. Net capital gains incl.
+         qualified dividends (Line 12) stays agent-supplied (defaulted to 0 at session creation); they
+         are excluded from the income cap base. -->
+    <Fact path="/planning/taxableIncomeBeforeQBIDeduction">
+      <Name>Taxable income before the QBI deduction (Form 8995 Line 11)</Name>
+      <Description>AGI minus the standard deduction, not below zero. Computed before the QBI deduction
+        itself (QBI cannot
+        reduce the base it is limited by).</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/planning/projectedAGI" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/standardDeduction" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/netCapitalGains">
+      <Name>Net capital gains incl. qualified dividends (Form 8995 Line 12)</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/qbiIncomeLimitBase">
+      <Name>Taxable income net of capital gains (Form 8995 Line 13)</Name>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/planning/taxableIncomeBeforeQBIDeduction" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/planning/netCapitalGains" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/qbiIncomeLimit">
+      <Name>Income limit on the QBI deduction (20% of Line 13, Form 8995 Line 14)</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/qbiIncomeLimitBase" />
+            <Dependency path="/qbiRate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <!-- IRC 199A(i): effective-year constants are data; eligibility requires a taxpayer answer. -->
+    <Fact path="/qbiMinimumDeduction">
+      <Name>Minimum deduction for eligible active QBI</Name>
+      <Description>Minimum deduction for eligible active QBI</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/qbiMinimumIncome">
+      <Name>Minimum active QBI required for the minimum deduction</Name>
+      <Description>Minimum active QBI required for the minimum deduction</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/qbiMaterialParticipation">
+      <Name>Taxpayer materially participates in this business under section 469(h)</Name>
+      <Description>Taxpayer materially participates in this business under section 469(h)</Description>
+      <Writable>
+        <Boolean />
+      </Writable>
+    </Fact>
+
+    <Fact path="/qbiRegularDeduction">
+      <Name>QBI deduction before the active-business minimum</Name>
+      <Derived>
+        <LesserOf>
+          <Dependency path="/qbiComponent" />
+          <Dependency path="/qbiIncomeLimit" />
+        </LesserOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/qbiDeduction">
+      <Name>QBI deduction</Name>
+      <Description>The regular simple-method deduction, or the eligible active-business minimum.
+        Material participation
+        is never inferred from the presence of a 1099.</Description>
+      <Derived>
+        <Switch>
+          <Case>
+            <When>
+              <Not>
+                <LessThan>
+                  <Left>
+                    <Dependency path="/qbiRegularDeduction" />
+                  </Left>
+                  <Right>
+                    <Dependency path="/qbiMinimumDeduction" />
+                  </Right>
+                </LessThan>
+              </Not>
+            </When>
+            <Then>
+              <Dependency path="/qbiRegularDeduction" />
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <LessThan>
+                <Left>
+                  <Dependency path="/qualifiedBusinessIncome" />
+                </Left>
+                <Right>
+                  <Dependency path="/qbiMinimumIncome" />
+                </Right>
+              </LessThan>
+            </When>
+            <Then>
+              <Dependency path="/qbiRegularDeduction" />
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <Dependency path="/planning/qbiMaterialParticipation" />
+            </When>
+            <Then>
+              <Dependency path="/qbiMinimumDeduction" />
+            </Then>
+          </Case>
+          <Case>
+            <When>
+              <True />
+            </When>
+            <Then>
+              <Dependency path="/qbiRegularDeduction" />
+            </Then>
+          </Case>
+        </Switch>
+      </Derived>
+    </Fact>
+
+
+    <Fact path="/qbiAboveThreshold">
+      <Name>Taxable income above the QBI simple-method threshold</Name>
+      <Description>True when taxable income exceeds the filing-status threshold, so Form 8995-A (SSTB / W-2
+        wage / UBIA
+        limits) governs and the simple-method deduction is only an upper bound.</Description>
+      <Derived>
+        <GreaterThan>
+          <Left>
+            <Dependency path="/planning/taxableIncomeBeforeQBIDeduction" />
+          </Left>
+          <Right>
+            <Dependency path="/qbiThreshold" />
+          </Right>
+        </GreaterThan>
+      </Derived>
+    </Fact>
+
+
+    <!-- ============================================================
+         FEDERAL INCOME TAX — Form 1040 ordinary-rate schedule
+
+         The planning total tax was previously an agent-supplied guess
+         (/planning/projectedCurrentYearTax was Writable), which let an LLM
+         caller invent a number the service then presented as authoritative.
+         It is now DERIVED here: net profit → AGI → taxable income → bracket
+         tax, plus SE tax and the Additional Medicare surtax.
+
+         Scope (MVP): ordinary income only. Models the standard deduction, the
+         §199A QBI deduction, and the seven ordinary brackets. Does NOT model
+         itemized deductions, credits, capital-gains/qualified-dividend rates,
+         the NIIT, or AMT. Income other than this Schedule C (e.g. W-2 wages)
+         enters only via the agent-supplied /planning/otherTaxableIncome.
+
+         Brackets are injected per planning tax year AND filing status from
+         tax-knowledge (income-tax-parameters.yaml): six ceilings (the top of
+         brackets 1–6; bracket 7 is open-ended) and seven rates. Tax is the sum
+         of (amount falling in each bracket × that bracket's rate), exactly as a
+         hand-computed Schedule helper would stack it — kept per-bracket (not a
+         compressed marginal-difference formula) so explain/cite read naturally.
+         ============================================================ -->
+    <Fact path="/incomeTax">
+      <Description>Parent node for the federal income-tax derivation.</Description>
+      <Derived>
+        <True />
+      </Derived>
+    </Fact>
+
+    <Fact path="/standardDeduction">
+      <Name>Standard deduction</Name>
+      <Description>Year- and filing-status-indexed standard deduction; injected per planning tax year and
+        filing status.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <!-- Ordinary income other than this Schedule C (e.g. W-2 box 1 wages, interest),
+         agent-supplied. Defaults to 0 at session creation so a pure gig filer's tax
+         derives without extra input. Lets a taxpayer with a W-2 get a fuller estimate. -->
+    <Fact path="/planning/otherTaxableIncome">
+      <Name>Other ordinary income (besides this Schedule C)</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/projectedAGI">
+      <Name>Projected adjusted gross income (Form 1040 Line 11)</Name>
+      <Description>Schedule C net profit plus other ordinary income, minus the deductible half of SE tax.
+        For a pure gig
+        filer with no other income this is net profit − ½ SE tax. Not below zero.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Add>
+                <Dependency path="/seNetProfit" />
+                <Dependency path="/planning/otherTaxableIncome" />
+              </Add>
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/deductibleHalfOfSETax" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <!-- Bracket ceilings: the top of brackets 1–6 (bracket 7 is open-ended).
+         Injected per planning tax year and filing status. -->
+    <Fact path="/incomeTax/bracket1Ceiling">
+      <Name>Top of the first (lowest) tax bracket</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+    <Fact path="/incomeTax/bracket2Ceiling">
+      <Name>Top of the second tax bracket</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+    <Fact path="/incomeTax/bracket3Ceiling">
+      <Name>Top of the third tax bracket</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+    <Fact path="/incomeTax/bracket4Ceiling">
+      <Name>Top of the fourth tax bracket</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+    <Fact path="/incomeTax/bracket5Ceiling">
+      <Name>Top of the fifth tax bracket</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+    <Fact path="/incomeTax/bracket6Ceiling">
+      <Name>Top of the sixth tax bracket</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <!-- Bracket marginal rates (status-agnostic: the seven ordinary rates are the
+         same for every filing status; only the ceilings differ). Injected per year. -->
+    <Fact path="/incomeTax/bracket1Rate">
+      <Name>First bracket marginal rate</Name>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+    <Fact path="/incomeTax/bracket2Rate">
+      <Name>Second bracket marginal rate</Name>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+    <Fact path="/incomeTax/bracket3Rate">
+      <Name>Third bracket marginal rate</Name>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+    <Fact path="/incomeTax/bracket4Rate">
+      <Name>Fourth bracket marginal rate</Name>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+    <Fact path="/incomeTax/bracket5Rate">
+      <Name>Fifth bracket marginal rate</Name>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+    <Fact path="/incomeTax/bracket6Rate">
+      <Name>Sixth bracket marginal rate</Name>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+    <Fact path="/incomeTax/bracket7Rate">
+      <Name>Seventh (top) bracket marginal rate</Name>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <!-- Taxable income that lands in each bracket: the slice of taxable income
+         between that bracket's floor and ceiling, never below zero. Bracket 1's
+         floor is $0; bracket 7 is open-ended (everything above ceiling 6). -->
+    <Fact path="/incomeTax/bracket1Amount">
+      <Name>Taxable income taxed at the first bracket rate</Name>
+      <Derived>
+        <LesserOf>
+          <Dependency path="/planning/taxableIncome" />
+          <Dependency path="/incomeTax/bracket1Ceiling" />
+        </LesserOf>
+      </Derived>
+    </Fact>
+    <Fact path="/incomeTax/bracket2Amount">
+      <Name>Taxable income taxed at the second bracket rate</Name>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <LesserOf>
+                <Dependency path="/planning/taxableIncome" />
+                <Dependency path="/incomeTax/bracket2Ceiling" />
+              </LesserOf>
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/incomeTax/bracket1Ceiling" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+    <Fact path="/incomeTax/bracket3Amount">
+      <Name>Taxable income taxed at the third bracket rate</Name>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <LesserOf>
+                <Dependency path="/planning/taxableIncome" />
+                <Dependency path="/incomeTax/bracket3Ceiling" />
+              </LesserOf>
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/incomeTax/bracket2Ceiling" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+    <Fact path="/incomeTax/bracket4Amount">
+      <Name>Taxable income taxed at the fourth bracket rate</Name>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <LesserOf>
+                <Dependency path="/planning/taxableIncome" />
+                <Dependency path="/incomeTax/bracket4Ceiling" />
+              </LesserOf>
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/incomeTax/bracket3Ceiling" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+    <Fact path="/incomeTax/bracket5Amount">
+      <Name>Taxable income taxed at the fifth bracket rate</Name>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <LesserOf>
+                <Dependency path="/planning/taxableIncome" />
+                <Dependency path="/incomeTax/bracket5Ceiling" />
+              </LesserOf>
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/incomeTax/bracket4Ceiling" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+    <Fact path="/incomeTax/bracket6Amount">
+      <Name>Taxable income taxed at the sixth bracket rate</Name>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <LesserOf>
+                <Dependency path="/planning/taxableIncome" />
+                <Dependency path="/incomeTax/bracket6Ceiling" />
+              </LesserOf>
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/incomeTax/bracket5Ceiling" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+    <Fact path="/incomeTax/bracket7Amount">
+      <Name>Taxable income taxed at the seventh (top) bracket rate</Name>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/planning/taxableIncome" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/incomeTax/bracket6Ceiling" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <!-- Tax contributed by each bracket = amount in that bracket × its rate. -->
+    <Fact path="/incomeTax/bracket1Tax">
+      <Name>Tax from the first bracket</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/incomeTax/bracket1Amount" />
+            <Dependency path="/incomeTax/bracket1Rate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+    <Fact path="/incomeTax/bracket2Tax">
+      <Name>Tax from the second bracket</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/incomeTax/bracket2Amount" />
+            <Dependency path="/incomeTax/bracket2Rate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+    <Fact path="/incomeTax/bracket3Tax">
+      <Name>Tax from the third bracket</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/incomeTax/bracket3Amount" />
+            <Dependency path="/incomeTax/bracket3Rate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+    <Fact path="/incomeTax/bracket4Tax">
+      <Name>Tax from the fourth bracket</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/incomeTax/bracket4Amount" />
+            <Dependency path="/incomeTax/bracket4Rate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+    <Fact path="/incomeTax/bracket5Tax">
+      <Name>Tax from the fifth bracket</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/incomeTax/bracket5Amount" />
+            <Dependency path="/incomeTax/bracket5Rate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+    <Fact path="/incomeTax/bracket6Tax">
+      <Name>Tax from the sixth bracket</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/incomeTax/bracket6Amount" />
+            <Dependency path="/incomeTax/bracket6Rate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+    <Fact path="/incomeTax/bracket7Tax">
+      <Name>Tax from the seventh (top) bracket</Name>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/incomeTax/bracket7Amount" />
+            <Dependency path="/incomeTax/bracket7Rate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/incomeTax/projectedIncomeTax">
+      <Name>Projected federal income tax (ordinary rates)</Name>
+      <Description>Sum of the tax from each bracket. Ordinary-rate income tax on taxable income; excludes
+        SE tax and the
+        Additional Medicare surtax (added into the total tax separately), and any credits,
+        capital-gains rates, NIIT, or
+        AMT (not modeled).</Description>
+      <Derived>
+        <Add>
+          <Dependency path="/incomeTax/bracket1Tax" />
+          <Dependency path="/incomeTax/bracket2Tax" />
+          <Dependency path="/incomeTax/bracket3Tax" />
+          <Dependency path="/incomeTax/bracket4Tax" />
+          <Dependency path="/incomeTax/bracket5Tax" />
+          <Dependency path="/incomeTax/bracket6Tax" />
+          <Dependency path="/incomeTax/bracket7Tax" />
+        </Add>
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/taxableIncome">
+      <Name>Projected taxable income (Form 1040 Line 15)</Name>
+      <Description>Taxable income before the QBI deduction, minus the QBI deduction. Not below zero. This is
+        the figure
+        the ordinary tax brackets apply to.</Description>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/planning/taxableIncomeBeforeQBIDeduction" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/qbiDeduction" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+
+    <!-- ============================================================
+         QUARTERLY ESTIMATED TAX (Form 1040-ES)
+
+         The agent gathers prior-year tax / AGI / YTD payments, then
+         reads /planning/nextQuarterlyPaymentSuggested. The graph picks
+         the lower of (100/110% prior-year tax) and (90% current-year
+         projected) per IRC 6654(d), subtracts YTD payments already
+         made, and divides across the remaining quarters of the year.
+         ============================================================ -->
+
+    <Fact path="/planning">
+      <Description>Parent node for planning-only facts.</Description>
+      <Derived>
+        <True />
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/priorYearTotalTax">
+      <Name>Prior-year total tax (Form 1040 Line 24)</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/priorYearAGI">
+      <Name>Prior-year AGI (Form 1040 Line 11)</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/highIncomeSafeHarborApplies">
+      <Name>High-income safe-harbor tier applies</Name>
+      <Description>If prior-year AGI exceeded the threshold, safe harbor requires
+        110% of prior-year tax. Otherwise 100%
+        suffices.</Description>
+      <Derived>
+        <GreaterThan>
+          <Left>
+            <Dependency path="/planning/priorYearAGI" />
+          </Left>
+          <Right>
+            <Dependency path="/highIncomeSafeHarborThreshold" />
+          </Right>
+        </GreaterThan>
+      </Derived>
+    </Fact>
+
+    <!-- IRC §6654 safe-harbor percentages — year-indexed (injected from tax-knowledge
+         estimated-tax-parameters.yaml). The 100% base case is the identity branch below
+         (no multiplier), so only the high-income 110% leg carries a rate here. -->
+    <Fact path="/planning/highIncomeSafeHarborRate">
+      <Name>High-income prior-year safe-harbor rate</Name>
+      <Description>Prior-year tax multiplier when AGI exceeds the high-income threshold (e.g. 110%); injected per
+        planning tax year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/currentYearSafeHarborRate">
+      <Name>Current-year safe-harbor rate</Name>
+      <Description>Multiplier on projected current-year tax for the safe-harbor alternative (e.g. 90%); injected per
+        planning tax year.</Description>
+      <Writable>
+        <Rational />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/priorYearSafeHarborTarget">
+      <Name>Prior-year safe-harbor target</Name>
+      <Description>100% or 110% of prior-year tax, depending on AGI tier.</Description>
+      <Derived>
+        <Round>
+          <Switch>
+            <Case>
+              <When>
+                <Dependency path="/planning/highIncomeSafeHarborApplies" />
+              </When>
+              <Then>
+                <Multiply>
+                  <Dependency path="/planning/priorYearTotalTax" />
+                  <Dependency path="/planning/highIncomeSafeHarborRate" />
+                </Multiply>
+              </Then>
+            </Case>
+            <Case>
+              <When>
+                <True />
+              </When>
+              <Then>
+                <Dependency path="/planning/priorYearTotalTax" />
+              </Then>
+            </Case>
+          </Switch>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <!-- Projected current-year total tax is now DERIVED, not agent-supplied: ordinary income tax
+         (on taxable income, after the standard and QBI deductions) + SE tax + the Additional Medicare
+         surtax. This was previously a Writable the agent had to estimate — the one number an LLM is
+         worst at — which the service then presented as authoritative (e.g. in the sealed export). It
+         excludes credits, capital-gains rates, NIIT, and AMT (not modeled); income other than this
+         Schedule C enters only via /planning/otherTaxableIncome. -->
+    <Fact path="/planning/projectedCurrentYearTax">
+      <Name>Projected current-year total tax</Name>
+      <Description>Total federal tax for the year: ordinary income tax + self-employment tax + Additional
+        Medicare
+        surtax. Excludes credits, capital-gains/qualified-dividend rates, NIIT, and AMT.</Description>
+      <Derived>
+        <Add>
+          <Dependency path="/incomeTax/projectedIncomeTax" />
+          <Dependency path="/seTax" />
+          <Dependency path="/additionalMedicareTax" />
+        </Add>
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/currentYearSafeHarborTarget">
+      <Name>Current-year safe-harbor target</Name>
+      <Description>90% of projected current-year tax — the alternative safe-harbor leg.</Description>
+      <Derived>
+        <Round>
+          <Multiply>
+            <Dependency path="/planning/projectedCurrentYearTax" />
+            <Dependency path="/planning/currentYearSafeHarborRate" />
+          </Multiply>
+        </Round>
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/safeHarborTarget">
+      <Name>Safe-harbor target</Name>
+      <Description>Lesser of (100%/110% prior-year tax) and (90% projected current-year tax).
+        Paying at least this much
+        across the year avoids underpayment penalty.</Description>
+      <Derived>
+        <LesserOf>
+          <Dependency path="/planning/priorYearSafeHarborTarget" />
+          <Dependency path="/planning/currentYearSafeHarborTarget" />
+        </LesserOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/ytdWithholding">
+      <Name>YTD federal withholding</Name>
+      <Description>Federal income tax already withheld by employers and platforms YTD.</Description>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/ytdEstimatedPaymentsMade">
+      <Name>Quarterly estimated payments already made YTD</Name>
+      <Writable>
+        <Dollar />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/ytdPaymentsApplied">
+      <Name>Payments already applied YTD (withholding + estimated)</Name>
+      <Derived>
+        <Add>
+          <Dependency path="/planning/ytdWithholding" />
+          <Dependency path="/planning/ytdEstimatedPaymentsMade" />
+        </Add>
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/remainingPaymentDue">
+      <Name>Remaining payment needed to hit safe harbor</Name>
+      <Derived>
+        <GreaterOf>
+          <Subtract>
+            <Minuend>
+              <Dependency path="/planning/safeHarborTarget" />
+            </Minuend>
+            <Subtrahends>
+              <Dependency path="/planning/ytdPaymentsApplied" />
+            </Subtrahends>
+          </Subtract>
+          <Dollar>0</Dollar>
+        </GreaterOf>
+      </Derived>
+    </Fact>
+
+    <Fact path="/planning/projectedBalanceDueAtFiling">
+      <Name>Projected balance due at filing</Name>
+      <Description>Projected total federal tax for the year minus payments already made
+        (withholding + estimated
+        payments). This is what you would still owe when you file
+        if you made no further payments. It is distinct from
+        the safe-harbor target, which is
+        only the minimum prepayment that avoids the IRC §6654 underpayment penalty —
+        paying
+        the safe-harbor amount can still leave a balance owed at filing. A negative value means
+        a projected refund.</Description>
+      <Derived>
+        <Subtract>
+          <Minuend>
+            <Dependency path="/planning/projectedCurrentYearTax" />
+          </Minuend>
+          <Subtrahends>
+            <Dependency path="/planning/ytdPaymentsApplied" />
+          </Subtrahends>
+        </Subtract>
+      </Derived>
+    </Fact>
+
+    <!-- The agent computes "how many quarterly deadlines are still ahead"
+         from today's date and writes it here. Splitting in the XML keeps the
+         division logic declarative without needing a Divide operator. -->
+    <Fact path="/planning/remainingQuarters">
+      <Name>Number of quarterly deadlines still upcoming</Name>
+      <Description>1 through 4 — written by the planning agent based on the current date.</Description>
+      <Writable>
+        <Int />
+      </Writable>
+    </Fact>
+
+    <Fact path="/planning/nextQuarterlyPaymentSuggested">
+      <Name>Suggested next quarterly payment</Name>
+      <Description>Remaining payment due, divided evenly across remaining quarters.</Description>
+      <Derived>
+        <Round>
+          <Switch>
+            <Case>
+              <When>
+                <Equal>
+                  <Left>
+                    <Dependency path="/planning/remainingQuarters" />
+                  </Left>
+                  <Right>
+                    <Int>4</Int>
+                  </Right>
+                </Equal>
+              </When>
+              <Then>
+                <Multiply>
+                  <Dependency path="/planning/remainingPaymentDue" />
+                  <Rational>1/4</Rational>
+                </Multiply>
+              </Then>
+            </Case>
+            <Case>
+              <When>
+                <Equal>
+                  <Left>
+                    <Dependency path="/planning/remainingQuarters" />
+                  </Left>
+                  <Right>
+                    <Int>3</Int>
+                  </Right>
+                </Equal>
+              </When>
+              <Then>
+                <Multiply>
+                  <Dependency path="/planning/remainingPaymentDue" />
+                  <Rational>1/3</Rational>
+                </Multiply>
+              </Then>
+            </Case>
+            <Case>
+              <When>
+                <Equal>
+                  <Left>
+                    <Dependency path="/planning/remainingQuarters" />
+                  </Left>
+                  <Right>
+                    <Int>2</Int>
+                  </Right>
+                </Equal>
+              </When>
+              <Then>
+                <Multiply>
+                  <Dependency path="/planning/remainingPaymentDue" />
+                  <Rational>1/2</Rational>
+                </Multiply>
+              </Then>
+            </Case>
+            <Case>
+              <When>
+                <Equal>
+                  <Left>
+                    <Dependency path="/planning/remainingQuarters" />
+                  </Left>
+                  <Right>
+                    <Int>1</Int>
+                  </Right>
+                </Equal>
+              </When>
+              <Then>
+                <Dependency path="/planning/remainingPaymentDue" />
+              </Then>
+            </Case>
+            <Case>
+              <When>
+                <True />
+              </When>
+              <Then>
+                <Dollar>0</Dollar>
+              </Then>
+            </Case>
+          </Switch>
+        </Round>
+      </Derived>
+    </Fact>
+
+  </Facts>
+</FactDictionaryModule>

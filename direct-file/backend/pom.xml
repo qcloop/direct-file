@@ -45,7 +45,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -67,6 +67,20 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Spring Boot 4 split the test slices out of spring-boot-starter-test into
+             per-technology modules. Declare the slices this module's tests use:
+             @DataJpaTest + TestEntityManager (data-jpa-test / jpa-test), @AutoConfigureTestDatabase
+             (jdbc-test) and @AutoConfigureMockMvc/MockMvc (webmvc-test). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-data-jpa-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -212,10 +226,6 @@
             <artifactId>nimbus-jose-jwt</artifactId>
             <version>9.37.3</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.retry</groupId>
-            <artifactId>spring-retry</artifactId>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>

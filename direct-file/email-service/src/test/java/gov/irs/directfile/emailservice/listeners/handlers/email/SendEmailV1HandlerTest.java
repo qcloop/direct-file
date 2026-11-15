@@ -104,8 +104,10 @@ class SendEmailV1HandlerTest {
             handleSendEmailMessage_createsSendEmailObjectsFromSQSPayloadAndCallsEmailRecordKeepingServiceToRecordEmailAttemptsAndResults()
                     throws Exception {
         doReturn(true).when(sendService).sendEmail(any());
-        doReturn(false).when(sendService).sendEmail(argThat((SendEmail email) -> email.getRecipientEmailAddress()
-                .equals("reject1@example.com")));
+        doReturn(false)
+                .when(sendService)
+                .sendEmail(argThat(
+                        (SendEmail email) -> email.getRecipientEmailAddress().equals("reject1@example.com")));
         EmailProcessingResults emailProcessingResults = handler.handleSendEmailMessage(queueMessage);
 
         ArgumentCaptor<List<SendEmail>> captor = ArgumentCaptor.forClass(List.class);
@@ -141,8 +143,10 @@ class SendEmailV1HandlerTest {
     @Test
     void handleSendEmailMessage_partial() throws Exception {
         doReturn(true).when(sendService).sendEmail(any());
-        doReturn(false).when(sendService).sendEmail(argThat((SendEmail email) -> email.getRecipientEmailAddress()
-                .equals("reject1@example.com")));
+        doReturn(false)
+                .when(sendService)
+                .sendEmail(argThat(
+                        (SendEmail email) -> email.getRecipientEmailAddress().equals("reject1@example.com")));
         EmailProcessingResults emailProcessingResults = handler.handleSendEmailMessage(queueMessage);
 
         assertEquals(4, emailProcessingResults.countToSend());

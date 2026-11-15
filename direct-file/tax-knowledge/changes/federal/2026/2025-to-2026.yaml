@@ -1,0 +1,116 @@
+tax_year: 2026
+jurisdiction: "federal"
+status: "draft"
+human_approvals: []
+changes:
+  - change_id: "income_calendar_year"
+    kind: "product_requirement"
+    status: "draft"
+    requirement: "User instruction: plan for income year 2026 throughout calendar year 2026."
+    implementation: "Injected server Clock, configurable planning zone, session-year interview default, explicit-year conflict rejection, optional server-date defaults for projection and payment tools."
+    validation:
+      - "PlanningYearIntegrationTest"
+  - change_id: "2026_split_mileage"
+    kind: "calculation_and_interview"
+    status: "draft"
+    effective_dates:
+      - "2026-01-01 through 2026-06-30: 725/1000 dollars per mile"
+      - "2026-07-01 through 2026-12-31: 76/100 dollars per mile"
+    fact_paths:
+      - "/standardMileageRate"
+      - "/standardMileageRateAfterChange"
+      - "/seVehicleBusinessMilesBeforeChange"
+      - "/seVehicleBusinessMilesAfterChange"
+      - "/seVehicleDeduction"
+    implementation: "Separate actual mileage inputs and graph projection factors for the two rate periods. Allocation is required from the change date onward; no guessed split."
+    source_refs:
+      - source_id: "irs_notice_2026_10"
+        chunk_id: "irs_notice_2026_10_chunk_0004"
+        pages:
+          - 3
+        text_sha256: "aa58305dfdafab850bc241852bae332d508e3d46cf641fe022a16c4dbe613b71"
+      - source_id: "irs_announcement_2026_11"
+        chunk_id: "irs_announcement_2026_11_chunk_0014"
+        pages:
+          - 13
+        text_sha256: "e5b044a44b9f514e36d252a5e018bd8839ba95da0c0c54016ddd0e2c52e6fdfe"
+    validation:
+      - "TaxYear2026IntegrationTest"
+      - "gig-worker-single-2026.json"
+      - "mileage_2026_march_projection.yaml"
+  - change_id: "2026_qbi_minimum_and_thresholds"
+    kind: "calculation_and_eligibility"
+    status: "draft"
+    implementation: "At least $1,000 of active QBI and confirmed material participation can establish the $400 minimum. MFS threshold is $201,775; single is $201,750; MFJ is $403,500."
+    scope_decision: "Form 8995-A wage/property/SSTB limits and expanded phase-in calculations remain unsupported. Above-threshold simple-method results are labeled upper bounds."
+    source_refs:
+      - source_id: "irc_199a_2026_snapshot"
+        chunk_id: "irc_199a_2026_snapshot_chunk_0030"
+        pages:
+          - 1
+        text_sha256: "213a435fbb9578b47b34b9da7cb6931130a38548d1d96ef3684254651ad21161"
+      - source_id: "irs_rev_proc_2025_32"
+        chunk_id: "irs_rev_proc_2025_32_chunk_0021"
+        pages:
+          - 22
+          - 23
+          - 24
+        text_sha256: "cb36d2aa13dd00ad9790374867b58b3a7ef3327a4aca64cd1cc58b46daa376e3"
+    validation:
+      - "TaxYear2026IntegrationTest"
+      - "active-qbi-minimum-2026.json"
+  - change_id: "2026_verified_annual_constants"
+    kind: "parameter_verification"
+    status: "draft"
+    implementation: "Verify the $184,500 wage base, $16,100/$32,200 basic standard deductions, and ordinary-rate brackets; remove stale provisional-value labels while keeping artifact approval pending."
+    source_refs:
+      - source_id: "irs_instruction_1040_schedule_se_2026"
+        chunk_id: "irs_instruction_1040_schedule_se_2026_chunk_0001"
+        pages:
+          - 1
+        text_sha256: "661650cceecf35a9f976ea610671caa89313ac85f94bc9dbeb2c981a8038cdc9"
+      - source_id: "irs_rev_proc_2025_32"
+        chunk_id: "irs_rev_proc_2025_32_chunk_0017"
+        pages:
+          - 17
+          - 18
+        text_sha256: "fbad796978fbda511b85a364c0cffe37402448bb15aeb6fa3beef2ffc6df108a"
+    validation:
+      - "TaxYearParametersTest"
+      - "CitationRegistryTest"
+      - "PlanningAgentEvalTest"
+  - change_id: "safe_harbor_status_and_boundary"
+    kind: "baseline_correction"
+    status: "draft"
+    implementation: "Use a $75,000 prior-year AGI threshold for MFS and $150,000 for single/MFJ. The higher percentage applies strictly above the threshold, not at equality. Correct all supported years."
+    source_refs:
+      - source_id: "irs_form_1040_es_2026"
+        chunk_id: "irs_form_1040_es_2026_chunk_0001"
+        pages:
+          - 1
+        text_sha256: "7cd45b5ef5ff0d5306ac070f94750011d7dbffe2dec8f47b0f37493da33c3f87"
+    validation:
+      - "TaxYear2026IntegrationTest"
+  - change_id: "2025_standard_deduction_correction"
+    kind: "baseline_correction"
+    status: "draft"
+    implementation: "Correct the inherited 2025 basic deductions to $15,750 single/MFS and $31,500 MFJ. Update independent 2025 QBI-cap and taxable-income expectations."
+    source_refs:
+      - source_id: "irs_rev_proc_2025_32"
+        chunk_id: "irs_rev_proc_2025_32_chunk_0007"
+        pages:
+          - 6
+          - 7
+        text_sha256: "cb9bd8d25b7338d3af102563091cfb2609b6d486e25fb93a0b0cd7b89bdede4b"
+    validation:
+      - "QbiDeductionTest"
+      - "PlanningAgentEvalTest"
+  - change_id: "release_isolation_and_integrity"
+    kind: "engineering"
+    status: "draft"
+    implementation: "Filter all interview artifact families by year and jurisdiction; reject draft runtime inputs by default; cache loaded parameters/citations; protect tax parameters from agent overrides; pin sessions and exports to knowledge plus executable XML content; reject retained sessions from another version."
+    validation:
+      - "KnowledgeReleaseTest"
+      - "PlanningYearIntegrationTest"
+      - "TaxYear2026IntegrationTest"
+      - "Python provenance and release-builder tests"

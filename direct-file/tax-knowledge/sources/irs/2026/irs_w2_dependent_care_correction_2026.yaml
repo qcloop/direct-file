@@ -1,0 +1,31 @@
+source_id: "irs_w2_dependent_care_correction_2026"
+product_id: "w2_dependent_care_correction"
+tax_year: 2026
+source_revision_year: 2026
+document_status: "final"
+disposition: "source_review_required"
+corrects_source_ids: []
+applicable_tax_years:
+  - 2026
+title: "2026 W-2/W-3 dependent care exclusion correction"
+source_url: "https://www.irs.gov/forms-pubs/correction-to-the-dependent-care-benefits-exclusion-amount-in-the-2026-general-instructions-for-forms-w-2-and-w-3"
+pdf_sha256: null
+source_sha256: "3117e15d3d2ada4bdf67f03d87550d0f341059bff0f7759531d92e4ec36225f6"
+document_format: "html"
+agency: "IRS"
+text_path: "direct-file/tax-knowledge/corpora/irs-2026/text/w2-dependent-care-correction.txt"
+generated_at: "2026-11-12T20:10:18.890113+00:00"
+chunking:
+  max_words: 450
+chunks:
+  - chunk_id: "irs_w2_dependent_care_correction_2026_chunk_0001"
+    source_id: "irs_w2_dependent_care_correction_2026"
+    product_id: "w2_dependent_care_correction"
+    title: "2026 W-2/W-3 dependent care exclusion correction"
+    pages:
+      - 1
+    heading: null
+    text: "The 2026 General Instructions for Forms W-2 and W-3, under Specific Instructions for Form W-2, Box 10—Dependent care benefits, states that the dependent care benefits exclusion is $5,000. P.L. 119-21, section 70404, increased the maximum amount of the exclusion to $7,500 beginning in 2026. All amounts paid or incurred (regardless of any employee forfeitures), including those in excess of the $7,500 exclusion, are reported in box 10."
+    text_sha256: "ebe1d2a02d4f9f7d406e0b1c9b1875c9eb63aed081dfb5b815ab835baaef190f"
+    source_url: "https://www.irs.gov/forms-pubs/correction-to-the-dependent-care-benefits-exclusion-amount-in-the-2026-general-instructions-for-forms-w-2-and-w-3"
+    pdf_sha256: "3117e15d3d2ada4bdf67f03d87550d0f341059bff0f7759531d92e4ec36225f6"

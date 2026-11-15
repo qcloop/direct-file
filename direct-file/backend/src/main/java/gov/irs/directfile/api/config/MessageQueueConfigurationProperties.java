@@ -15,45 +15,32 @@ import org.springframework.validation.annotation.Validated;
 @AllArgsConstructor
 public class MessageQueueConfigurationProperties {
 
-    @NotBlank
-    @URL
+    @NotBlank @URL
     private final String endpoint;
 
     private final boolean sqsMessageSendingEnabled;
 
-    @NotBlank
-    private final String dispatchQueue;
+    @NotBlank private final String dispatchQueue;
 
-    @NotBlank
-    private final String dlqStatusChangeQueue;
+    @NotBlank private final String dlqStatusChangeQueue;
 
-    @NotBlank
-    private final String dlqSubmissionConfirmationQueue;
+    @NotBlank private final String dlqSubmissionConfirmationQueue;
 
-    @NotBlank
-    private final String dlqS3NotificationEventQueue;
+    @NotBlank private final String dlqS3NotificationEventQueue;
 
-    @NotBlank
-    private final String sendEmailQueue;
+    @NotBlank private final String sendEmailQueue;
 
-    @NotBlank
-    private final String statusChangeQueue;
+    @NotBlank private final String statusChangeQueue;
 
-    @NotBlank
-    private final String submissionConfirmationQueue;
+    @NotBlank private final String submissionConfirmationQueue;
 
-    @NotBlank
-    private final String s3NotificationEventQueue;
+    @NotBlank private final String s3NotificationEventQueue;
 
-    @NotBlank
-    private final String dataImportRequestQueue;
+    @NotBlank private final String dataImportRequestQueue;
 
-    @NotBlank
-    private final String dlqDataImportRequestQueue;
+    @NotBlank private final String dlqDataImportRequestQueue;
 
-    @NotBlank
-    private final String dataImportResultQueue;
+    @NotBlank private final String dataImportResultQueue;
 
-    @NotBlank
-    private final String dlqDataImportResultQueue;
+    @NotBlank private final String dlqDataImportResultQueue;
 }

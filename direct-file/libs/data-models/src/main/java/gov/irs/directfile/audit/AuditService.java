@@ -2,7 +2,6 @@ package gov.irs.directfile.audit;
 
 import java.util.Map;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.slf4j.spi.LoggingEventBuilder;
@@ -13,7 +12,6 @@ import gov.irs.directfile.audit.events.EventStatus;
 
 @Service
 @Slf4j
-@SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED", justification = "Initial Spotbugs Setup")
 public class AuditService {
 
     public void addAuditPropertiesToMDC(final Event event) {
@@ -61,7 +59,11 @@ public class AuditService {
                         ? log.atInfo()
                         : log.atError();
 
-        eventData.getEventData().forEach((k, v) -> builder.addKeyValue(k.toString(), v));
+        // LoggingEventBuilder is a fluent (potentially immutable) API, so thread the
+        // returned builder through each call rather than discarding the return value.
+        for (var entry : eventData.getEventData().entrySet()) {
+            builder = builder.addKeyValue(entry.getKey().toString(), entry.getValue());
+        }
 
         // Add `cyberOnly`: the property that indicates event should be forwarded to XXXX
         builder.addKeyValue(AuditLogElement.cyberOnly.toString(), true).log();

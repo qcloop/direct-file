@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,6 @@ import gov.irs.directfile.emailservice.exceptions.MissingTemplateException;
 @Service
 @Slf4j
 @Profile("send-email")
-@SuppressFBWarnings(value = "CT_CONSTRUCTOR_THROW", justification = "Java 21 update")
 @SuppressWarnings("PMD.MissingOverride")
 public class SendService implements ISendService {
     // TODO: rate limiting?

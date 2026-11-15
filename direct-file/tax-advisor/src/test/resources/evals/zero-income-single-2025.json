@@ -1,0 +1,29 @@
+{
+  "name": "Edge case — zero self-employment income, single, TY2025: every figure is zero",
+  "taxYear": 2025,
+  "filingStatus": "single",
+  "steps": [
+    {
+      "tool": "calculate_se_tax",
+      "args": { "grossReceipts": "0" },
+      "expect": {
+        "netProfit": 0,
+        "netEarningsFromSe": 0,
+        "selfEmploymentTax": 0,
+        "deductibleHalf": 0
+      }
+    },
+    {
+      "tool": "project_total_tax",
+      "args": {},
+      "expect": {
+        "adjustedGrossIncome": 0,
+        "qbiDeduction": 0,
+        "taxableIncome": 0,
+        "incomeTax": 0,
+        "selfEmploymentTax": 0,
+        "projectedTotalTax": 0
+      }
+    }
+  ]
+}

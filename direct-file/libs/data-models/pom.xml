@@ -22,9 +22,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
+        <!-- This is a plain data-models library; it must not drag in a servlet web stack
+             (Tomcat + spring-webmvc), which would force every consumer into SERVLET mode and
+             shadow reactive apps. The only web type used here is org.springframework.http.HttpStatus
+             (in a single error-code enum), which lives in the lightweight spring-web jar — no
+             embedded server, no DispatcherServlet. -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate.orm</groupId>
@@ -46,8 +51,13 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>sqs</artifactId>
         </dependency>
-        <!-- jackson-core/databind/annotations are transitive via spring-boot-starter-web.
-             jackson-datatype-jsr310 must be declared explicitly (not transitive). -->
+        <!-- Jackson: data-models annotates its DTOs/records for (de)serialization. jackson-databind
+             pulls jackson-core + jackson-annotations transitively; jackson-datatype-jsr310 is
+             declared separately. (Previously these rode in via spring-boot-starter-web, removed above.) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>

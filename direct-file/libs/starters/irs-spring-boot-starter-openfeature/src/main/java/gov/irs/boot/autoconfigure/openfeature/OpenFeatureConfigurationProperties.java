@@ -10,4 +10,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @ConfigurationProperties("openfeature-starter.s3-provider")
 public record OpenFeatureConfigurationProperties(
-        @NotNull String environmentPrefix, @NotBlank String bucket, @NotNull Duration expiration) {}
+        @NotNull String environmentPrefix,
+        @NotBlank String bucket,
+        @NotNull Duration expiration) {}

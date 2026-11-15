@@ -1,0 +1,17 @@
+**
+!tax-advisor/
+!tax-advisor/target/
+!tax-advisor/target/tax-advisor-0.0.1-SNAPSHOT.jar
+!tax-knowledge/
+!tax-knowledge/rules/
+!tax-knowledge/rules/**
+!tax-knowledge/questions/
+!tax-knowledge/questions/**
+!tax-knowledge/evidence/
+!tax-knowledge/evidence/**
+!tax-knowledge/conflicts/
+!tax-knowledge/conflicts/**
+!tax-knowledge/sources/
+!tax-knowledge/sources/**
+!tax-knowledge/releases/
+!tax-knowledge/releases/**

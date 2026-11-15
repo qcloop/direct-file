@@ -1,0 +1,49 @@
+{
+  "name": "Gig worker, single, TY2026 — final sources and split mileage periods",
+  "taxYear": 2026,
+  "filingStatus": "single",
+  "steps": [
+    {
+      "tool": "calculate_se_tax",
+      "args": {
+        "grossReceipts": "50000",
+        "businessMilesBeforeRateChange": "5000",
+        "businessMilesAfterRateChange": "5000"
+      },
+      "expect": {
+        "taxYear": 2026,
+        "netProfit": 42575,
+        "netEarningsFromSe": 39318,
+        "selfEmploymentTax": 6016,
+        "deductibleHalf": 3008
+      }
+    },
+    {
+      "tool": "calculate_additional_medicare",
+      "args": {
+        "medicareWagesFromW2": "0"
+      },
+      "expect": {
+        "additionalMedicareTax": 0
+      }
+    },
+    {
+      "tool": "estimate_qbi_deduction",
+      "args": {},
+      "expect": {
+        "qualifiedBusinessIncome": 39567,
+        "qbiDeduction": 4693,
+        "aboveThreshold": false
+      }
+    },
+    {
+      "tool": "project_total_tax",
+      "args": {},
+      "expect": {
+        "standardDeduction": 16100,
+        "taxableIncome": 18774,
+        "selfEmploymentTax": 6016
+      }
+    }
+  ]
+}

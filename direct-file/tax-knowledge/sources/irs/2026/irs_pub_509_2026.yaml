@@ -1,0 +1,1208 @@
+source_id: "irs_pub_509_2026"
+product_id: "p509"
+tax_year: 2026
+source_revision_year: 2026
+document_status: "final"
+disposition: "source_review_required"
+revision_label: "2026"
+applicability_review: "Verify printed revision and effective dates before artifact promotion."
+applicable_tax_years:
+  - 2026
+title: "Tax Calendars"
+source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+source_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+document_format: "pdf"
+agency: "IRS"
+text_path: "direct-file/tax-knowledge/corpora/irs-2026/text/p509.txt"
+generated_at: "2026-11-12T20:10:18.879814+00:00"
+chunking:
+  max_words: 450
+chunks:
+  - chunk_id: "irs_pub_509_2026_chunk_0001"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 1
+    heading: null
+    text: |
+      Userid: CPM Schema: tipx Leadpct: 100% Pt. size: 8
+      AH XSL/XML  Draft  Ok to Print
+      Fileid: … cation-509/2026/a/xml/cycle06/source (Init. & Date) _______
+      Page 1 of 14  11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      Publication 509 Contents
+      Tax Calendars Introduction . . . . . . . . . . . . . . . . . . 1
+      Background Information for Using
+      the Tax Calendars . . . . . . . . . . . 2
+      For use in 2026 General Tax Calendar . . . . . . . . . . . . 3
+      First Quarter . . . . . . . . . . . . . . . 3
+      Second Quarter . . . . . . . . . . . . . 4
+      Third Quarter . . . . . . . . . . . . . . . 5
+      Fourth Quarter . . . . . . . . . . . . . . 5
+      Employer’s Tax Calendar . . . . . . . . . . 6
+      First Quarter . . . . . . . . . . . . . . . 6
+      Second Quarter . . . . . . . . . . . . . 7
+      Third Quarter . . . . . . . . . . . . . . . 7
+      Fourth Quarter . . . . . . . . . . . . . . 8
+      Excise Tax Calendar . . . . . . . . . . . . . 8
+      First Quarter . . . . . . . . . . . . . . . 9
+      Second Quarter . . . . . . . . . . . . . 9
+      Third Quarter . . . . . . . . . . . . . . 10
+      Fourth Quarter . . . . . . . . . . . . . 10
+      How To Get Tax Help . . . . . . . . . . . . 12
+      Future Developments
+      For the latest information about developments
+      related to Pub. 509, such as legislation enacted
+      after it was published, go to IRS.gov/Pub509.
+      Reminders
+      Form 1099-NEC. Form 1099-NEC, Nonem-
+      ployee Compensation, is used to report nonem-
+      ployee compensation.
+      Form 1040-SR. Form 1040-SR, U.S. Income
+      Tax Return for Seniors, is a tax return for senior
+      citizens. For tax year 2025, Form 1040-SR is
+      available to you if you were born before January
+      2, 1961. The form generally mirrors Form 1040.
+      Online IRS Tax Calendar. The IRS Tax Calen-
+      dar is available online at IRS.gov/TaxCalendar.
+      This calendar is also available in Spanish and
+      Chinese.
+      Photographs of missing children. The IRS is
+      a proud partner with the National Center for
+      Missing & Exploited Children® (NCMEC). Pho-
+      tographs of missing children selected by the
+      Center may appear in this publication on pages
+      that would otherwise be blank. You can help
+      bring these children home by looking at the
+      photographs and calling 1-800-THE-LOST
+      (1-800-843-5678) if you recognize a child.
+      Introduction
+      A tax calendar is a 12-month calendar divided
+      into quarters. The calendar gives specific due
+      Get forms and other information faster and easier at: dates for:
+      • IRS.gov (English) • IRS.gov/Korean (한국어) • Filing tax forms,
+      • IRS.gov/Spanish (Español) • Paying taxes, and
+      • IRS.gov/Chinese (中文) • IRS.gov/Russian (Pусский)
+      • IRS.gov/Vietnamese (Tiếng Việt) • Taking other actions required by federal tax
+      law.
+      Publication 509 (2026)  Catalog Number 15013X
+      Dec 2, 2025 Department of the Treasury  Internal Revenue Service  www.irs.gov
+    text_sha256: "c8e5daabc2a13de70d0a121bee2fffbf75ea75c7d6ae2b20b49dbf59ade7763e"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+  - chunk_id: "irs_pub_509_2026_chunk_0002"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 2
+    heading: null
+    text: |
+      Page 2 of 14  Fileid: … cation-509/2026/a/xml/cycle06/source 11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      What does this publication contain? This cations discussed in this publication have Span- forms and instructions. The IRS will process
+      publication contains the following. ish-language versions available. Some exam- your order for forms and publications as soon
+      1. A section on how to use the tax calendars. ples include Form 1040 (sp), Form 941 (sp), as possible. Don’t resubmit requests you’ve al-
+      Form W-4 (sp), Form 2290 (sp), and Pub. 15 ready sent us. You can get forms and publica-
+      2. Three tax calendars: (sp). Although this publication doesn’t reference tions faster online.
+      a. General Tax Calendar, Spanish-language forms, instructions, and pub-
+      lications in each instance that one is available,
+      b. Employer’s Tax Calendar, and you can go to IRS.gov/SpanishForms to deter-
+      c. Excise Tax Calendar. mine if a Spanish-language version is available. Background Information
+      3. A table showing the semiweekly deposit What isn’t included in these calendars? for Using the Tax
+      due dates for payroll taxes for 2026. The calendars don’t cover the employment or Calendars
+      Most of the due dates discussed in this pub- excise tax deposit rules. You can find the de-
+      lication are also included in the online IRS Tax posit rules for employment taxes in Pub. 15.
+      Calendar, available at IRS.gov/TaxCalendar. The deposit rules for excise taxes are in Pub. The following brief explanations may be helpful
+      The online IRS Tax Calendar is also available in 510 and in the Instructions for Form 720. In ad- to you in using the tax calendars.
+      Spanish and Chinese. dition, the calendars don’t cover filing forms and
+      other requirements for: Electronic services to make taxes easier.
+      Who should use this publication? Primarily, • Estate taxes, Individuals and businesses can enjoy the bene-
+      employers need to use this publication. How- • Gift taxes, fits of filing and paying their federal taxes elec-
+      ever, the General Tax Calendar, later, has im- • Trusts, tronically. Whether you rely on a tax professio-
+      nal or handle your own taxes, the IRS offers you
+      portant due dates for all businesses and individ- • Exempt organizations,
+      uals. Anyone who must pay excise taxes may • Certain types of corporations, convenient programs to make taxes easier.
+      need the Excise Tax Calendar, later. • Foreign partnerships, or • Individuals can e-file Form 1040 or Form
+      • Nonresident aliens. 1040-SR. For more information, see How
+      To Get Tax Help, later, and go to IRS.gov/
+      What are the advantages of using a tax cal-
+      endar? The following are advantages of using Comments and suggestions. We welcome Efile. Individuals can make a variety of tax
+      payments, including estimated tax pay-
+      a tax calendar. your comments about this publication and sug-
+      • You don’t have to figure the due dates gestions for future editions. ments and paying a balance due on your
+      return, using the Electronic Federal Tax
+      yourself. You can send us comments through Payment System (EFTPS), IRS Direct Pay,
+      • You can file or pay timely and avoid penal- IRS.gov/FormComments. Or you can write to or your IRS individual tax account. For
+      ties. the Internal Revenue Service, Tax Forms and more information about EFTPS or to enroll
+      • You don’t have to adjust the due dates for Publications, 1111 Constitution Ave. NW, in EFTPS, go to EFTPS.gov. Also see
+      Saturdays, Sundays, and legal holidays. IR-6526, Washington, DC 20224. Electronic deposit requirement, later, for
+      • You don’t have to adjust the due dates for Although we can’t respond individually to the EFTPS phone numbers. For more in-
+      special banking rules if you use the Em- each comment received, we do appreciate your formation about IRS Direct Pay, go to
+      ployer’s Tax Calendar or Excise Tax Calen- feedback and will consider your comments and IRS.gov/DirectPay. For more information
+      dar, later. suggestions as we revise our tax forms, instruc- about creating and accessing your IRS in-
+      tions, and publications. Don’t send tax ques- dividual tax account, go to IRS.gov/
+      Which calendar(s) should I use? To decide tions, tax returns, or payments to the above ad- Account.
+      which calendar(s) to use, first look at the Gen- dress. • Businesses can e-file certain business tax
+      eral Tax Calendar, later, and highlight the dates Getting answers to your tax questions. returns such as Forms 1120, 1120-S, and
+      that apply to you. If you’re an employer, also use If you have a tax question not answered by this 1065; certain employment tax returns such
+      the Employer’s Tax Calendar, later. If you must publication or the How To Get Tax Help section as Forms 940 and 941; certain excise tax
+      pay excise taxes, use the Excise Tax Calendar, at the end of this publication, go to the IRS In- returns such as Forms 720, 2290, and
+      later. Depending on your situation, you may teractive Tax Assistant page at IRS.gov/ 8849; and Form 1099 and other informa-
+      need to use more than one calendar. Help/ITA where you can find topics by using the tion returns. Go to IRS.gov/BusinessEfile
+      What other publications and tax forms will I search feature or viewing the categories listed. for more information. Most businesses can
+      make a variety of tax payments, including
+      need? Table 1 lists other publications you may Getting tax forms, instructions, and pub­ estimated tax payments, federal tax depos-
+      need. Each calendar lists the forms you may lications. Go to IRS.gov/Forms to download its, and paying a balance due on your re-
+      need. current and prior-year forms, instructions, and turn, using EFTPS, IRS Direct Pay, or your
+      See How To Get Tax Help at the end of this publications. IRS business tax account. For more infor-
+      publication for information about getting publi- mation about EFTPS or to enroll in EFTPS,
+      cations and forms. Ordering tax forms, instructions, and go to EFTPS.gov. Also see Electronic de-
+      publications. Go to IRS.gov/OrderForms to or- posit requirement, later, for the EFTPS
+      Forms, instructions, and publications in der current forms, instructions, and publica- phone numbers. For more information
+      Spanish. Some forms, instructions , and publi- tions; call 800-829-3676 to order prior-year about IRS Direct Pay, go to IRS.gov/
+      DirectPay. For more information about cre-
+      Table 1. Useful Publications ating and accessing your IRS business tax
+      account, go to IRS.gov/BusinessAccount.
+      IF you’re... THEN you may need... For more information about other payment
+      an employer • Pub. 15, Employer’s Tax Guide. options, go to IRS.gov/Pay.
+      • Pub. 15-A, Employer’s Supplemental Tax Guide. Tax deposits. Some taxes can be paid with
+      • Pub. 15-B, Employer’s Tax Guide to Fringe Benefits. the return on which they are reported. However,
+      • Pub. 15-T, Federal Income Tax Withholding Methods. in many cases, you have to deposit the tax be-
+      • Pub. 926, Household Employer’s Tax Guide. fore the due date for filing the return. Tax depos-
+      a farmer • Pub. 15, Employer’s Tax Guide. its are figured for periods of time that are shorter
+      • Pub. 225, Farmer’s Tax Guide. than the time period covered by the return. See
+      Pub. 15 for the employment tax deposit rules.
+      an individual • Pub. 505, Tax Withholding and Estimated Tax. For the excise tax deposit rules, see Pub. 510 or
+      required to pay excise taxes • Pub. 510, Excise Taxes. the Instructions for Form 720.
+      2 Publication 509 (2026)
+    text_sha256: "ef2ea60683282ae602b92e12a1cf030e183bdb68f6808283c24109ce0068d1e1"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+  - chunk_id: "irs_pub_509_2026_chunk_0003"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 3
+    heading: null
+    text: |
+      Page 3 of 14  Fileid: … cation-509/2026/a/xml/cycle06/source 11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      Electronic deposit requirement. You • November 11—Veterans Day
+      • January 15
+      must use electronic funds transfer (EFT) to November 26—Thanksgiving Day
+      make all federal tax deposits. Generally, an EFT • December 25—Christmas Day Individuals. Make a payment of your esti-
+      is made using EFTPS, IRS Direct Pay, or your
+      IRS business tax account. If you don’t want to Statewide legal holidays. In general, a mated tax for 2025 if you didn’t pay your in-
+      use one of these methods, you can arrange for statewide legal holiday delays a due date for fil- come tax for the year through withholding (or
+      your tax professional, financial institution, pay- ing a return only if the IRS office where you’re didn’t pay in enough tax that way). See Form
+      roll service, or other trusted third party to make required to file is located in that state. For indi- 1040-ES for more information, including how
+      electronic deposits on your behalf. Also, you viduals, a statewide legal holiday also delays a to make estimated tax payments electroni-
+      may arrange for your financial institution to ini- due date for filing a return for residents of that cally. This is the final installment date for
+      tiate a same-day wire payment on your behalf. state. A statewide legal holiday doesn’t delay a 2025 estimated tax payments. However, you
+      EFTPS is a free service provided by the Depart- due date for making a federal tax deposit. don’t have to make this payment if you file
+      your 2025 return (Form 1040 or Form
+      ment of the Treasury. Payments made using IRS
+      Direct Pay or through your IRS business tax ac- Penalties and Interest. Whenever possible, 1040-SR) and pay all tax due by February 2,
+      count are also free. Services provided by your you should take action before the listed due 2026.
+      tax professional, financial institution, payroll date. If you’re late, you may have to pay a pen- Farmers and fishermen. Pay your esti-
+      service, or other third party may have a fee. alty as well as interest on any overdue taxes. mated tax for 2025. See Form 1040-ES for
+      To get more information or to enroll in Be sure to follow all the tax laws that apply to more information, including how to make esti-
+      EFTPS, go to EFTPS.gov or call 800-555-4477. you. In addition to civil penalties, criminal penal- mated tax payments electronically. You have
+      To contact EFTPS using Telecommunications ties may be imposed for intentionally not paying until April 15 to file your 2025 income tax re-
+      Relay Services (TRS) for people who are deaf, taxes, for intentionally filing a false return, or for turn (Form 1040 or Form 1040-SR). If you
+      hard of hearing, or have a speech disability, dial not filing a required return. don’t pay your estimated tax by January 15,
+      711 and then provide the TRS assistant the you must file your 2025 return and pay all tax
+      800-555-4477 number above or 800-733-4829. Use of private delivery services. You can due by March 2, 2026, to avoid an estimated
+      Additional information about EFTPS is also use certain private delivery services (PDSs) tax penalty.
+      available in Pub. 966. designated by the IRS to meet the timely mail-
+      For more information about IRS Direct Pay, ing as timely filing/paying rule for tax returns
+      and payments. February 2
+      go to IRS.gov/DirectPay. For more information
+      about making an EFT through your IRS busi- Go to IRS.gov/PDS for the current list of
+      ness tax account, go to IRS.gov/ designated PDSs. For the IRS mailing address Individuals who must make estimated tax
+      BusinessAccount. to use if you’re using a PDS, go to IRS.gov/ payments. If you didn’t pay your last in-
+      PDSstreetAddresses. Select the mailing ad- stallment of estimated tax by January 15, you
+      dress listed on the webpage that is in the same may choose (but aren’t required) to file your
+      Caution: If you fail to timely, properly, and fully
+      make your federal tax deposit, you may be sub- state as the address to which you would mail income tax return (Form 1040 or Form
+      the return without a payment, as shown in the 1040-SR) for 2025 by February 2. Filing your
+      ject to a failure-to-deposit penalty. EFTPS ac-
+      cepts same-day payments of $1 million or less if instructions for your tax return. return and paying all tax due by February 2
+      prevents any penalty for late payment of the
+      the payment is submitted before 3:00 p.m. East- The PDS can tell you how to get written last installment. If you can’t file and pay your
+      ern time on a business day. If your payment is proof of the mailing date. tax by February 2, file and pay your tax by
+      more than $1 million, you must submit the de- April 15.
+      posit by 8 p.m. Eastern time the day before the Caution: PDSs can’t deliver items to P.O.
+      date the deposit is due. boxes. You must use the U.S. Postal Service to All businesses. Give annual information
+      mail any item to an IRS P.O. box address. statements to recipients of certain payments
+      Saturday, Sunday, or legal holiday. Gener- you made during 2025. You can use the ap-
+      ally, if a due date for performing any act for tax
+      purposes falls on a Saturday, Sunday, or legal General Tax Calendar propriate version of Form 1099 or other infor-
+      mation return. Form 1099 can be issued elec-
+      holiday, the act is considered to be performed tronically with the consent of the recipient.
+      timely if it is performed no later than the next This tax calendar has the due dates for 2026 Payments that may be covered include the
+      day that isn’t a Saturday, Sunday, or legal holi- that most taxpayers will need. Employers and following.
+      day. The term “legal holiday” means any legal persons who pay excise taxes should also use • Cash payments for fish (or other aquatic
+      holiday in the District of Columbia. The calen- the Employer’s Tax Calendar and the Excise Tax life) purchased from anyone engaged in
+      dars provided in this publication make the ad- Calendar, later. the trade or business of catching fish.
+      justments for Saturdays, Sundays, and legal • Compensation for workers who aren’t
+      holidays. But you must make any adjustments Fiscal-year taxpayers. If you file your income considered employees (including fishing
+      for statewide legal holidays, as discussed later. tax return for a fiscal year rather than the calen- boat proceeds to crew members).
+      dar year, you must change some of the dates in • Dividends and other corporate distribu-
+      Caution: An exception to this rule for certain this calendar. These changes are described un- tions.
+      excise taxes is noted later under the Excise Tax der Fiscal-Year Taxpayers at the end of this cal- • Interest.
+      Calendar. endar. • Rent.
+      Legal holidays. Legal holidays occurring in • Royalties.
+      2026 are listed below. First Quarter • Payments of Indian gaming profits to
+      • January 1—New Year’s Day tribal members.
+      • January 19—Birthday of Martin Luther The first quarter of a calendar year is made up • Profit-sharing distributions.
+      King, Jr. of January, February, and March. • Retirement plan distributions.
+      • February 16—Washington’s Birthday • Original issue discount.
+      • April 16—District of Columbia Emancipa- • Prizes and awards.
+      tion Day January 12 • Medical and health care payments.
+      • May 25—Memorial Day • Debt cancellation (treated as payment to
+      • June 19—Juneteenth National Independ- Employees who work for tips. If you re- debtor).
+      ence Day ceived $20 or more in tips during December, • Cash payments over $10,000. See the
+      • July 3—Independence Day (observed) report them to your employer. See Pub. 531, Instructions for Form 8300.
+      • September 7—Labor Day Reporting Tip Income, for more information
+      • October 12—Indigenous Peoples’ Day on how to report tips to your employer. See the General Instructions for Certain
+      Information Returns for information on what
+      (Columbus Day) payments are covered, how much the pay-
+      ment must be before a statement is required,
+      Publication 509 (2026) 3
+    text_sha256: "bf818fbee60233a088942c9eef3034f23ecd6d1886d3fb90ce38f57181f52d3f"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+  - chunk_id: "irs_pub_509_2026_chunk_0004"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 4
+    heading: null
+    text: |
+      Page 4 of 14  Fileid: … cation-509/2026/a/xml/cycle06/source 11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      which form to use, when to file, and exten- March 10 Second Quarter
+      sions of time to provide statements to the
+      IRS. Form 1099-B, Proceeds From Broker Employees who work for tips. If you re- The second quarter of a calendar year is made
+      and Barter Exchange Transactions; Form ceived $20 or more in tips during February, up of April, May, and June.
+      1099-S, Proceeds From Real Estate Transac- report them to your employer. See Pub. 531
+      tions; and certain reporting on Form for more information on how to report tips to
+      1099-MISC, Miscellaneous Information, are your employer. April 10
+      due to recipients by February 17.
+      Payers of nonemployee compensation. March 16 Employees who work for tips. If you re-
+      ceived $20 or more in tips during March, re-
+      File Form 1099-NEC for nonemployee port them to your employer. See Pub. 531 for
+      compensation paid in 2025. Partnerships. File a 2025 calendar year more information on how to report tips to your
+      return (Form 1065). Provide each partner employer.
+      February 10 with a copy of their Schedule K-1 (Form
+      1065), Partner’s Share of Income, Deduc-
+      tions, Credits, etc., or substitute Sched- April 15
+      Employees who work for tips. If you re-
+      ceived $20 or more in tips during January, re- ule K-1 (Form 1065), and, if applicable,
+      port them to your employer. See Pub. 531 for Schedule K-3 (Form 1065), Partner’s Share Individuals. File a 2025 Form 1040 or
+      of Income, Deductions, Credits, etc.—Inter- Form 1040-SR and pay any tax due. If you
+      more information on how to report tips to your
+      employer. national, or substitute Schedule K-3 (Form want an automatic 6-month extension of time
+      1065). to file the return, file Form 4868 and pay what
+      To request an automatic 6-month extension you estimate you owe in tax to avoid penal-
+      February 17 of time to file the return, file Form 7004. Then, ties and interest. For more information, see
+      file the return and provide each partner with a Form 4868. Then, file Form 1040 or Form
+      Individuals. If you claimed exemption copy of their final or amended (if required) 1040-SR by October 15.
+      from income tax withholding last year on the Schedule K-1 (Form 1065) and, if applicable, If you’re not paying your 2026 income tax
+      Form W-4 you gave your employer, you must Schedule K-3 (Form 1065) by September 15. through withholding (or won’t pay in enough tax
+      file a new Form W-4 by this date to continue during the year that way), pay the first install-
+      your exemption for another year. S corporations. File a 2025 calendar year ment of your 2026 estimated tax. See Form
+      income tax return (Form 1120-S) and pay any 1040-ES for more information, including how to
+      All businesses. Give annual information tax due. Provide each shareholder with a make estimated tax payments electronically.
+      statements to recipients of certain payments copy of their Schedule K-1 (Form 1120-S), Also, see Pub. 505.
+      you made during 2025. You can use the ap- Shareholder’s Share of Income, Deductions,
+      propriate version of Form 1099 or other infor- Credits, etc., or substitute Schedule K-1 Household employers. If you paid cash
+      mation return. Form 1099 can be issued elec- (Form 1120-S), and, if applicable, Sched- wages of $2,800 or more in 2025 to a house-
+      tronically with the consent of the recipient. ule K-3 (Form 1120-S), Shareholder’s Share hold employee, you must file Schedule H
+      This due date applies only to the following of Income, Deductions, Credits, etc.—Inter- (Form 1040), Household Employment Taxes.
+      types of payments.
+      • national, or substitute Schedule K-3 (Form If you’re required to file a federal income tax
+      All payments reported on Form 1099-B.
+      • 1120-S). return (Form 1040 or Form 1040-SR), file
+      All payments reported on Form 1099-S.
+      • Substitute payments reported in box 8 or To request an automatic 6-month extension Schedule H (Form 1040) with the return and
+      gross proceeds paid to an attorney re- of time to file the return, file Form 7004 and de- report any household employment taxes. Re-
+      ported in box 10 of Form 1099-MISC. posit what you estimate you owe in tax. Then, port any federal unemployment (FUTA) tax on
+      file the return; pay any tax, interest, and penal- Schedule H (Form 1040) if you paid total
+      ties due; and provide each shareholder with a cash wages of $1,000 or more in any calen-
+      March 2 copy of their Schedule K-1 (Form 1120-S) and, dar quarter of 2024 or 2025 to household em-
+      if applicable, Schedule K-3 (Form 1120-S) by ployees. Also, report any income tax you
+      All businesses. File information returns September 15. withheld for your household employees. For
+      (for example, certain Forms 1099) for certain more information, see Pub. 926.
+      payments you made during 2025. These pay- S corporation election. File Form 2553 Corporations. File a 2025 calendar year
+      ments are described under All businesses to elect to be treated as an S corporation be- income tax return (Form 1120) and pay any
+      under February 2, earlier. However, Form ginning with calendar year 2026. If Form tax due. If you want an automatic 6-month ex-
+      1099-NEC reporting nonemployee compen- 2553 is filed late, S corporation treatment will tension of time to file the return, file Form
+      sation must be filed by February 2. There are begin with calendar year 2027. 7004 and deposit what you estimate you owe
+      different forms for different types of pay- in taxes.
+      ments. Use a separate Form 1096 to summa-
+      rize and transmit the forms for each type of March 31 Deposit the first installment of estimated in-
+      payment. See the General Instructions for come tax for 2026.
+      Certain Information Returns for information Electronic filing of Forms 1097, 1098, 1099,
+      on what payments are covered, how much 3921, 3922, and W-2G. File Forms
+      the payment must be before a return is re- 1097, 1098, 1099 (except a Form 1099-NEC May 11
+      quired, which form to use, and extensions of reporting nonemployee compensation),
+      time to file. 3921, 3922, and W-2G with the IRS. This due Employees who work for tips. If you re-
+      date applies only if you file electronically. Oth- ceived $20 or more in tips during April, report
+      If you file Forms 1097, 1098, 1099 (except a erwise, see All businesses under March 2, them to your employer. See Pub. 531 for
+      Form 1099-NEC reporting nonemployee com- earlier. more information on how to report tips to your
+      pensation), 3921, 3922, or W-2G electronically, employer.
+      your due date for filing them with the IRS will be The due date for giving the recipient these
+      extended to March 31. The due date for giving forms generally remains February 2.
+      the recipient these forms generally remains For information about filing Forms 1097, June 10
+      February 2. 1098, 1099, 3921, 3922, and W-2G electroni- Employees who work for tips. If you re-
+      cally, see Pub. 1220. ceived $20 or more in tips during May, report
+      Farmers and fishermen. File your 2025 them to your employer. See Pub. 531 for
+      income tax return (Form 1040 or Form more information on how to report tips to your
+      1040-SR) and pay all tax due. However, you employer.
+      have until April 15 to file if you paid your 2025
+      estimated tax by January 15, 2026.
+      4 Publication 509 (2026)
+    text_sha256: "3bc507b4e3581d9919f9339920d28d0d8b424cb9f2a5d00b8084837607760e96"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+  - chunk_id: "irs_pub_509_2026_chunk_0005"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 5
+    heading: null
+    text: |
+      Page 5 of 14  Fileid: … cation-509/2026/a/xml/cycle06/source 11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      June 15 6-month extension. Otherwise, see Partner- Fiscal-Year Taxpayers
+      ships under March 16, earlier. Provide each
+      Individuals. If you’re a U.S. citizen or resi- partner with a copy of their final or amended
+      dent alien living and working (or on military Schedule K-1 (Form 1065) or substitute If you use a fiscal year (rather than the calendar
+      duty) outside the United States and Puerto Schedule K-1 (Form 1065) and, if applicable, year) as your tax year, you should change some
+      Rico, file Form 1040 or Form 1040-SR and Schedule K-3 (Form 1065) or substitute of the dates in this calendar. Use the following
+      pay any tax, interest, and penalties due. Oth- Schedule K-3 (Form 1065). general guidelines to make these changes.
+      erwise, see Individuals under April 15, earlier.
+      If you want additional time to file your return, S corporations. File a 2025 calendar year Tip: The 3 months that make up each quar-
+      file Form 4868 to obtain 4 additional months income tax return (Form 1120-S) and pay any ter of a fiscal year may be different from those of
+      to file and pay what you estimate you owe in tax, interest, and penalties due. This due each calendar quarter, depending on when the
+      tax to avoid penalties and interest. Then, file date applies only if you timely requested an fiscal year begins. Also, see Saturday, Sunday,
+      Form 1040 or Form 1040-SR by October 15. automatic 6-month extension of time to file or legal holiday, earlier.
+      However, if you’re a participant in a combat the return. Otherwise, see S corporations un-
+      zone, you may be able to further extend the fil- der March 16, earlier. Provide each share- Individuals
+      ing deadline. See Pub. 3, Armed Forces’ Tax holder with a copy of their final or amended
+      Guide. Schedule K-1 (Form 1120-S) or substitute Form 1040 or Form 1040-SR. This form is
+      Schedule K-1 (Form 1120-S) and, if applica- due on the 15th day of the 4th month after the
+      Individuals. Make a payment of your 2026 ble, Schedule K-3 (Form 1120-S) or substi- end of your tax year. Form 4868 is used to re-
+      estimated tax if you’re not paying your income tute Schedule K-3 (Form 1120-S). quest an automatic 6-month extension of time
+      tax for the year through withholding (or won’t to file Form 1040 or Form 1040-SR.
+      pay in enough tax that way). See Form Corporations. Deposit the third install-
+      1040-ES for more information, including how ment of estimated income tax for 2026. Estimated tax payments. Payments are due
+      to make estimated tax payments electroni- on the 15th day of the 4th, 6th, and 9th months
+      cally. This is the second installment date for Fourth Quarter of your tax year and on the 15th day of the 1st
+      estimated tax in 2026. Also, see Pub. 505. month after your tax year ends. See Form
+      1040-ES for more information, including how to
+      Corporations. Deposit the second install- The fourth quarter of a calendar year is made
+      ment of estimated income tax for 2026. up of October, November, and December. make estimated tax payments electronically.
+      Partnerships
+      Third Quarter October 13
+      Employees who work for tips. If you re- Form 1065. This form is due on the 15th day of
+      The third quarter of a calendar year is made up ceived $20 or more in tips during September, the 3rd month after the end of the partnership’s
+      of July, August, and September. report them to your employer. See Pub. 531 tax year. Provide each partner with a copy of
+      for more information on how to report tips to their Schedule K-1 (Form 1065) or substitute
+      July 10 your employer. Schedule K-1 (Form 1065) and, if applicable,
+      Schedule K-3 (Form 1065) or substitute Sched-
+      Employees who work for tips. If you re- October 15 ule K-3 (Form 1065) by the 15th day of the 3rd
+      month after the end of the partnership’s tax
+      ceived $20 or more in tips during June, report
+      them to your employer. See Pub. 531 for Individuals. If you have an automatic year. Form 7004 is used to request an auto-
+      more information on how to report tips to your 6-month extension to file your income tax re- matic 6-month extension of time to file Form
+      employer. turn for 2025, file Form 1040 or Form 1065.
+      1040-SR and pay any tax, interest, and pen-
+      August 10 alties due. Corporations and S Corporations
+      Corporations. File a 2025 calendar year Form 1120 (or Form 7004). This form is due
+      Employees who work for tips. If you re- income tax return (Form 1120) and pay any on the 15th day of the 4th month after the end of
+      ceived $20 or more in tips during July, report tax, interest, and penalties due. This due the corporation’s tax year. However, corpora-
+      them to your employer. See Pub. 531 for date applies only if you timely requested an tions with a short tax year that began before
+      more information on how to report tips to your automatic 6-month extension. Otherwise, see January 1, 2026, and ends on June 30, 2026,
+      employer. Corporations under April 15, earlier. must file by September 15, 2026. A corporation
+      with a short tax year ending anytime in June will
+      September 10 November 10 be treated as if the short year ended on June
+      30.
+      Employees who work for tips. If you re- Employees who work for tips. If you re- Form 7004 is used to request an automatic
+      ceived $20 or more in tips during August, re- ceived $20 or more in tips during October, re- 6-month extension of time to file Form 1120.
+      port them to your employer. See Pub. 531 for port them to your employer. See Pub. 531 for However, corporations with a fiscal tax year
+      more information on how to report tips to your more information on how to report tips to your ending June 30, or a short tax year treated as if
+      employer. employer. the short year ended June 30 that begins before
+      January 1, 2026, will use Form 7004 to request
+      September 15 December 10 an automatic 7-month extension of time to file
+      Form 1120.
+      Individuals. Make a payment of your 2026 Employees who work for tips. If you re-
+      estimated tax if you’re not paying your income ceived $20 or more in tips during November, Form 1120-S (or Form 7004). This form is
+      tax for the year through withholding (or won’t report them to your employer. See Pub. 531 due on the 15th day of the 3rd month after the
+      pay in enough tax that way). See Form for more information on how to report tips to end of the corporation’s tax year. Provide each
+      1040-ES for more information, including how your employer. shareholder with a copy of their Schedule K-1
+      to make estimated tax payments electroni- (Form 1120-S) or substitute Schedule K-1
+      cally. This is the third installment date for esti-
+      mated tax in 2026. Also, see Pub. 505. December 15 (Form 1120-S) and, if applicable, Schedule K-3
+      (Form 1120-S) or substitute Schedule K-3
+      (Form 1120-S) by the 15th day of the 3rd month
+      Partnerships. File a 2025 calendar year Corporations. Deposit the fourth install-
+      return (Form 1065). This due date applies ment of estimated income tax for 2026. after the end of the corporation’s tax year. Form
+      7004 is used to request an automatic 6-month
+      only if you timely requested an automatic extension of time to file Form 1120-S.
+      Publication 509 (2026) 5
+    text_sha256: "38742faafff92474cf28477db8e6dc516600f29f4dce1b88fd3ed26f47d6b775"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+  - chunk_id: "irs_pub_509_2026_chunk_0006"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 6
+    heading: null
+    text: |
+      Page 6 of 14  Fileid: … cation-509/2026/a/xml/cycle06/source 11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      Estimated tax payments. Payments are due tion is the date for filing forms in the Form 5500 withholding on pensions, annuities, IRAs,
+      on the 15th day of the 4th, 6th, 9th, and 12th series, for example, Forms 5500, Annual Re- gambling winnings, and payments of Indian
+      months of the corporation’s tax year. turn/Report of Employee Benefit Plan, and gaming profits to tribal members. Deposit or
+      5500-EZ, Annual Return of A One-Participant pay any undeposited tax under the accuracy
+      Form 2553. This form is used to choose S cor- (Owners/Partners and Their Spouses) Retire- of deposits rule. If your tax liability is less than
+      poration treatment. It is due no more than 2 ment Plan or A Foreign Plan. These employee $2,500, you can pay it in full with a timely filed
+      months and 15 days after the beginning of the benefit plan forms are due by the last day of the return. If you deposited the tax for the year
+      tax year the election is to take effect or at any seventh month after the plan year ends. See All timely, properly, and in full, you have until
+      time during the preceding tax year. employers under July 31, later. For more infor- February 10 to file the return.
+      mation on filing these forms, go to IRS.gov/
+      Employer’s Tax Calendar Form5500. Social security, Medicare, and withheld in-
+      come tax. File Form 941 for the fourth
+      Extended due dates. If you timely deposit in quarter of 2025. Deposit or pay any undepos-
+      This tax calendar covers various due dates of full the tax you’re required to report on Form ited tax under the accuracy of deposits rule. If
+      interest to employers. Principally, it covers the 940, 941, 943, 944, or 945, you may file the re- your tax liability is less than $2,500, you can
+      following federal taxes. turn by the 10th day of the 2nd month that fol- pay it in full with a timely filed return. If you
+      • Income tax you withhold from your employ- lows the end of the return period. deposited the tax for the quarter timely, prop-
+      ees’ wages or from nonpayroll amounts erly, and in full, you have until February 10 to
+      you pay out. Caution: If you’re subject to the semiweekly file the return.
+      • Social security and Medicare taxes (FICA deposit rule, use Table 2 near the end of this
+      taxes) you withhold from your employees’ publication for your deposit due dates. How- Certain small employers. File Form 944
+      wages and the social security and Medi- ever, if you accumulate $100,000 or more of to report social security and Medicare taxes
+      care taxes you must pay as an employer. taxes on any day during a deposit period, you and withheld income tax for 2025. Deposit or
+      • Federal unemployment (FUTA) tax you must deposit the tax by the next business day pay any undeposited tax under the accuracy
+      must pay as an employer. instead of the date shown in Table 2. of deposits rule. If your tax liability is $2,500
+      or more for 2025 but less than $2,500 for the
+      The calendar lists due dates for filing returns
+      and for making deposits of these three taxes First Quarter fourth quarter, deposit any undeposited tax or
+      pay it in full with a timely filed return. If you
+      throughout the year. Use this calendar with Pub. deposited the tax for the year timely, properly,
+      15, which gives the deposit rules. The first quarter of a calendar year is made up and in full, you have until February 10 to file
+      of January, February, and March. the return.
+      Forms you may need. The following is a list
+      and description of the primary employment tax During January Farm employers. File Form 943 to report
+      forms you may need. social security and Medicare taxes and with-
+      1. Form 940, Employer’s Annual Federal Un- All employers. Give your employees their cop- held income tax for 2025. Deposit or pay any
+      employment (FUTA) Tax Return. This form ies of Form W-2, Wage and Tax Statement, for undeposited tax under the accuracy of de-
+      is due the last day of the first calendar 2025 by February 2, 2026. If the employee posits rule. If your tax liability is less than
+      month after the calendar year ends. Use it agreed to receive Form W-2 electronically, have $2,500, you can pay it in full with a timely filed
+      to report the FUTA tax on wages you paid. it posted on a website and notify the employee return. If you deposited the tax for the year
+      of the posting. timely, properly, and in full, you have until
+      2. Form 941, Employer’s QUARTERLY Fed- February 10 to file the return.
+      eral Tax Return. This form is due the last
+      day of the first calendar month after the January 15 Federal unemployment (FUTA) tax. File
+      Form 940 for 2025. If your undeposited tax is
+      calendar quarter ends. Use it to report so- Social security, Medicare, and withheld in- $500 or less, you can either pay it with your
+      cial security and Medicare taxes and with- come tax. If the monthly deposit rule return or deposit it. If it is more than $500,
+      held income taxes on wages if your em- applies, deposit the tax for payments made in you must deposit it. However, if you depos-
+      ployees aren’t farm workers or household December 2025. ited the tax for the year timely, properly, and
+      employees. in full, you have until February 10 to file the
+      3. Form 943, Employer’s Annual Federal Tax Nonpayroll withholding. If the monthly return.
+      Return for Agricultural Employees. This deposit rule applies, deposit the tax for pay-
+      form is due the last day of the first calen- ments made in December 2025. February 10
+      dar month after the calendar year ends.
+      Use it to report social security and Medi- February 2 Nonpayroll taxes. File Form 945 to report
+      care taxes and withheld income taxes on income tax withheld for 2025 on all nonpay-
+      wages if your employees are farm workers. All employers. Give your employees their roll items. This due date applies only if you
+      copies of Form W-2 for 2025. If an employee deposited the tax for the year timely, properly,
+      4. Form 944, Employer’s ANNUAL Federal agreed to receive Form W-2 electronically, and in full.
+      Tax Return. This form is due the last day of have it posted on a website and notify the
+      the first calendar month after the calendar employee of the posting. Social security, Medicare, and withheld in-
+      year ends. Certain small employers use it File Form W-3, Transmittal of Wage and Tax come tax. File Form 941 for the fourth
+      instead of Form 941 to report social secur- Statements, along with Copy A of all the Forms quarter of 2025. This due date applies only if
+      ity and Medicare taxes and withheld in- W-2 you issued for 2025. you deposited the tax for the quarter timely,
+      come tax. properly, and in full.
+      5. Form 945, Annual Return of Withheld Fed- Payers of nonemployee compensation. Certain small employers. File Form 944
+      eral Income Tax. This form is due the last File Form 1099-NEC for nonemployee
+      day of the first calendar month after the compensation paid in 2025. to report social security and Medicare taxes
+      and withheld income tax for 2025. This due
+      calendar year ends. Use it to report in- Payers of gambling winnings. If you ei- date applies only if you deposited the tax for
+      come tax withheld on all nonpayroll items. ther paid reportable gambling winnings or the year timely, properly, and in full.
+      A list of nonpayroll items is available in the withheld income tax from gambling winnings,
+      Instructions for Form 945. give the winners their copies of Form W-2G. Farm employers. File Form 943 to report
+      social security and Medicare taxes and with-
+      Fiscal-year taxpayers. The dates in this cal- Nonpayroll taxes. File Form 945 to report held income tax for 2025. This due date ap-
+      endar apply whether you use a fiscal year or the income tax withheld for 2025 on all nonpay- plies only if you deposited the tax for the year
+      calendar year as your tax year. The only excep- roll items, including backup withholding and timely, properly, and in full.
+      6 Publication 509 (2026)
+    text_sha256: "3c2b2789af274ee2d0146f233053e572f2044e586f9e25e2dcd91a4285ac08c5"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+  - chunk_id: "irs_pub_509_2026_chunk_0007"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 7
+    heading: null
+    text: |
+      Page 7 of 14  Fileid: … cation-509/2026/a/xml/cycle06/source 11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      Federal unemployment (FUTA) tax. File Forms 1094-C and 1095-C for more informa- April 30
+      Form 940 for 2025. This due date applies tion about the information reporting require-
+      only if you deposited the tax for the year ments. Social security, Medicare, and withheld in-
+      timely, properly, and in full. come tax. File Form 941 for the first
+      March 16 quarter of 2026. Deposit or pay any undepos-
+      February 17 ited tax under the accuracy of deposits rule. If
+      Social security, Medicare, and withheld in- your tax liability is less than $2,500, you can
+      Social security, Medicare, and withheld in- come tax. If the monthly deposit rule pay it in full with a timely filed return. If you
+      come tax. If the monthly deposit rule applies, deposit the tax for payments made in deposited the tax for the quarter timely, prop-
+      applies, deposit the tax for payments made in February. erly, and in full, you have until May 11 to file
+      January. the return.
+      Nonpayroll withholding. If the monthly
+      Nonpayroll withholding. If the monthly deposit rule applies, deposit the tax for pay- Federal unemployment (FUTA) tax. De-
+      deposit rule applies, deposit the tax for pay- ments made in February. posit the tax owed through March if more
+      ments made in January. than $500.
+      February 18 March 31 May 11
+      Electronic filing of Forms W-2G. File
+      All employers. Begin withholding income copies of all the Forms W-2G you issued for Social security, Medicare, and withheld in-
+      tax from the pay of any employee who 2025. This due date applies only if you elec- come tax. File Form 941 for the first
+      claimed exemption from withholding in 2025, tronically file. Otherwise, see Payers of gam- quarter of 2026. This due date applies only if
+      but didn’t give you Form W-4 to continue the bling winnings under March 2, earlier. you deposited the tax for the quarter timely,
+      exemption this year. The due date for giving the recipient these properly, and in full.
+      forms remains February 2.
+      March 2 For information about filing Forms W-2G May 15
+      electronically, see Pub. 1220.
+      Payers of gambling winnings. File Form Social security, Medicare, and withheld in-
+      1096 along with Copy A of all the Forms Electronic filing of Forms 8027. File come tax. If the monthly deposit rule
+      W-2G you issued for 2025. Forms 8027 for 2025. This due date applies applies, deposit the tax for payments made in
+      If you file Forms W-2G electronically, your only if you electronically file. Otherwise, see April.
+      due date for filing them with the IRS will be ex- Large food and beverage establishment em-
+      tended to March 31. The due date for giving the ployers under March 2, earlier. Nonpayroll withholding. If the monthly
+      recipient these forms remains February 2. deposit rule applies, deposit the tax for pay-
+      Electronic filing of Forms 1094-C and ments made in April.
+      Health coverage reporting to IRS. If 1095-C and Forms 1094-B and 1095-B.
+      you’re an Applicable Large Employer, file pa- If you’re an Applicable Large Employer,
+      per Forms 1094-C, Transmittal of Em- file electronic Forms 1094-C and 1095-C with June 15
+      ployer-Provided Health Insurance Offer and the IRS. For all other providers of minimum Social security, Medicare, and withheld in-
+      Coverage Information Returns, and 1095-C essential coverage, file electronic Forms come tax. If the monthly deposit rule
+      with the IRS. For all other providers of mini- 1094-B and 1095-B with the IRS. Otherwise, applies, deposit the tax for payments made in
+      mum essential coverage, file paper Forms see Health coverage reporting to IRS under May.
+      1094-B, Transmittal of Health Coverage Infor- March 2, earlier.
+      mation Returns, and 1095-B with the IRS. If Nonpayroll withholding. If the monthly
+      you’re filing any of these forms with the IRS Second Quarter deposit rule applies, deposit the tax for pay-
+      electronically, your due date for filing them ments made in May.
+      will be extended to March 31. See the In- The second quarter is made up of April, May,
+      structions for Forms 1094-B and 1095-B, and and June. Third Quarter
+      the Instructions for Forms 1094-C and
+      1095-C for more information about the infor-
+      mation reporting requirements. April 15 The third quarter of a calendar year is made up
+      of July, August, and September.
+      Large food and beverage establishment Social security, Medicare, and withheld in-
+      employers. File Form 8027, Employer’s come tax. If the monthly deposit rule July 15
+      Annual Information Return of Tip Income and applies, deposit the tax for payments made in
+      Allocated Tips. Use Form 8027-T, Transmittal March. Social security, Medicare, and withheld in-
+      of Employer’s Annual Information Return of come tax. If the monthly deposit rule
+      Tip Income and Allocated Tips, to summarize Nonpayroll withholding. If the monthly applies, deposit the tax for payments made in
+      and transmit paper Forms 8027 if you have deposit rule applies, deposit the tax for pay- June.
+      more than one establishment. ments made in March.
+      Nonpayroll withholding. If the monthly
+      If you file Forms 8027 electronically, your Household employers. If you paid cash deposit rule applies, deposit the tax for pay-
+      due date for filing them with the IRS will be ex- wages of $2,800 or more in 2025 to a house- ments made in June.
+      tended to March 31. hold employee, you must file Schedule H
+      Health coverage reporting to employees. (Form 1040). If you’re required to file a federal
+      If you’re an Applicable Large Employer, income tax return (Form 1040 or Form July 31
+      provide Form 1095-C, Employer-Provided 1040-SR), file Schedule H (Form 1040) with
+      Health Insurance Offer and Coverage, to the return and report any household employ- Social security, Medicare, and withheld in-
+      ment taxes. Report any federal unemploy- come tax. File Form 941 for the second
+      full-time employees. For all other providers of
+      minimum essential coverage, provide Form ment (FUTA) tax on Schedule H (Form 1040) quarter of 2026. Deposit or pay any undepos-
+      if you paid total cash wages of $1,000 or ited tax under the accuracy of deposits rule. If
+      1095-B, Health Coverage, to responsible in-
+      dividuals. See the Instructions for Forms more in any calendar quarter of 2024 or 2025 your tax liability is less than $2,500, you can
+      1094-B and 1095-B, and the Instructions for to household employees. Also, report any in- pay it in full with a timely filed return. If you
+      come tax you withheld for your household deposited the tax for the quarter timely, prop-
+      employees. For more information, see Pub. erly, and in full, you have until August 10 to
+      926. file the return.
+      Publication 509 (2026) 7
+    text_sha256: "933be1efb33300f48e01cdd3a90073c51fe6ebdfa38875f2dd7bb611b07f3564"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+  - chunk_id: "irs_pub_509_2026_chunk_0008"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 8
+    heading: null
+    text: |
+      Page 8 of 14  Fileid: … cation-509/2026/a/xml/cycle06/source 11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      Certain small employers. Deposit any number of jobs worked during the year, and to register any wagering activity and to pay
+      undeposited tax if your tax liability is $2,500 other income, deductions, or credits. The an occupational tax on wagering. File
+      or more for 2026 but less than $2,500 for the 2027 revision of Form W-4 will be available at Form 11-C if you’re in the business of ac-
+      second quarter. IRS.gov/FormW4 by mid-December. Encour- cepting wagers, including conducting a
+      Federal unemployment (FUTA) tax. De- age your employees to use the IRS Tax With- wagering pool or lottery, or are an agent of
+      posit the tax owed through June if more than holding Estimator available at IRS.gov/ someone who accepts wagers. You must
+      $500. W4App. file the form before you begin accepting
+      wagers. After that, file the form by July 1 of
+      All employers. If you maintain an em- November 2 each year. Also, see Form 730 below.
+      ployee benefit plan, such as a pension, 2. Form 720, Quarterly Federal Excise Tax
+      profit-sharing, or stock bonus plan, file Form Social security, Medicare, and withheld in- Return. File this form by the last day of the
+      5500 or 5500-EZ for calendar year 2025. If come tax. File Form 941 for the third month following the calendar quarter. Use
+      you use a fiscal year as your plan year, file quarter of 2026. Deposit or pay any undepos- this form to report a wide variety of excise
+      the form by the last day of the seventh month ited tax under the accuracy of deposits rule. If taxes, including:
+      after the plan year ends. For more information your tax liability is less than $2,500, you can
+      on filing these forms, go to IRS.gov/ pay it in full with a timely filed return. If you a. Environmental taxes,
+      Form5500. deposited the tax for the quarter timely, prop-
+      erly, and in full, you have until November 10 b. Communications and air transporta-
+      August 10 to file the return. tion taxes,
+      c. Fuel taxes,
+      Social security, Medicare, and withheld in- Certain small employers. Deposit any
+      come tax. File Form 941 for the second undeposited tax if your tax liability is $2,500 d. Retail tax,
+      quarter of 2026. This due date applies only if or more for 2026 but less than $2,500 for the e. Ship passenger tax, and
+      you deposited the tax for the quarter timely, third quarter. f. Manufacturers taxes.
+      properly, and in full. Federal unemployment (FUTA) tax. De-
+      posit the tax owed through September if more 3. Form 730, Monthly Tax Return for Wagers.
+      August 17 than $500. Use this form to pay an excise tax on wa-
+      gers you accept. File this form for each
+      month by the last day of the following
+      Social security, Medicare, and withheld in- November 10 month. Also, see Form 11-C above.
+      come tax. If the monthly deposit rule
+      applies, deposit the tax for payments made in Social security, Medicare, and withheld in- 4. Form 2290, Heavy Highway Vehicle Use
+      July. come tax. File Form 941 for the third Tax Return. Use this form to pay the fed-
+      Nonpayroll withholding. If the monthly quarter of 2026. This due date applies only if eral use tax on heavy highway vehicles
+      deposit rule applies, deposit the tax for pay- you deposited the tax for the quarter timely, registered in your name. File this form by
+      ments made in July. properly, and in full. the last day of the month following the
+      month of the vehicle’s first taxable use in
+      September 15 November 16 the tax period. The tax period begins on
+      July 1 and ends the following June 30. You
+      must pay the full year’s tax on all vehicles
+      Social security, Medicare, and withheld in- Social security, Medicare, and withheld in-
+      come tax. If the monthly deposit rule come tax. If the monthly deposit rule you have in use during the month of July.
+      applies, deposit the tax for payments made in applies, deposit the tax for payments made in You must also pay a partial-year tax on
+      August. October. taxable vehicles that you put into use in a
+      month after July. For more information, see
+      the Instructions for Form 2290.
+      Nonpayroll withholding. If the monthly Nonpayroll withholding. If the monthly
+      deposit rule applies, deposit the tax for pay- deposit rule applies, deposit the tax for pay-
+      ments made in August. ments made in October. Fiscal-year taxpayers. The dates in this cal-
+      endar apply whether you use a fiscal year or the
+      Fourth Quarter December 15 calendar year as your tax year.
+      Adjustments for Saturday, Sunday, or legal
+      Social security, Medicare, and withheld in- holidays. Generally, if a due date falls on a
+      The fourth quarter of a calendar year is made come tax. If the monthly deposit rule Saturday, Sunday, or legal holiday, the due date
+      up of October, November, and December. applies, deposit the tax for payments made in is delayed until the next day that isn’t a Satur-
+      November. day, Sunday, or legal holiday. For excise taxes,
+      October 15 Nonpayroll withholding. If the monthly there are two exceptions to this rule.
+      deposit rule applies, deposit the tax for pay- • For deposits of regular method taxes, if
+      Social security, Medicare, and withheld in- ments made in November. the due date is a Saturday, Sunday, or legal
+      come tax. If the monthly deposit rule holiday, the due date is the immediately
+      applies, deposit the tax for payments made in preceding day that isn’t a Saturday, Sun-
+      September. Excise Tax Calendar day, or legal holiday.
+      • Under the special September deposit
+      Nonpayroll withholding. If the monthly rules, if the due date falls on a Saturday,
+      deposit rule applies, deposit the tax for pay- This tax calendar gives the due dates for filing the deposit is due on the preceding Friday.
+      ments made in September. returns and making deposits of excise taxes. If the due date falls on a Sunday, the de-
+      Use this calendar with Pub. 510. Also, see the posit is due on the following Monday. For
+      During November instructions for Forms 11-C, 720, 730, and 2290 more information, see the Instructions for
+      for more information. Form 720.
+      Income tax withholding. Encourage em-
+      ployees to fill out a new Form W-4 for 2027 if Forms you may need. The following is a list The Excise Tax Calendar has been adjusted for
+      they experienced any personal or financial and description of the excise tax forms you may all of these provisions.
+      changes. Examples of changes that could re- need. Regular method taxes. These are taxes,
+      quire a new Form W-4 include changing the 1. Form 11-C, Occupational Tax and Regis- other than alternative method taxes used for
+      filing status on a tax return, changing the tration Return for Wagering. Use this form communication and air transportation taxes,
+      8 Publication 509 (2026)
+    text_sha256: "6f2ccce53772c086213ad037f9a9c6c31d8c54e65fbe51ae0697a8f465cd392b"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+  - chunk_id: "irs_pub_509_2026_chunk_0009"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 9
+    heading: null
+    text: |
+      Page 9 of 14  Fileid: … cation-509/2026/a/xml/cycle06/source 11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      reported on Form 720 for which deposits are re- March 2 April 30
+      quired.
+      Wagering tax. File Form 730 and pay the Form 720 taxes. File Form 720 for the first
+      First Quarter tax on wagers accepted during January. quarter of 2026.
+      Heavy highway vehicle use tax. File Wagering tax. File Form 730 and pay the
+      The first quarter of a calendar year is made up Form 2290 and pay the tax for vehicles first tax on wagers accepted during March.
+      of January, February, and March. used in January. Heavy highway vehicle use tax. File
+      January 12 March 11 Form 2290 and pay the tax for vehicles first
+      used in March.
+      Communications and air transportation Communications and air transportation
+      taxes under the alternative method. taxes under the alternative method. May 12
+      Deposit the tax included in amounts billed or Deposit the tax included in amounts billed or
+      tickets sold during the first 15 days of Decem- tickets sold during the first 15 days of Febru- Communications and air transportation
+      ber 2025. ary. taxes under the alternative method.
+      Deposit the tax included in amounts billed or
+      January 14 March 13 tickets sold during the first 15 days of April.
+      Regular method taxes. Deposit the tax Regular method taxes. Deposit the tax May 14
+      for the last 16 days of December 2025. for the last 13 days of February. Regular method taxes. Deposit the tax
+      January 27 March 25 for the last 15 days of April.
+      Communications and air transportation Communications and air transportation May 28
+      taxes under the alternative method. taxes under the alternative method.
+      Deposit the tax included in amounts billed or Deposit the tax included in amounts billed or Communications and air transportation
+      tickets sold during the last 16 days of Decem- tickets sold during the last 13 days of Febru- taxes under the alternative method.
+      ber 2025. ary. Deposit the tax included in amounts billed or
+      tickets sold during the last 15 days of April.
+      January 29 March 27 May 29
+      Regular method taxes. Deposit the tax Regular method taxes. Deposit the tax
+      for the first 15 days of January. for the first 15 days of March. Regular method taxes. Deposit the tax
+      for the first 15 days of May.
+      February 2 March 31 June 1
+      Form 720 taxes. File Form 720 for the Wagering tax. File Form 730 and pay the
+      fourth quarter of 2025. tax on wagers accepted during February. Wagering tax. File Form 730 and pay the
+      tax on wagers accepted during April.
+      Wagering tax. File Form 730 and pay the Heavy highway vehicle use tax. File
+      tax on wagers accepted during December Form 2290 and pay the tax for vehicles first Heavy highway vehicle use tax. File
+      2025. used in February. Form 2290 and pay the tax for vehicles first
+      used in April.
+      Heavy highway vehicle use tax. File
+      Form 2290 and pay the tax for vehicles first Second Quarter
+      used in December 2025. June 10
+      The second quarter of a calendar year is made
+      February 11 up of April, May, and June. Communications and air transportation
+      taxes under the alternative method.
+      Communications and air transportation April 10 Deposit the tax included in amounts billed or
+      tickets sold during the first 15 days of May.
+      taxes under the alternative method.
+      Deposit the tax included in amounts billed or Communications and air transportation
+      tickets sold during the first 15 days of Janu- taxes under the alternative method. June 12
+      ary. Deposit the tax included in amounts billed or
+      tickets sold during the first 15 days of March. Regular method taxes. Deposit the tax
+      February 13 for the last 16 days of May.
+      April 14
+      Regular method taxes. Deposit the tax June 25
+      for the last 16 days of January. Regular method taxes. Deposit the tax
+      for the last 16 days of March. Communications and air transportation
+      February 25 taxes under the alternative method.
+      April 27 Deposit the tax included in amounts billed or
+      tickets sold during the last 16 days of May.
+      Communications and air transportation
+      taxes under the alternative method. Communications and air transportation
+      Deposit the tax included in amounts billed or taxes under the alternative method. June 29
+      tickets sold during the last 16 days of Janu- Deposit the tax included in amounts billed or
+      ary. tickets sold during the last 16 days of March. Regular method taxes. Deposit the tax
+      for the first 15 days of June.
+      February 27 April 29
+      Regular method taxes. Deposit the tax Regular method taxes. Deposit the tax
+      for the first 15 days of February. for the first 15 days of April.
+      Publication 509 (2026) 9
+    text_sha256: "74b620a3a4fc6c16e67cc6d00fe9046906a2ba442d8a05f9054e535c3f66742d"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+  - chunk_id: "irs_pub_509_2026_chunk_0010"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 10
+    heading: null
+    text: |
+      Page 10 of 14  Fileid: … cation-509/2026/a/xml/cycle06/source 11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      June 30 August 12 September 30
+      Wagering tax. File Form 730 and pay the Communications and air transportation Wagering tax. File Form 730 and pay the
+      tax on wagers accepted during May. taxes under the alternative method. tax on wagers accepted during August.
+      Heavy highway vehicle use tax. File Deposit the tax included in amounts billed or
+      Form 2290 and pay the tax for vehicles first tickets sold during the first 15 days of July. Heavy highway vehicle use tax. File
+      Form 2290 and pay the tax for vehicles first
+      used in May. August 14 used in August.
+      Floor stocks tax for ozone-depleting chemi-
+      cals (IRS No. 20). Deposit the tax for Regular method taxes. Deposit the tax Fourth Quarter
+      January 1, 2026. for the last 16 days of July.
+      The fourth quarter of a calendar year is made
+      Third Quarter August 26 up of October, November, and December.
+      The third quarter of a calendar year is made up Communications and air transportation
+      of July, August, and September. taxes under the alternative method. October 13
+      Deposit the tax included in amounts billed or
+      July 1 tickets sold during the last 16 days of July. Communications and air transportation
+      taxes under the alternative method (spe-
+      cial September deposit rule). Deposit
+      Occupational excise taxes. File Form August 28 the tax included in amounts billed or tickets
+      11-C to register and pay the annual tax if sold during the period beginning September
+      you’re in the business of accepting wagers. Regular method taxes. Deposit the tax 12 and ending September 15.
+      for the first 15 days of August.
+      July 10 August 31 October 14
+      Communications and air transportation Regular method taxes (special September
+      taxes under the alternative method. Heavy highway vehicle use tax. File deposit rule). Deposit the tax for the
+      Deposit the tax included in amounts billed or Form 2290 and pay the full year’s tax on all last 4 days of September.
+      tickets sold during the first 15 days of June. vehicles you have in use during the month of
+      July. October 27
+      July 14 Wagering tax. File Form 730 and pay the
+      tax on wagers accepted during July. Communications and air transportation
+      Regular method taxes. Deposit the tax taxes under the alternative method.
+      for the last 15 days of June. September 10 Deposit the tax included in amounts billed or
+      tickets sold during the last 15 days of Sep-
+      July 27 Communications and air transportation tember.
+      taxes under the alternative method.
+      Communications and air transportation Deposit the tax included in amounts billed or October 29
+      taxes under the alternative method. tickets sold during the first 15 days of August.
+      Deposit the tax included in amounts billed or Regular method taxes. Deposit the tax
+      tickets sold during the last 15 days of June. September 14 for the first 15 days of October.
+      July 29 Regular method taxes. Deposit the tax November 2
+      for the last 16 days of August.
+      Regular method taxes. Deposit the tax Form 720 taxes. File Form 720 for the
+      for the first 15 days of July. September 25 third quarter of 2026.
+      Wagering tax. File Form 730 and pay the
+      July 31 Communications and air transportation tax on wagers accepted during September.
+      taxes under the alternative method.
+      Form 720 taxes. File Form 720 for the Deposit the tax included in amounts billed or Heavy highway vehicle use tax. File
+      second quarter of 2026. tickets sold during the last 16 days of August. Form 2290 and pay the tax for vehicles first
+      used in September.
+      Patient-Centered Outcomes Research
+      (PCOR) Fee. File Form 720 annually to September 29
+      report and pay the fee on the second quarter November 12
+      Form 720 no later than July 31 of the calen- Regular method taxes. Deposit the tax
+      dar year immediately following the last day of for the first 15 days of September. Communications and air transportation
+      the policy year or plan year to which the fee taxes under the alternative method.
+      applies. If you file Form 720 only to report the Regular method taxes (special September Deposit the tax included in amounts billed or
+      fee, don’t file Form 720 for the first, third, or deposit rule). Deposit the tax for the tickets sold during the first 15 days of Octo-
+      fourth quarters of the year. period beginning September 16 and ending ber.
+      September 26.
+      Wagering tax. File Form 730 and pay the
+      tax on wagers accepted during June. Communications and air transportation November 13
+      taxes under the alternative method (spe-
+      Heavy highway vehicle use tax. File cial September deposit rule). Deposit Regular method taxes. Deposit the tax
+      for the last 16 days of October.
+      Form 2290 and pay the tax for vehicles first the tax included in amounts billed or tickets
+      used in June. sold during the period beginning September
+      1 and ending September 11. November 25
+      Communications and air transportation
+      taxes under the alternative method.
+      Deposit the tax included in amounts billed or
+      10 Publication 509 (2026)
+    text_sha256: "7ea0a8dd49862427da8f71513090f2840cb7f4986cf03d09c423e6b5a038fb7f"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+  - chunk_id: "irs_pub_509_2026_chunk_0011"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 11
+    heading: null
+    text: |
+      Page 11 of 14  Fileid: … cation-509/2026/a/xml/cycle06/source 11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      tickets sold during the last 16 days of Octo- Deposit the tax included in amounts billed or December 29
+      ber. tickets sold during the first 15 days of Novem-
+      ber. Regular method taxes. Deposit the tax
+      November 27 for the first 15 days of December.
+      December 14
+      Regular method taxes. Deposit the tax December 31
+      for the first 15 days of November. Regular method taxes. Deposit the tax
+      for the last 15 days of November. Wagering tax. File Form 730 and pay the
+      November 30 tax on wagers accepted during November.
+      December 28
+      Wagering tax. File Form 730 and pay the Heavy highway vehicle use tax. File
+      tax on wagers accepted during October. Communications and air transportation Form 2290 and pay the tax for vehicles first
+      Heavy highway vehicle use tax. File taxes under the alternative method. used in November.
+      Form 2290 and pay the tax for vehicles first Deposit the tax included in amounts billed or
+      used in October. tickets sold during the last 15 days of Novem-
+      ber.
+      December 10
+      Communications and air transportation
+      taxes under the alternative method.
+      Table 2. Due Dates for Electronic Funds Transfer of Taxes for 2026 Under the Semiweekly Rule
+      First Quarter: Second Quarter: Third Quarter: Fourth Quarter:
+      Payroll Date Due Date Payroll Date Due Date Payroll Date Due Date Payroll Date Due Date
+      Jan. 1–2 Jan. 7 Apr. 1–3 Apr. 8 July 1–3 July 8 Oct. 1–2 Oct. 7
+      Jan. 3–6 Jan. 9 Apr. 4–7 Apr. 10 July 4–7 July 10 Oct. 3–6 Oct. 9
+      Jan. 7–9 Jan. 14 Apr. 8–10 Apr. 15 July 8–10 July 15 Oct. 7–9 Oct. 15
+      Jan. 10–13 Jan. 16 Apr. 11–14 Apr. 20 July 11–14 July 17 Oct. 10–13 Oct. 16
+      Jan. 14–16 Jan. 22 Apr. 15–17 Apr. 22 July 15–17 July 22 Oct. 14–16 Oct. 21
+      Jan. 17–20 Jan. 23 Apr. 18–21 Apr. 24 July 18–21 July 24 Oct. 17–20 Oct. 23
+      Jan. 21–23 Jan. 28 Apr. 22–24 Apr. 29 July 22–24 July 29 Oct. 21–23 Oct. 28
+      Jan. 24–27 Jan. 30 Apr. 25–28 May 1 July 25–28 July 31 Oct. 24–27 Oct. 30
+      Jan. 28–30 Feb. 4 Apr. 29–May 1 May 6 July 29–31 Aug. 5 Oct. 28–30 Nov. 4
+      Jan. 31– Feb. 3 Feb. 6 May 2–5 May 8 Aug. 1–4 Aug. 7 Oct. 31–Nov. 3 Nov. 6
+      Feb. 4–6 Feb. 11 May 6–8 May 13 Aug. 5–7 Aug. 12 Nov. 4–6 Nov. 12
+      Feb. 7–10 Feb. 13 May 9–12 May 15 Aug. 8–11 Aug. 14 Nov. 7–10 Nov. 16
+      Feb. 11–13 Feb. 19 May 13–15 May 20 Aug. 12–14 Aug. 19 Nov. 11–13 Nov. 18
+      Feb. 14–17 Feb. 20 May 16–19 May 22 Aug. 15–18 Aug. 21 Nov. 14–17 Nov. 20
+      Feb. 18–20 Feb. 25 May 20–22 May 28 Aug. 19–21 Aug. 26 Nov. 18–20 Nov. 25
+      Feb. 21–24 Feb. 27 May 23–26 May 29 Aug. 22–25 Aug. 28 Nov. 21–24 Nov. 30
+      Feb. 25–27 Mar. 4 May 27–29 June 3 Aug. 26–28 Sept. 2 Nov. 25–27 Dec. 2
+      Feb. 28–Mar. 3 Mar. 6 May 30–June 2 June 5 Aug. 29–Sept. 1 Sept. 4 Nov. 28–Dec. 1 Dec. 4
+      Mar. 4–6 Mar. 11 June 3–5 June 10 Sept. 2–4 Sept. 10 Dec. 2–4 Dec. 9
+      Mar. 7–10 Mar. 13 June 6–9 June 12 Sept. 5–8 Sept. 11 Dec. 5–8 Dec. 11
+      Mar. 11–13 Mar. 18 June 10–12 June 17 Sept. 9–11 Sept. 16 Dec. 9–11 Dec. 16
+      Mar. 14–17 Mar. 20 June 13–16 June 22 Sept. 12–15 Sept. 18 Dec. 12–15 Dec. 18
+      Mar. 18–20 Mar. 25 June 17–19 June 24 Sept. 16–18 Sept. 23 Dec. 16–18 Dec. 23
+      Mar. 21–24 Mar. 27 June 20–23 June 26 Sept. 19–22 Sept. 25 Dec. 19–22 Dec. 28
+      Mar. 25–27 Apr. 1 June 24–26 July 1 Sept. 23–25 Sept. 30 Dec. 23–25 Dec. 30
+      Mar. 28–31 Apr. 3 June 27–30 July 6 Sept. 26–29 Oct. 2 Dec. 26–29 Jan. 4
+      Sept. 30 Oct. 7 Dec. 30–31 Jan. 6
+      Note. This calendar reflects all legal holidays.
+      Publication 509 (2026) 11
+    text_sha256: "52994588310c44e610281c5bfaefe635f1abcfcad25bacdd0c7974297ca7bdf6"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+  - chunk_id: "irs_pub_509_2026_chunk_0012"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 12
+    heading: null
+    text: |
+      Page 12 of 14  Fileid: … cation-509/2026/a/xml/cycle06/source 11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      Using online tools to help prepare your re- Business tax account. If you are a sole pro-
+      How To Get Tax Help turn. Go to IRS.gov/Tools for the following. prietor, a partnership, an S corporation, a C cor-
+      • The Earned Income Tax Credit Assistant poration, or a single-member limited liability
+      (IRS.gov/EITCAssistant) determines if company (LLC), you can view your tax informa-
+      If you have questions about a tax issue; need you’re eligible for the earned income credit tion on record with the IRS and do more with a
+      help preparing your tax return; or want to down- (EITC). business tax account. Go to IRS.gov/
+      load free publications, forms, or instructions, go • The Online EIN Application (IRS.gov/EIN) BusinessAccount for more information.
+      to IRS.gov to find resources that can help you helps you get an employer identification
+      right away. number (EIN) at no cost. IRS social media. Go to IRS.gov/SocialMedia
+      • The Tax Withholding Estimator (IRS.gov/ to see the various social media tools the IRS
+      Tax reform. Tax reform legislation impacting W4App) makes it easier for you to estimate uses to share the latest information on tax
+      federal taxes, credits, and deductions was the federal income tax you want your em- changes, scam alerts, initiatives, products, and
+      enacted in P.L. 119-21, commonly known as the ployer to withhold from your paycheck. services. At the IRS, privacy and security are
+      One Big Beautiful Bill Act, on July 4, 2025. Go This is tax withholding. See how your with- our highest priority. We use these tools to share
+      to IRS.gov/OBBB for more information and up- holding affects your refund, take-home pay, public information with you. Don’t post your so-
+      dates on how this legislation affects your taxes. or tax due. cial security number (SSN) or other confidential
+      Preparing and filing your tax return.  After • The Sales Tax Deduction Calculator information on social media sites. Always pro-
+      (IRS.gov/SalesTax) figures the amount you tect your identity when using any social net-
+      receiving all your wage and earnings state-
+      ments (Forms W-2, W-2G, 1099-R, 1099-MISC, can claim if you itemize deductions on working site.
+      1099-NEC, etc.); unemployment compensation Schedule A (Form 1040). The following IRS YouTube channels provide
+      statements (by mail or in a digital format) or short, informative videos on various tax-related
+      Getting answers to your tax questions. On
+      other government payment statements (Form topics in English, Spanish, and ASL.
+      IRS.gov, you can get up-to-date information on
+      1099-G); and interest, dividend, and retirement • Youtube.com/irsvideos.
+      current events and changes in tax law.
+      statements from banks and investment firms • Youtube.com/irsvideosmultilingua.
+      • IRS.gov/Help: A variety of tools to help you
+      (Forms 1099), you have several options to • Youtube.com/irsvideosASL.
+      get answers to some of the most common
+      choose from to prepare and file your tax return. tax questions.
+      You can prepare the tax return yourself, see if Online tax information in other languages.
+      • IRS.gov/ITA: The Interactive Tax Assistant,
+      you qualify for free tax preparation, or hire a tax You can find information on IRS.gov/
+      a tool that will ask you questions and,
+      professional to prepare your return. MyLanguage if English isn’t your native lan-
+      based on your input, provide answers on a guage.
+      Free options for tax preparation.  Your op- number of tax topics.
+      tions for preparing and filing your return online • IRS.gov/Forms: Find forms, instructions, Over-the-Phone Interpreter (OPI) Service.
+      or in your local community, if you qualify, include and publications. You will find details on The IRS offers the OPI Service to taxpayers
+      the following. the most recent tax changes and interac- needing language interpretation. The OPI Serv-
+      • tive links to help you find answers to your ice is available at Taxpayer Assistance Centers
+      Free File. This program lets you prepare questions. (TACs), most IRS offices, and every VITA/TCE
+      and file your federal individual income tax • You may also be able to access tax infor- tax return site. This service is available in Span-
+      return for free using software or Free File mation in your e-filing software. ish, Mandarin, Cantonese, Korean, Vietnam-
+      Fillable Forms. However, state tax prepara- ese, Russian, and Haitian Creole.
+      tion may not be available through Free File. Need someone to prepare your tax return?
+      Go to IRS.gov/FreeFile to see if you qualify There are various types of tax return preparers, Accessibility Helpline available for taxpay-
+      for free online federal tax preparation, e-fil- including enrolled agents, certified public ac- ers with disabilities. Taxpayers who need in-
+      ing, and direct deposit or payment options. countants (CPAs), accountants, and many oth- formation about accessibility services can call
+      • VITA. The Volunteer Income Tax Assis- ers who don’t have professional credentials. If 833-690-0598. The Accessibility Helpline can
+      tance (VITA) program offers free tax help to you choose to have someone prepare your tax answer questions related to current and future
+      people with low-to-moderate incomes, per- return, choose that preparer wisely. A paid tax accessibility products and services available in
+      sons with disabilities, and limited-Eng- preparer is: alternative media formats (for example,
+      lish-speaking taxpayers who need help • Primarily responsible for the overall sub- braille-ready, large print, audio, etc.). The Ac-
+      preparing their own tax returns. Go to stantive accuracy of your return, cessibility Helpline doesn’t have access to your
+      IRS.gov/VITA, download the free IRS2Go • Required to sign the return, and IRS account. For help with tax law, refunds, or
+      app, or call 800-906-9887 for information • Required to include their preparer tax iden- account-related issues, go to IRS.gov/
+      on free tax return preparation. tification number (PTIN). LetUsHelp.
+      • TCE. The Tax Counseling for the Elderly
+      (TCE) program offers free tax help for all Caution: Although the tax preparer always Alternative media preference. Form 9000,
+      taxpayers, particularly those who are 60 signs the return, you’re ultimately responsible Alternative Media Preference, or Form
+      years of age and older. TCE volunteers for providing all the information required for the 9000(SP) allows you to elect to receive certain
+      specialize in answering questions about preparer to accurately prepare your return and types of written correspondence in the following
+      pensions and retirement-related issues for the accuracy of every item reported on the formats.
+      unique to seniors. Go to IRS.gov/TCE or return. Anyone paid to prepare tax returns for • Standard Print.
+      download the free IRS2Go app for informa- others should have a thorough understanding of
+      tion on free tax return preparation. tax matters. For more information on how to • Large Print.
+      • MilTax. Members of the U.S. Armed choose a tax preparer, go to Tips for Choosing • Braille.
+      Forces and qualified veterans may use Mil- a Tax Preparer on IRS.gov.
+      Tax, a free tax service offered by the De- • Audio (MP3).
+      partment of Defense through Military One- Employers can register to use Business • Plain Text File (TXT).
+      Source. For more information, go to Services Online. The Social Security Adminis- • Braille-Ready File (BRF).
+      MilitaryOneSource (MilitaryOneSource.mil/ tration (SSA) offers online service at SSA.gov/
+      MilTax). employer for fast, free, and secure W-2 filing op- Disasters. Go to IRS.gov/DisasterRelief to re-
+      Also, the IRS offers Free Fillable Forms, tions to CPAs, accountants, enrolled agents, view the available disaster tax relief.
+      which can be completed online and then and individuals who process Form W-2, and
+      e-filed regardless of income. Form W-2c, Corrected Wage and Tax State- Getting tax forms and publications. Go to
+      ment. IRS.gov/Forms to view, download, or print most
+      of the forms, instructions, and publications you
+      12 Publication 509 (2026)
+    text_sha256: "a5de2278768abc593f002d44c357ce9a362e4ce478af696f068aa18040adc4c7"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+  - chunk_id: "irs_pub_509_2026_chunk_0013"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 13
+    heading: null
+    text: |
+      Page 13 of 14  Fileid: … cation-509/2026/a/xml/cycle06/source 11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      may need. Or you can go to IRS.gov/ fected if your SSN is used to file a fraudu- Note: The IRS uses the latest encryption tech-
+      OrderForms to place an order. lent return or to claim a refund or credit. nology to ensure that the electronic payments
+      you make online, by phone, or from a mobile
+      Mobile-friendly forms.  You’ll need an IRS • The IRS doesn’t initiate contact with tax-
+      Online Account (OLA) to complete mo- payers by email, text messages (including device using the IRS2Go app are safe and se-
+      cure. Paying electronically is quick and easy.
+      bile-friendly forms that require signatures. You’ll shortened links), telephone calls, or social
+      have the option to submit your form(s) online or media channels to request or verify per-
+      download a copy for mailing. You’ll need scans sonal or financial information. This includes What if I can’t pay now? Go to IRS.gov/
+      of your documents to support your submission. requests for personal identification num- Payments for more information about your op-
+      Go to IRS.gov/MobileFriendlyForms for more in- bers (PINs), passwords, or similar informa- tions.
+      formation. tion for credit cards, banks, or other finan- • Apply for an online payment agreement
+      cial accounts. (IRS.gov/OPA) to meet your tax obligation
+      in monthly installments if you can’t pay
+      Getting tax publications and instructions in • Go to IRS.gov/IdentityTheft, the IRS Iden-
+      eBook format. Download and view most tax tity Theft Central webpage, for information your taxes in full today. Once you complete
+      publications and instructions (including Pub. on identity theft and data security protec- the online process, you will receive imme-
+      509) on mobile devices as eBooks at IRS.gov/ tion for taxpayers, tax professionals, and diate notification of whether your agree-
+      eBooks. businesses. If your SSN has been lost or ment has been approved.
+      • Use the Offer in Compromise Pre-Qualifier
+      IRS eBooks have been tested using Apple’s stolen or you suspect you’re a victim of
+      iBooks for iPad. Our eBooks haven’t been tes- tax-related identity theft, you can learn to see if you can settle your tax debt for
+      less than the full amount you owe. For
+      ted on other dedicated eBook readers, and what steps you should take.
+      eBook functionality may not operate as inten- • Get an Identity Protection PIN (IP PIN). IP more information on the Offer in Compro-
+      ded. PINs are six-digit numbers assigned to tax- mise program, go to IRS.gov/OIC.
+      payers to help prevent the misuse of their
+      Access your online account (individual tax- SSNs on fraudulent federal income tax re- Filing an amended return. Go to IRS.gov/
+      1040X for information and updates.
+      payers only). Go to IRS.gov/Account to se- turns. When you have an IP PIN, it pre-
+      curely access information about your federal tax vents someone else from filing a tax return
+      account. with your SSN. To learn more, go to Checking the status of your amended re-
+      • View the amount you owe and a break- IRS.gov/IPPIN. turn. Go to IRS.gov/WMAR to track the status
+      of Form 1040-X amended returns.
+      down by tax year.
+      • See payment plan details or apply for a Ways to check on the status of your refund.
+      new payment plan. • Go to IRS.gov/Refunds. Caution: It can take up to 3 weeks from the
+      date you filed your amended return for it to
+      • Make a payment or view 5 years of pay- • Download the official IRS2Go app to your
+      ment history and any pending or sched- mobile device to check your refund status. show up in our system, and processing it can
+      uled payments. • Call the automated refund hotline at take up to 16 weeks.
+      • Access your tax records, including key 800-829-1954. Understanding an IRS notice or letter
+      data from your most recent tax return, and
+      transcripts. Caution: The IRS can’t issue refunds before you’ve received. Go to IRS.gov/Notices to find
+      • View digital copies of select notices from mid-February for returns that claimed the EITC additional information about responding to an
+      the IRS. or the additional child tax credit (ACTC). This IRS notice or letter.
+      • Approve or reject authorization requests applies to the entire refund, not just the portion
+      from tax professionals. associated with these credits. IRS Document Upload Tool.  You may be
+      able to use the Document Upload Tool to re-
+      Get a transcript of your return. With an on- Making a tax payment. The IRS recommends spond digitally to eligible IRS notices and letters
+      line account, you can access a variety of infor- paying electronically whenever possible. Op- by securely uploading required documents on-
+      mation to help you during the filing season. You tions to pay electronically are included in the list line through IRS.gov. For more information, go
+      to IRS.gov/DUT.
+      can get a transcript, review your most recently below. Payments of U.S. tax must be remitted to
+      filed tax return, and get your adjusted gross in- the IRS in U.S. dollars. Digital assets are not
+      come. Create or access your online account at accepted. Go to IRS.gov/Payments for informa- Schedule LEP. You can use Schedule LEP
+      IRS.gov/Account. tion on how to make a payment using any of the (Form 1040), Request for Change in Language
+      following options. Preference, to state a preference to receive no-
+      tices, letters, or other written communications
+      Tax Pro Account. This tool lets your tax pro- • IRS Direct Pay: Pay taxes from your bank
+      fessional submit an authorization request to ac- account. It’s free and secure, and no from the IRS in an alternative language. You
+      may not immediately receive written communi-
+      cess your individual taxpayer IRS OLA. For sign-in is required. You can change or can-
+      more information, go to IRS.gov/ cel within 2 days of scheduled payment. cations in the requested language. The IRS’s
+      TaxProAccount. • Debit Card, Credit Card, or Digital Wallet: commitment to LEP taxpayers is part of a
+      Choose an approved payment processor multi-year timeline that began providing transla-
+      tions in 2023. You will continue to receive com-
+      Using direct deposit. The safest and easiest to pay online or by phone.
+      way to receive a tax refund is to e-file and • Electronic Funds Withdrawal: Schedule a munications, including notices and letters, in
+      choose direct deposit, which securely and elec- payment when filing your federal taxes us- English until they are translated to your prefer-
+      red language.
+      tronically transfers your refund directly into your ing tax return preparation software or
+      financial account. Direct deposit also avoids the through a tax professional.
+      possibility that your check could be lost, stolen, • Electronic Federal Tax Payment System: Contacting your local TAC. Keep in mind,
+      destroyed, or returned undeliverable to the IRS. This is the best option for businesses. En- many questions can be answered on IRS.gov
+      without visiting a TAC. Go to IRS.gov/LetUsHelp
+      Eight in 10 taxpayers use direct deposit to re- rollment is required.
+      ceive their refunds. If you don’t have a bank ac- • Check or Money Order: Mail your payment for the topics people ask about most. If you still
+      count, go to IRS.gov/DirectDeposit for more in- to the address listed on the notice or in- need help, TACs provide tax help when a tax is-
+      sue can’t be handled online or by phone. All
+      formation on where to find a bank or credit structions.
+      union that can open an account online. • Cash: You may be able to pay your taxes TACs now provide service by appointment, so
+      with cash at a participating retail store. you’ll know in advance that you can get the
+      service you need without long wait times. Be-
+      Reporting and resolving your tax-related • Same-Day Wire: You may be able to do
+      identity theft issues. same-day wire from your financial institu- fore you visit, go to IRS.gov/TAC to find the
+      nearest TAC and to check hours, available serv-
+      • Tax-related identity theft happens when tion. Contact your financial institution for
+      someone steals your personal information availability, cost, and time frames. ices, and appointment options. Or on the
+      IRS2Go app, under the Stay Connected tab,
+      to commit tax fraud. Your taxes can be af-
+      Publication 509 (2026) 13
+    text_sha256: "bcd014a4b84b1ad652a962367ae5cf6d90121436ef73cf77d62448f83f601f0b"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"
+  - chunk_id: "irs_pub_509_2026_chunk_0014"
+    source_id: "irs_pub_509_2026"
+    product_id: "p509"
+    title: "Tax Calendars"
+    pages:
+      - 14
+    heading: null
+    text: |
+      Page 14 of 14  Fileid: … cation-509/2026/a/xml/cycle06/source 11:33 - 2-Dec-2025
+      The type and rule above prints on all proofs including departmental reproduction proofs. MUST be removed before printing.
+      choose the Contact Us option and click on “Lo- How Can TAS Help Me? www.IRS.gov/SAMS. (Be sure not to in-
+      cal Offices.” clude any personal identifiable informa-
+      TAS can help you resolve problems that you tion.)
+      ——————————————————— haven’t been able to resolve with the IRS on
+      your own. Always try to resolve your problem
+      Below is a message to you from the Tax- with the IRS first, but if you can’t, then come to How Do I Contact TAS?
+      payer Advocate Service, an independent organ- TAS. Our services are free.
+      ization established by Congress. • TAS helps all taxpayers (and their repre- TAS has offices in every state, the District of
+      sentatives), including individuals, busi- Columbia, and Puerto Rico. To find your local
+      The Taxpayer Advocate nesses, and exempt organizations. You advocate’s number:
+      Service (TAS) Is Here To may be eligible for TAS help if your IRS • Go to www.TaxpayerAdvocate.IRS.gov/
+      Help You problem is causing financial difficulty, if Contact-Us,
+      you’ve tried and been unable to resolve • Check your local directory, or
+      • Call TAS toll free at 877-777-4778.
+      What Is the Taxpayer Advocate your issue with the IRS, or if you believe an
+      Service? IRS system, process, or procedure just
+      isn’t working as it should. What Are My Rights as a
+      Taxpayer?
+      The Taxpayer Advocate Service (TAS) is an in­ • To get help any time with general tax top-
+      dependent organization within the Internal ics, visit www.TaxpayerAdvocate.IRS.gov.
+      Revenue Service (IRS). TAS helps taxpayers re- The site can help you with common tax is- The Taxpayer Bill of Rights describes ten basic
+      solve problems with the IRS, makes administra- sues and situations, such as what to do if rights that all taxpayers have when dealing with
+      the IRS. Go to www.TaxpayerAdvocate.IRS.gov/
+      tive and legislative recommendations to prevent you make a mistake on your return or if you
+      or correct the problems, and protects taxpayer get a notice from the IRS. Taxpayer-Rights for more information about the
+      rights, what they mean to you, and how they ap-
+      rights. We work to ensure that every taxpayer is • TAS works to resolve large-scale (sys-
+      treated fairly and that you know and understand temic) problems that affect many taxpay- ply to specific situations you may encounter
+      your rights under the Taxpayer Bill of Rights. We ers. You can report systemic issues at with the IRS. TAS strives to protect taxpayer
+      rights and ensure the IRS is administering the
+      are Your Voice at the IRS. tax law in a fair and equitable way.
+      14 Publication 509 (2026)
+    text_sha256: "df6c3ee3d65b6146f40e49299a5cd04a403d60dabbfce978173295abdd2b1c0c"
+    source_url: "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    pdf_sha256: "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb"

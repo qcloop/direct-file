@@ -1,0 +1,259 @@
+tax_year: 2026
+jurisdiction: federal
+status: draft
+human_approvals: []
+scope: Source acquisition, extraction, and impact review; existing calculation graph
+  retained.
+changes:
+- change_id: final_2026_schedule_c_se_forms
+  status: draft
+  kind: source_review
+  summary: Acquired final 2026 Schedule C and SE forms. Schedule SE page 1 corroborates
+    the existing $184,500 wage base, 92.35% multiplier, $400 threshold, 12.4%/2.9%
+    rates, and half-SE-tax deduction.
+  required_action: Reconcile supported graph facts and output labels. Additional optional
+    methods and filing-backend PDF mappings remain outside this run.
+  source_refs:
+  - source_id: irs_form_schedule_c_2026
+    chunk_id: irs_form_schedule_c_2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: 224623e70b16ee6ef729d24e712ac2c6c700432fed5fc6fe19b85b0126744489
+  - source_id: irs_form_schedule_se_2026
+    chunk_id: irs_form_schedule_se_2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: 7db8447319351c0d4138db90f9e34843daac7bb1ef65f58b1899fc7a1c253ec1
+  runtime_disposition: Review pending; no calculation or evidence-schema change applied
+    in this acquisition run.
+- change_id: publication_1099_source_identity
+  status: draft
+  kind: source_review
+  summary: Publication 1099 replaces the general information-return instructions for
+    tax year 2026, processing year 2027.
+  required_action: Retain the new publication identity and migration notice in evidence-authority
+    mappings.
+  source_refs:
+  - source_id: irs_pub_1099_transition_2026
+    chunk_id: irs_pub_1099_transition_2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: 4267cc2583071d913ab9beacdc1b7874863b180a2f088760ccced6bc2377576e
+  - source_id: irs_pub_1099_2026
+    chunk_id: irs_pub_1099_2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: a67be4bfa19525507587b672e048547d47c382fbc04cfd5d1c3e43d9ff0210be
+  runtime_disposition: Review pending; no calculation or evidence-schema change applied
+    in this acquisition run.
+- change_id: dec2026_information_return_boxes
+  status: draft
+  kind: source_review
+  summary: Printed December 2026 revisions are verified for 1099-K/NEC/MISC. NEC compensation
+    is box 1a; new cash-tip, occupation-code, and overtime boxes require review.
+  required_action: Review provider field contracts, income deduplication, and unsupported
+    special deductions before extending mappings. NEC 1b/1c/1d; MISC 13a/13b/14; K
+    1c/1d must not be blindly summed with gross income. AcroForm field names are inventoried
+    separately.
+  source_refs:
+  - source_id: irs_form_1099_nec_dec2026
+    chunk_id: irs_form_1099_nec_dec2026_chunk_0002
+    pages:
+    - 2
+    text_sha256: f8e95f4a9e993c7da507b737787cdfe2cd3aea7fc6acf328f3d3ff7606a9c9a0
+  - source_id: irs_form_1099_misc_dec2026
+    chunk_id: irs_form_1099_misc_dec2026_chunk_0002
+    pages:
+    - 2
+    text_sha256: a0b51d8023dec14ff0ae007bafbdc8ed21e8b190b8c4f550dfdd3ea38d507bf7
+  - source_id: irs_form_1099_k_dec2026
+    chunk_id: irs_form_1099_k_dec2026_chunk_0002
+    pages:
+    - 2
+    text_sha256: 08c3c052787976cadc2ee201112b81a2ba166dc3ac7b49a8d803b12b80f93239
+  - source_id: irs_instructions_1099_misc_nec_dec2026
+    chunk_id: irs_instructions_1099_misc_nec_dec2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: c212b9b881806f44cee005e47a4a3ba167ea031bdd97d811ae1cfa149b114721
+  - source_id: irs_instructions_1099_k_dec2026
+    chunk_id: irs_instructions_1099_k_dec2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: 2ed19621aa2f0183bccc6da121291feb7ec367d8e42263de0fc2e8151d712aad
+  runtime_disposition: Review pending; no calculation or evidence-schema change applied
+    in this acquisition run.
+- change_id: information_return_thresholds
+  status: draft
+  kind: source_review
+  summary: The December 2026 MISC/NEC instructions describe a $2,000 reporting threshold
+    for certain payments; K instructions describe the TPSO $20,000 and more-than-200-transactions
+    exception.
+  required_action: Review payer reporting requirements separately from the recipient
+    income-tax rules. Never use reporting thresholds to suppress otherwise taxable
+    income.
+  source_refs:
+  - source_id: irs_instructions_1099_misc_nec_dec2026
+    chunk_id: irs_instructions_1099_misc_nec_dec2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: c212b9b881806f44cee005e47a4a3ba167ea031bdd97d811ae1cfa149b114721
+  - source_id: irs_instructions_1099_k_dec2026
+    chunk_id: irs_instructions_1099_k_dec2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: 2ed19621aa2f0183bccc6da121291feb7ec367d8e42263de0fc2e8151d712aad
+  runtime_disposition: Review pending; no calculation or evidence-schema change applied
+    in this acquisition run.
+- change_id: 1040_es_unrevised_salt_erratum
+  status: draft
+  kind: source_review
+  summary: The 2026 SALT reminder is corrected on a separate HTML page; IRS says the
+    1040-ES PDF will not be revised.
+  required_action: Keep the notice linked to the unchanged PDF and independently monitored.
+    Itemized deductions remain outside the planner calculation scope.
+  source_refs:
+  - source_id: irs_1040_es_salt_correction_2026
+    chunk_id: irs_1040_es_salt_correction_2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: f2ded83df49fa38b4f4d5cbd2c96c69c4bcb08a02190e0b4db477087773d9d3a
+  runtime_disposition: Review pending; no calculation or evidence-schema change applied
+    in this acquisition run.
+- change_id: 1040_es_mailing_address_correction
+  status: draft
+  kind: source_review
+  summary: IRS says the PDF was updated for addresses and identifies downloads before
+    February 13, 2026 as affected.
+  required_action: Use the pinned current PDF and notice together if authoring payment-voucher
+    guidance.
+  source_refs:
+  - source_id: irs_1040_es_address_correction_2026
+    chunk_id: irs_1040_es_address_correction_2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: f6e32bf196025924fecf211a0ea1e9c50cd9b96a39657f74157827be01db052d
+  runtime_disposition: Review pending; no calculation or evidence-schema change applied
+    in this acquisition run.
+- change_id: qbi_prior_revision_corrections
+  status: draft
+  kind: source_review
+  summary: Both correction pages explicitly concern the 2025 8995/8995-A instructions
+    downloaded before January 27, 2026.
+  required_action: Review the supported QBI base and omitted deductions, but do not
+    adopt 2025 line references as final 2026 line references.
+  source_refs:
+  - source_id: irs_8995_qbi_correction_posted_2026
+    chunk_id: irs_8995_qbi_correction_posted_2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: f6c5157e66464f2bf1929cafea70a21d9598ed072f1fd3124345782807732931
+    carry_forward_reason: 'Review input only: this source concerns 2025. No 2026 calculation
+      authority is inferred.'
+  - source_id: irs_8995a_qbi_correction_posted_2026
+    chunk_id: irs_8995a_qbi_correction_posted_2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: 746972c538e0375ec013837f73736366c79c1320158c566d8edc8f2cab4efdfb
+    carry_forward_reason: 'Review input only: this source concerns 2025. No 2026 calculation
+      authority is inferred.'
+  runtime_disposition: Review pending; no calculation or evidence-schema change applied
+    in this acquisition run.
+- change_id: w2_page_layout_only
+  status: draft
+  kind: source_review
+  summary: IRS describes the 2026 W-2 family revision as two forms per page, with
+    no operational impact and no other changes.
+  required_action: No tax-rule delta follows from this notice; review OCR/layout handling
+    if those forms are parsed.
+  source_refs:
+  - source_id: irs_w2_changes_2026
+    chunk_id: irs_w2_changes_2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: 3f45c57baa57a2b139873b63b531ec0ac35c64ba71f6e273d3226290d83628cb
+  runtime_disposition: Review pending; no calculation or evidence-schema change applied
+    in this acquisition run.
+- change_id: w2_dependent_care_exclusion
+  status: draft
+  kind: source_review
+  summary: The notice corrects the 2026 dependent-care exclusion in W-2/W-3 instructions
+    to $7,500; all amounts paid/incurred are still reported in box 10.
+  required_action: Review only if dependent-care benefits are added to supported scope;
+    do not reinterpret box 10 as the excluded amount.
+  source_refs:
+  - source_id: irs_w2_dependent_care_correction_2026
+    chunk_id: irs_w2_dependent_care_correction_2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: ebe1d2a02d4f9f7d406e0b1c9b1875c9eb63aed081dfb5b815ab835baaef190f
+  runtime_disposition: Review pending; no calculation or evidence-schema change applied
+    in this acquisition run.
+- change_id: 8829_revision_mismatch
+  status: draft
+  kind: source_review
+  summary: The notice calls its instructions 2026, but the downloaded current i8829.pdf
+    is visibly printed 2025.
+  required_action: Retain the PDF as revision 2025 and require applicability review
+    before any 2026 home-office rule is derived. The notice-to-PDF revision mismatch
+    is unresolved.
+  source_refs:
+  - source_id: irs_8829_update_posted_2026
+    chunk_id: irs_8829_update_posted_2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: 03f5668cba0e17b3610f8340faae044cf0a4615563b9d086a6cb840c08dd6254
+  - source_id: irs_instructions_8829_revision_2025
+    chunk_id: irs_instructions_8829_revision_2025_chunk_0001
+    pages:
+    - 1
+    text_sha256: 5c0ec6c6c8dd828f431b4c30fa94a9b32bade3af8b0826597977f8748bc65c82
+    carry_forward_reason: 'Review input only: this source concerns 2025. No 2026 calculation
+      authority is inferred.'
+  runtime_disposition: Review pending; no calculation or evidence-schema change applied
+    in this acquisition run.
+- change_id: mileage_notice_precedence
+  status: draft
+  kind: source_review
+  summary: The February mileage HTML update describes the original 72.5-cent rate;
+    the existing corpus also holds later July-effective bulletin authority.
+  required_action: Preserve the existing split-rate implementation. The earlier HTML
+    reminder must not overwrite later effective-period authority.
+  source_refs:
+  - source_id: irs_mileage_update_2026
+    chunk_id: irs_mileage_update_2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: d6ca1e156715af3bb1c95c985ad18d29c1d62cc1ffe83db8ed33548b0983f47a
+  - source_id: irs_notice_2026_10
+    chunk_id: irs_notice_2026_10_chunk_0001
+    pages:
+    - 1
+    text_sha256: faf3eb38f6779c7ffb30621b4ed701985fd9e721fb45157005793f1300c00832
+  - source_id: irs_announcement_2026_11
+    chunk_id: irs_announcement_2026_11_chunk_0014
+    pages:
+    - 13
+    text_sha256: e5b044a44b9f514e36d252a5e018bd8839ba95da0c0c54016ddd0e2c52e6fdfe
+  runtime_disposition: Review pending; no calculation or evidence-schema change applied
+    in this acquisition run.
+- change_id: calendar_year_vs_income_year
+  status: draft
+  kind: source_review
+  summary: Publication 509 is a 2026 calendar and includes deadlines for other income
+    years, including 2025 estimated payments due in January 2026.
+  required_action: Tag income year separately from payment date. Continue using 2026
+    1040-ES/Pub 505 for the 2026-income installment that falls in January 2027.
+  source_refs:
+  - source_id: irs_pub_509_2026
+    chunk_id: irs_pub_509_2026_chunk_0003
+    pages:
+    - 3
+    text_sha256: bf818fbee60233a088942c9eef3034f23ecd6d1886d3fb90ce38f57181f52d3f
+  - source_id: irs_form_1040_es_2026
+    chunk_id: irs_form_1040_es_2026_chunk_0001
+    pages:
+    - 1
+    text_sha256: 7cd45b5ef5ff0d5306ac070f94750011d7dbffe2dec8f47b0f37493da33c3f87
+  runtime_disposition: Review pending; no calculation or evidence-schema change applied
+    in this acquisition run.

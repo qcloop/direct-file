@@ -14,14 +14,11 @@ import gov.irs.directfile.models.FactTypeWithItem;
 @Getter
 @Setter
 public class CreateRequestBody {
-    @NotNull @Min(value = 2023)
-    @Max(value = 2050)
-    private int taxYear;
+    @NotNull @Min(value = 2023) @Max(value = 2050) private int taxYear;
 
     @NotNull(message = "No facts provided") private Map<@NotEmpty String, @NotNull FactTypeWithItem> facts;
 
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
     {
         "taxYear": 2024,
         "facts": {

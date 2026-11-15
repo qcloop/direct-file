@@ -1,6 +1,5 @@
 package gov.irs.directfile.api.taxreturn.submissions;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.MessageListener;
@@ -16,7 +15,6 @@ import gov.irs.directfile.api.config.MessageQueueConfigurationProperties;
 @Service
 @ConditionalOnProperty(value = "direct-file.aws.messageQueue.sqs-message-handling-enabled", havingValue = "true")
 @EnableConfigurationProperties(MessageQueueConfigurationProperties.class)
-@SuppressFBWarnings(value = "CT_CONSTRUCTOR_THROW", justification = "Java 21 update")
 public class DlqS3NotificationEventQueueListenerService implements MessageListener {
 
     private final String dlqS3NotificationEventQueueListenerServiceQueue;

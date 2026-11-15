@@ -1,0 +1,35 @@
+source_id: "irs_1040_es_salt_correction_2026"
+product_id: "1040_es_salt_correction"
+tax_year: 2026
+source_revision_year: 2026
+document_status: "final"
+disposition: "source_review_required"
+corrects_source_ids:
+  - "irs_form_1040_es_2026"
+applicable_tax_years:
+  - 2026
+title: "Correction to 2026 Form 1040-ES SALT reminder"
+source_url: "https://www.irs.gov/forms-pubs/correction-to-state-and-local-income-tax-deduction-amount-in-the-2026-form-1040-es"
+pdf_sha256: null
+source_sha256: "10e51a20bd62856abc8d8f255a525eb9e0b0bacf13f31cc3e7a3e17817b9e79d"
+document_format: "html"
+agency: "IRS"
+text_path: "direct-file/tax-knowledge/corpora/irs-2026/text/1040-es-salt-correction.txt"
+generated_at: "2026-11-12T20:10:18.888495+00:00"
+chunking:
+  max_words: 450
+chunks:
+  - chunk_id: "irs_1040_es_salt_correction_2026_chunk_0001"
+    source_id: "irs_1040_es_salt_correction_2026"
+    product_id: "1040_es_salt_correction"
+    title: "Correction to 2026 Form 1040-ES SALT reminder"
+    pages:
+      - 1
+    heading: null
+    text: |
+      If you downloaded or printed 2026 Form 1040-ES, please note the following correction to the Reminders section.
+      The text for the Reminder, State and local income tax deduction increased should read: The overall limit on the deduction for state and local income, sales, and property taxes has increased. For 2026, the limit is $40,400 ($20,200 if married filing separately) and the overall limit is reduced if your modified adjusted gross income is more than $505,000 ($252,500 if married filing separately) but will not be reduced below $10,000 ($5,000 if married filing separately).
+      The 2026 Form 1040-ES will not be revised.
+    text_sha256: "f2ded83df49fa38b4f4d5cbd2c96c69c4bcb08a02190e0b4db477087773d9d3a"
+    source_url: "https://www.irs.gov/forms-pubs/correction-to-state-and-local-income-tax-deduction-amount-in-the-2026-form-1040-es"
+    pdf_sha256: "10e51a20bd62856abc8d8f255a525eb9e0b0bacf13f31cc3e7a3e17817b9e79d"

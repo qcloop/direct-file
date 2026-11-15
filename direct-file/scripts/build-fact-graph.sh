@@ -2,7 +2,9 @@
 
 set -e
 
-cd ../fact-graph-scala
+# fact-graph now lives in the standalone repo (a sibling of the direct-file repo).
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+cd "$SCRIPT_DIR/../../../fact-graph"
 echo "cleaning fact graph..."
 sbt clean
 echo "compiling fact graph..."

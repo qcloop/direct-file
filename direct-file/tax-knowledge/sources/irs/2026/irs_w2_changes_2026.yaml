@@ -1,0 +1,36 @@
+source_id: "irs_w2_changes_2026"
+product_id: "w2_changes_2026"
+tax_year: 2026
+source_revision_year: 2026
+document_status: "final"
+disposition: "source_review_required"
+corrects_source_ids: []
+applicable_tax_years:
+  - 2026
+title: "Changes to 2026 W-2 family forms"
+source_url: "https://www.irs.gov/forms-pubs/changes-to-the-2026-forms-w-2-w-2as-w-2gu-and-w-2vi-posted-on-irsgov"
+pdf_sha256: null
+source_sha256: "72f39fb70fe6a0f55252e11b8d6e49a1be4bca08714f9b0e09b8ef02f5091b10"
+document_format: "html"
+agency: "IRS"
+text_path: "direct-file/tax-knowledge/corpora/irs-2026/text/w2-changes-2026.txt"
+generated_at: "2026-11-12T20:10:18.890343+00:00"
+chunking:
+  max_words: 450
+chunks:
+  - chunk_id: "irs_w2_changes_2026_chunk_0001"
+    source_id: "irs_w2_changes_2026"
+    product_id: "w2_changes_2026"
+    title: "Changes to 2026 W-2 family forms"
+    pages:
+      - 1
+    heading: null
+    text: |
+      The 2026 Forms W-2, W-2AS, W-2GU, and W-2VI posted to IRS.gov in January 2026 have been revised to a two-per-page format that matches the official printed IRS forms. There is no operational impact, and no other changes were made.
+      The change was made to ease the burden for those completing and filing Copies 1, B, C, and 2 available on IRS.gov. You may continue to use forms that were downloaded before Aug. 4, 2026.
+      Caution: Copy A of this form is provided for informational purposes only. Although Copy A appears in red, similar to the official IRS form, it does not meet SSA’s requirements for scanning and processing.
+      Do not print and file Copy A downloaded from www.irs.gov with the SSA. You may be charged a penalty if you file forms that can’t be scanned.
+      See the Penalties section in the current General Instructions for Forms W-2 and W-3, for more information.
+    text_sha256: "3f45c57baa57a2b139873b63b531ec0ac35c64ba71f6e273d3226290d83628cb"
+    source_url: "https://www.irs.gov/forms-pubs/changes-to-the-2026-forms-w-2-w-2as-w-2gu-and-w-2vi-posted-on-irsgov"
+    pdf_sha256: "72f39fb70fe6a0f55252e11b8d6e49a1be4bca08714f9b0e09b8ef02f5091b10"

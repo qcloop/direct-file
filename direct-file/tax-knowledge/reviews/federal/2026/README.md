@@ -1,0 +1,156 @@
+# Federal 2026 planning release review
+
+Status: **draft — human approvals pending**. No tax-specialist, content-owner, or engineering
+approval is asserted by this packet. The repository pipeline requires “Tax expert approves
+interpretation” and tax/content/engineering approval before runtime release.
+
+This release covers planning for income earned during calendar year 2026, including
+2026 estimated payments whose last regular installment falls in January 2027. It does
+not authorize 2026 e-filing, change MeF/export mappings, or expand the filing backend.
+
+## Review materials
+
+- [Change register](../../../changes/federal/2026/2025-to-2026.yaml): changes, effective dates, exact source references, implementation targets, and scenario coverage.
+- [Source inventory](../../../corpora/irs-2026/README.md): document revisions, hashes, current versus older products, and update monitoring.
+- [Parameters](../../../rules/federal/2026/): ordinary income, self-employment, and estimated-tax constants.
+- [Interview](../../../questions/federal/2026/gateway-questions.yaml), [evidence maps](../../../evidence/federal/2026/document-signals.yaml), and [conflicts](../../../conflicts/federal/2026/document-answer-conflicts.yaml).
+- [Scenarios](../../../scenarios/federal/2026/) and executable golden fixtures in `tax-advisor/src/test/resources/evals/*2026.json`.
+- [Release manifest](../../../releases/federal/2026/manifest.json): immutable artifact and executable XML hashes. Its status remains draft until actual human approval.
+- [November 12 source expansion](../../../runs/irs-2026-source-expansion-20261112.md): 19 acquired sources, extraction QA, classification, and repeatable pipeline commands.
+- [Source impact queue](../../../changes/federal/2026/source-expansion-20261112.yaml): 12 cited review items, including 1099 box changes, independently pinned corrections, and the unresolved 8829 revision mismatch.
+- [Mileage interview update](../../../changes/federal/2026/mileage-interview-20261112.yaml): total-first collection, one conditional follow-up, retained actuals/date, and atomic invalidation of superseded allocations.
+- [Mileage validation run](../../../runs/irs-2026-mileage-interview-20261112.md): 96 service tests, atomic/pending-state regressions, and live HTTP response-schema checks.
+
+## Tax and content decisions requiring approval
+
+1. The two 2026 mileage rates and the July 1 boundary are represented with separate actual
+   period facts. The interview starts with one total and asks one allocation question only
+   in exact-only mode when actuals span the change; a supplied period determines the other.
+   Unknown allocations now default to an explicitly labeled planning estimate, spread
+   by calendar days over the covered period. Estimated period counts are separate from
+   actuals and exported with the assumption; actual period mileage can refine them.
+   Exact-only mode retains the pending behavior. See the November 13 change record.
+   Before July, observed mileage is projected into both six-month periods.
+   After July, the completed first-period total is retained and the second period is
+   projected from its own observed pace. Monthly projections are estimates and assume even
+   activity within their observation periods. Verify the interview wording and assumptions.
+2. The eligible active-business QBI minimum is modeled from section 199A(i). An unknown
+   material-participation answer stays unknown; it can produce `needs_facts`. Verify the
+   eligibility question, $1,000 boundary, and $400 minimum, including its interaction with
+   the ordinary income limit. Only a single consolidated business is modeled.
+3. MFS uses its own $201,775 QBI threshold and $75,000 prior-year AGI safe-harbor threshold.
+   The 110% safe harbor applies strictly above its AGI threshold. The safe-harbor correction
+   also affects 2024/2025 planning.
+4. The inherited 2025 standard deductions are corrected to $15,750 single/MFS and $31,500
+   MFJ using Rev. Proc. 2025-32. Review that baseline correction alongside 2026.
+5. The QBI base still omits SE health-insurance, retirement, and qualified-tip adjustments.
+   Review eligibility and scope for affected taxpayers before using a minimum deduction.
+   The 2026 interview is limited to self-employment and wage-related planning signals; digital-asset
+   branches are not carried into this supported interview scope. The ordinary-income model still omits credits, capital-gains/qualified-dividend rates,
+   itemized deductions, NIIT, AMT, and special personal deductions (including qualified tips,
+   overtime, senior, car-loan, and non-itemizer charitable deductions). QBI above the simple-
+   method threshold remains an upper bound: Form 8995-A wage/property/SSTB limits and the
+   expanded phase-in calculations are not implemented. Estimates involving these items need
+   appropriate review; this release does not claim complete Form 1040 coverage.
+6. Older downloaded 2025 publications/instructions are inventory and carry-forward review
+   inputs. They are not automatically authoritative for changed 2026 provisions. Confirm
+   each section's applicability and replacements before extending runtime coverage.
+
+## Engineering acceptance
+
+The server clock determines the default income year in a configurable named zone. An
+existing session keeps its year across New Year. Explicit other years remain available
+when supported; an unsupported current year fails instead of falling back. Interview,
+evidence, and conflicts are scoped together by year/jurisdiction. Evidence with an explicit
+conflicting income year is rejected, regardless of its receipt date.
+
+Default runtime policy admits `approved`, legacy `published`, and `compiled` artifacts.
+The `preview` profile explicitly permits drafts for review and labels the 2026 outputs.
+Tax parameters cannot be overwritten through `set_fact`. Loaded parameters and citations
+are immutable until restart. Sessions and exports carry the hash of knowledge plus XML;
+retained sessions from another version must be recreated rather than reinterpreted.
+
+The provenance validator checks source ownership, chunk identity, cited pages, and actual
+text hashes. Source snapshots are also byte-hashed before packaging. The source monitor
+checks known documents and IRS discovery listings; it cannot approve or deploy changes.
+
+## Validation and promotion
+
+Build `tax-advisor` first (`mvn clean package` with JDK 26), then from `direct-file/` use
+a Python environment with `tax-knowledge/tools/requirements.txt`:
+
+```bash
+python3 -m unittest discover -s tax-knowledge/tools
+python3 tax-knowledge/tools/validate_artifact_provenance.py \
+  --root tax-knowledge --tax-year 2026 \
+  --sources-dir tax-knowledge/sources/irs/2026 --warnings-are-errors
+python3 tax-knowledge/tools/build_knowledge_release.py \
+  --root tax-knowledge --tax-year 2026 \
+  --output tax-knowledge/releases/federal/2026/manifest.json \
+  --package /tmp/federal-2026-review.zip
+```
+
+Build `tax-advisor` with tests and static analysis, and smoke-test both `/actuator/health`
+and the real `/mcp` handshake/tool calls. The review ZIP includes exact raw IRS and US Code
+snapshots; retain it in release artifact storage. The manifest records the matching service
+jar hash and inventories XML from that built jar, rejecting unbuilt XML source changes.
+The current MCP assembly ships the planning module; backend filing XML is not claimed as
+part of this executable release merely because it exists in the repository.
+
+After the actual owners approve, record their names, roles, date, and reviewed content
+hash in the release record. Update the status of each approved root artifact and each
+reviewed nested evidence/conflict item; approving only the containing file does not
+approve a nested draft. Repeat validation and packaging after these status changes,
+record approval for the final content identity, and run without the preview profile.
+The packager always produces a draft candidate and never invents approvals.
+
+Deployment uses the matching service build and the packaged knowledge directory via
+`DF_TAX_KNOWLEDGE_ROOT`. For rollback, restore that build and directory together; sessions
+from a different version must be recreated. The legacy 2025 corpus still contains invalid
+PDF control characters in some generated YAML; the 2026 validator is scoped to the clean
+2026 corpus. Re-segment and re-review legacy chunks before seeking a global provenance pass.
+
+## Recorded verification — November 12, 2026
+
+- Service `mvn -o clean package` on JDK 26: 87 tests, zero failures/errors; SpotBugs,
+  PMD, Spotless, packaging, and JaCoCo passed. Offline mode uses already cached dependencies.
+- Python ingestion/provenance/monitor/packager tests: 27 passed. Release provenance has zero
+  errors and warnings; legacy corpus issues are outside this year-scoped result.
+- Independent PDFBox/pypdf extraction comparison: six documents, 130 pages. One length-ratio
+  flag on Pub. 505 page 19 was visually checked as a worksheet layout/dot-leader difference.
+  Bracket and QBI tables were also checked visually; these are extraction checks, not tax approval.
+- Live monitor: 13 official documents and four IRS discovery pages checked, unchanged,
+  with zero retrieval errors.
+- Packaged HTTP server: health UP, Streamable HTTP initialization, 14 MCP tools, current-year
+  session default 2026 with server date 2026-11-12, matching interview year, split-rate SE
+  calculation, both period citations, and a versioned preview-labeled export all passed.
+- The normal HTTP profile rejected draft 2026 parameters with an actionable error.
+- Repeated review packaging of identical inputs produced byte-identical ZIPs.
+
+## Source expansion verification — November 12, 2026
+
+- Added 10 PDFs and nine IRS correction/transition HTML snapshots; all 13 previously
+  pinned documents were unchanged. Draft IRS products remain discovery-only.
+- Segmented 106 new citation chunks; the combined source index has 353 chunks.
+- Independent PDFBox/pypdf extraction comparison: 10 documents, 92 pages, zero flags.
+  Rendered first pages and 1099 form pages were visually inspected. This verified
+  printed revisions, including the 2025 PDF behind the notice labeled 2026 for 8829.
+- Generated 411 draft topic classifications and 12 exact-citation impact-review items.
+  The self-employment fact graph generator produced zero new work items because no
+  new explicit calculation rule models were authored by this source acquisition run.
+- Python pipeline tests: 34 passed. Provenance validation: zero errors and warnings.
+- Rebuilt tax-advisor with 87 tests and static analysis passing. Calculation parameters
+  and executable graph remain as in the preceding review candidate; the expanded
+  source and review artifacts are packaged into a new draft candidate.
+- Packaged preview HTTP smoke passed: health UP, initialization, 14 tools, current-year
+  session/interview default 2026, calculation and both mileage-period citations, and
+  matching versioned preview export. The review ZIP's artifact hashes and all 32 raw
+  source snapshots were checked; repeated packaging was byte-identical.
+
+## November 13 mileage robustness update
+
+- [Change record](../../../changes/federal/2026/mileage-estimate-20261113.yaml):
+  user-selected labeled planning fallback for unknown period splits, separate
+  actual/estimated/projected outputs, and retained inputs for client scenarios.
+- [Validation run](../../../runs/irs-2026-mileage-estimate-20261113.md).
+- Release status remains draft; this update does not assert tax/content/engineering approval.

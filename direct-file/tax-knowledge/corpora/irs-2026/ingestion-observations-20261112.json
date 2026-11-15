@@ -1,0 +1,371 @@
+{
+  "changes": [
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "cc44e7d1150e54d991835814c1191f60a32617730ca9e50e6f532b51293a86b4",
+      "previous_sha256": null,
+      "source_id": "irs_form_schedule_c_2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "a42f5a19c0e84a966a49b5f4ca021d3f49c4fda2e087da0b00bf2003525f8655",
+      "previous_sha256": null,
+      "source_id": "irs_form_schedule_se_2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "72136f4ec750020c80cc7da46d72f16a5ef1b2578faa89dc8aa45867e70342a7",
+      "previous_sha256": null,
+      "source_id": "irs_pub_1099_2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb",
+      "previous_sha256": null,
+      "source_id": "irs_pub_509_2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "fa3a2b659f7ee13d59ea6c66ad992a5ab55afa0060db275ad1ee122478189b89",
+      "previous_sha256": null,
+      "source_id": "irs_form_1099_k_dec2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "d7f48a804e26d83b5419aa51bb76fee7b129a388960c01d82e83e255337ea699",
+      "previous_sha256": null,
+      "source_id": "irs_instructions_1099_k_dec2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "68a8f00078be6dd6a4912cc4209df317b31840d5fe19560222d39df9f2f7ff49",
+      "previous_sha256": null,
+      "source_id": "irs_form_1099_nec_dec2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "38051fe1cdce8fac5183a7e7b182b1a0de590dcfec3e4f66a156eba3f98943fa",
+      "previous_sha256": null,
+      "source_id": "irs_form_1099_misc_dec2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "883fb800e5100ff74a37fb0427d0c16c14031a2421a058254f71c66f8c03087e",
+      "previous_sha256": null,
+      "source_id": "irs_instructions_1099_misc_nec_dec2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "10e51a20bd62856abc8d8f255a525eb9e0b0bacf13f31cc3e7a3e17817b9e79d",
+      "previous_sha256": null,
+      "source_id": "irs_1040_es_salt_correction_2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "3782d4099e8d6836188cc4df8d29cd7a9ef952a2236dcf5156c2e444724eba5c",
+      "previous_sha256": null,
+      "source_id": "irs_1040_es_address_correction_2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "c27b0e41d358643a440def7a7be85b096e6aa48111701eeafb7fa57a1c482bfc",
+      "previous_sha256": null,
+      "source_id": "irs_pub_1099_transition_2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "020abade377b75f14fb1bcc230c181123b78cca86e0e7c9f4b4285de9cdd01eb",
+      "previous_sha256": null,
+      "source_id": "irs_8995_qbi_correction_posted_2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "368da758115694b240c46fb9297a2a7b4172718f42ed793688f02b1a62fe82ca",
+      "previous_sha256": null,
+      "source_id": "irs_8995a_qbi_correction_posted_2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "611c013e7741635af1e831d366def3cb2575af31c50aac5cdadb90240b23006a",
+      "previous_sha256": null,
+      "source_id": "irs_mileage_update_2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "3117e15d3d2ada4bdf67f03d87550d0f341059bff0f7759531d92e4ec36225f6",
+      "previous_sha256": null,
+      "source_id": "irs_w2_dependent_care_correction_2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "72f39fb70fe6a0f55252e11b8d6e49a1be4bca08714f9b0e09b8ef02f5091b10",
+      "previous_sha256": null,
+      "source_id": "irs_w2_changes_2026"
+    },
+    {
+      "action": "Verify revision, effective dates, affected artifacts, and scenarios before promotion.",
+      "kind": "new",
+      "observed_sha256": "7baaa91d530e0be30135610aa6f8e9c1edadb0dbfb2fb31db311ba4da01213b3",
+      "previous_sha256": null,
+      "source_id": "irs_8829_update_posted_2026"
+    },
+    {
+      "action": "Review newly posted announcements, corrections, and final revisions. The listing is not itself tax-law authority.",
+      "kind": "discovery_page_changed",
+      "observed_sha256": "4ee80ae12405ed9a27a4a3e21d5542a72cbcf723b890f9901179d01d7eed0c46",
+      "previous_sha256": "5a49bd9178527db4b4dec15416ca19c3367cdfa34677d251470772719e3d49fa",
+      "url": "https://www.irs.gov/forms-pubs/changes-to-current-forms-publications"
+    },
+    {
+      "action": "Review newly posted announcements, corrections, and final revisions. The listing is not itself tax-law authority.",
+      "kind": "discovery_page_changed",
+      "observed_sha256": "169299b504f36380f750cac6defe55b73b79673b78f654d132975c2a2275371a",
+      "previous_sha256": "db229aeb693e873aae251bbf2ebfd3b75f0ebb78849e012ec64e8c2c142bc6b5",
+      "url": "https://www.irs.gov/forms-instructions-and-publications"
+    },
+    {
+      "action": "Review newly posted announcements, corrections, and final revisions. The listing is not itself tax-law authority.",
+      "kind": "discovery_page_changed",
+      "observed_sha256": "bcf1fabebdc2db80aae7356d82c6428f70693845018e96f4cc7efc52f1f9a1ee",
+      "previous_sha256": "df51882438889f2ff655913c3aa0284674627935e67b20a18e699fec2adb1927",
+      "url": "https://www.irs.gov/draft-tax-forms"
+    },
+    {
+      "kind": "new",
+      "observed_sha256": "6a02b8a4e5f9295ea5ab1ba03987c8dcf2a6313e5eb526b438210e10d19abee8",
+      "source_id": "irs_instructions_8829_revision_2025"
+    }
+  ],
+  "checked_at": "2026-11-12T20:07:24.082505+00:00",
+  "errors": [],
+  "observations": [
+    {
+      "bytes": 260406,
+      "sha256": "e9ada115fb43a4af5ea326ca91edd40ab0bf29b9be01d2c13d7b8fa96214635b",
+      "source_id": "irs_rev_proc_2025_32",
+      "url": "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf"
+    },
+    {
+      "bytes": 331490,
+      "sha256": "396ffad25baa737b33a67d27624f7444be3ac4e7245d287aebe5f89864f90b54",
+      "source_id": "irs_form_1040_es_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/f1040es.pdf"
+    },
+    {
+      "bytes": 105177,
+      "sha256": "8fdda8f02245c38134e08fca50238732c74b0ae693c408252dedf96623d4977a",
+      "source_id": "irs_notice_2026_10",
+      "url": "https://www.irs.gov/pub/irs-drop/n-26-10.pdf"
+    },
+    {
+      "bytes": 944507,
+      "sha256": "ba14ab76bf382cad90b7feb20fc443c4bda5e3743878fb4f6b2d79b8c8ef18cd",
+      "source_id": "irs_announcement_2026_11",
+      "url": "https://www.irs.gov/pub/irs-irbs/irb26-29.pdf"
+    },
+    {
+      "bytes": 202900,
+      "sha256": "7054fa6c86d893018f69d15f461430a58a1ee3759e817de660ef6cdfe84dc2c0",
+      "source_id": "irs_instruction_1040_schedule_se_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/i1040sse.pdf"
+    },
+    {
+      "bytes": 357575,
+      "sha256": "b5536db91498a450572e37078d7d5ee8fdc400e385d4fee3a26c230a33e399b6",
+      "source_id": "irs_instruction_schedule_c_revision_2025",
+      "url": "https://www.irs.gov/pub/irs-pdf/i1040sc.pdf"
+    },
+    {
+      "bytes": 2714784,
+      "sha256": "722639ba7bfd6f5348234b58d21e1afd8cb0c04895138bd5c4539142dde6c60a",
+      "source_id": "irs_p334_2025",
+      "url": "https://www.irs.gov/pub/irs-pdf/p334.pdf"
+    },
+    {
+      "bytes": 1851538,
+      "sha256": "ddc3bb15e437bd65c37da2036debdae78c1a0bf5a080b19d5301c81f5ec5ae5d",
+      "source_id": "irs_p463_2025",
+      "url": "https://www.irs.gov/pub/irs-pdf/p463.pdf"
+    },
+    {
+      "bytes": 1776844,
+      "sha256": "c69e87caa93cdefa4493f0ec1d8478b1ff9ec1329ee18c7b9d442f2dcb79c621",
+      "source_id": "irs_pub_505_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/p505.pdf"
+    },
+    {
+      "bytes": 216021,
+      "sha256": "875843baead68f6fa9aa7c3f6f27d6c1f37cb971ac334bcf414acdb4c1487684",
+      "source_id": "irs_instructions_form_8995_revision_2025",
+      "url": "https://www.irs.gov/pub/irs-pdf/i8995.pdf"
+    },
+    {
+      "bytes": 146897,
+      "sha256": "1d223be73b4bac959a00e9b55784297bafa73a986567987c083671abf687b68f",
+      "source_id": "irs_instructions_form_8959_revision_2025",
+      "url": "https://www.irs.gov/pub/irs-pdf/i8959.pdf"
+    },
+    {
+      "bytes": 57474,
+      "sha256": "7292dac7f3c1b4e68cd6e8b9b548ddadbe375d92a347a282ec5f5759ae2144b9",
+      "source_id": "irc_199a_2026_snapshot",
+      "url": "https://uscode.house.gov/us/usc/119-124/t26/s199A/"
+    },
+    {
+      "bytes": 89782,
+      "sha256": "a1b23089917d3c60e41dacf1e5326819c4ef7e1028b5e5a6ee88599e36a82186",
+      "source_id": "irc_1401_2026_snapshot",
+      "url": "https://uscode.house.gov/us/usc/119-124/t26/s1401/"
+    },
+    {
+      "bytes": 119172,
+      "sha256": "cc44e7d1150e54d991835814c1191f60a32617730ca9e50e6f532b51293a86b4",
+      "source_id": "irs_form_schedule_c_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/f1040sc.pdf"
+    },
+    {
+      "bytes": 77739,
+      "sha256": "a42f5a19c0e84a966a49b5f4ca021d3f49c4fda2e087da0b00bf2003525f8655",
+      "source_id": "irs_form_schedule_se_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/f1040sse.pdf"
+    },
+    {
+      "bytes": 1449821,
+      "sha256": "72136f4ec750020c80cc7da46d72f16a5ef1b2578faa89dc8aa45867e70342a7",
+      "source_id": "irs_pub_1099_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/p1099.pdf"
+    },
+    {
+      "bytes": 1195405,
+      "sha256": "d7d7e3f816bb3e08782d4628efeee1505ae9740fa0a4633aa8746f02f3f4a0cb",
+      "source_id": "irs_pub_509_2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/p509.pdf"
+    },
+    {
+      "bytes": 580107,
+      "sha256": "fa3a2b659f7ee13d59ea6c66ad992a5ab55afa0060db275ad1ee122478189b89",
+      "source_id": "irs_form_1099_k_dec2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/f1099k.pdf"
+    },
+    {
+      "bytes": 177311,
+      "sha256": "d7f48a804e26d83b5419aa51bb76fee7b129a388960c01d82e83e255337ea699",
+      "source_id": "irs_instructions_1099_k_dec2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/i1099k.pdf"
+    },
+    {
+      "bytes": 537467,
+      "sha256": "68a8f00078be6dd6a4912cc4209df317b31840d5fe19560222d39df9f2f7ff49",
+      "source_id": "irs_form_1099_nec_dec2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/f1099nec.pdf"
+    },
+    {
+      "bytes": 561788,
+      "sha256": "38051fe1cdce8fac5183a7e7b182b1a0de590dcfec3e4f66a156eba3f98943fa",
+      "source_id": "irs_form_1099_misc_dec2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/f1099msc.pdf"
+    },
+    {
+      "bytes": 312867,
+      "sha256": "883fb800e5100ff74a37fb0427d0c16c14031a2421a058254f71c66f8c03087e",
+      "source_id": "irs_instructions_1099_misc_nec_dec2026",
+      "url": "https://www.irs.gov/pub/irs-pdf/i1099mec.pdf"
+    },
+    {
+      "bytes": 98358,
+      "sha256": "10e51a20bd62856abc8d8f255a525eb9e0b0bacf13f31cc3e7a3e17817b9e79d",
+      "source_id": "irs_1040_es_salt_correction_2026",
+      "url": "https://www.irs.gov/forms-pubs/correction-to-state-and-local-income-tax-deduction-amount-in-the-2026-form-1040-es"
+    },
+    {
+      "bytes": 98578,
+      "sha256": "3782d4099e8d6836188cc4df8d29cd7a9ef952a2236dcf5156c2e444724eba5c",
+      "source_id": "irs_1040_es_address_correction_2026",
+      "url": "https://www.irs.gov/forms-pubs/correction-to-the-mailing-addresses-in-the-2026-form-1040-es"
+    },
+    {
+      "bytes": 98145,
+      "sha256": "c27b0e41d358643a440def7a7be85b096e6aa48111701eeafb7fa57a1c482bfc",
+      "source_id": "irs_pub_1099_transition_2026",
+      "url": "https://www.irs.gov/forms-pubs/new-publication-1099-general-instructions-for-certain-information-returns-forms-1096-1097-1098-1099-3921-3922-5498-and-w-2g"
+    },
+    {
+      "bytes": 97738,
+      "sha256": "020abade377b75f14fb1bcc230c181123b78cca86e0e7c9f4b4285de9cdd01eb",
+      "source_id": "irs_8995_qbi_correction_posted_2026",
+      "url": "https://www.irs.gov/forms-pubs/corrections-to-the-instructions-on-how-to-calculate-the-taxable-income-before-qbi-deduction-for-form-8995"
+    },
+    {
+      "bytes": 97927,
+      "sha256": "368da758115694b240c46fb9297a2a7b4172718f42ed793688f02b1a62fe82ca",
+      "source_id": "irs_8995a_qbi_correction_posted_2026",
+      "url": "https://www.irs.gov/forms-pubs/corrections-to-the-instructions-on-how-to-calculate-the-taxable-income-before-qbi-deduction-for-form-8995-a"
+    },
+    {
+      "bytes": 98007,
+      "sha256": "611c013e7741635af1e831d366def3cb2575af31c50aac5cdadb90240b23006a",
+      "source_id": "irs_mileage_update_2026",
+      "url": "https://www.irs.gov/forms-pubs/the-standard-mileage-rates-and-maximum-automobile-fair-market-values-have-been-updated-for-2026"
+    },
+    {
+      "bytes": 98077,
+      "sha256": "3117e15d3d2ada4bdf67f03d87550d0f341059bff0f7759531d92e4ec36225f6",
+      "source_id": "irs_w2_dependent_care_correction_2026",
+      "url": "https://www.irs.gov/forms-pubs/correction-to-the-dependent-care-benefits-exclusion-amount-in-the-2026-general-instructions-for-forms-w-2-and-w-3"
+    },
+    {
+      "bytes": 97433,
+      "sha256": "72f39fb70fe6a0f55252e11b8d6e49a1be4bca08714f9b0e09b8ef02f5091b10",
+      "source_id": "irs_w2_changes_2026",
+      "url": "https://www.irs.gov/forms-pubs/changes-to-the-2026-forms-w-2-w-2as-w-2gu-and-w-2vi-posted-on-irsgov"
+    },
+    {
+      "bytes": 96845,
+      "sha256": "7baaa91d530e0be30135610aa6f8e9c1edadb0dbfb2fb31db311ba4da01213b3",
+      "source_id": "irs_8829_update_posted_2026",
+      "url": "https://www.irs.gov/forms-pubs/updates-to-the-instructions-for-form-8829"
+    },
+    {
+      "bytes": 182532,
+      "sha256": "6a02b8a4e5f9295ea5ab1ba03987c8dcf2a6313e5eb526b438210e10d19abee8",
+      "source_id": "irs_instructions_8829_revision_2025",
+      "url": "https://www.irs.gov/pub/irs-pdf/i8829.pdf"
+    }
+  ],
+  "tax_year": 2026,
+  "watch_pages": [
+    {
+      "sha256": "4ee80ae12405ed9a27a4a3e21d5542a72cbcf723b890f9901179d01d7eed0c46",
+      "url": "https://www.irs.gov/forms-pubs/changes-to-current-forms-publications"
+    },
+    {
+      "sha256": "169299b504f36380f750cac6defe55b73b79673b78f654d132975c2a2275371a",
+      "url": "https://www.irs.gov/forms-instructions-and-publications"
+    },
+    {
+      "sha256": "fb95344b6046e63b458ac1cd4c57de339e6095301f8dd7edcd64032b7b9a40cc",
+      "url": "https://www.irs.gov/irb"
+    },
+    {
+      "sha256": "bcf1fabebdc2db80aae7356d82c6428f70693845018e96f4cc7efc52f1f9a1ee",
+      "url": "https://www.irs.gov/draft-tax-forms"
+    }
+  ]
+}

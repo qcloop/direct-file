@@ -38,6 +38,16 @@ Human check:
 
 ## 2. Extraction QA
 
+For catalog-driven PDF and IRS HTML additions, first acquire observations and
+content-addressed snapshots with `tools/check_source_updates.py`. Then run
+`tools/ingest_source_observations.py` against a draft catalog. It validates the
+whole batch, refuses changed existing pins, checks source bytes, and extracts IRS
+`<main>` HTML as logical page 1. It updates draft inventory manifests without
+approving sources or changing calculation parameters. Changed pinned revisions
+still require a separate revision review. Preserve the observation report and
+repeat PDFBox extraction for acquired PDFs before segmentation. The
+[2026 expansion run](runs/irs-2026-source-expansion-20261112.md) records the commands.
+
 The `document-understanding-agent` verifies that source extraction is good enough for downstream citation and rule drafting.
 
 Output:
@@ -92,7 +102,7 @@ Output:
 - `RUNTIME_RESOURCE_DEPENDENCY_MAP.md`
 
 Automation:
-- Inventory `backend/src/main/resources` and `df-plan-service/src/main/resources`.
+- Inventory `backend/src/main/resources` and `tax-advisor/src/main/resources`.
 - Mark each resource group as direct IRS-corpus dependent, indirectly tax-dependent, derived, platform-only, or non-tax infrastructure.
 
 Human check:
@@ -128,7 +138,7 @@ The `rule-modeling-agent` and `release-agent` draft fact graph XML, validation X
 Output:
 - `factgraph/<jurisdiction>/<tax-year>/*.yaml`
 - draft patches for `backend/src/main/resources/tax/*.xml`
-- draft patches for `df-plan-service/src/main/resources/tax-plan/*.xml`
+- draft patches for `tax-advisor/src/main/resources/tax-plan/*.xml`
 - regenerated draft `backend/src/main/resources/factgraphservice/xmlFactPaths`
 
 Automation:
@@ -215,3 +225,39 @@ Output:
 Human check:
 - Tax owner, compliance reviewer, product/content owner, and engineering owner approve before runtime use.
 - Provenance validator has zero errors for reviewed or approved artifacts.
+
+## Annual planning-year releases
+
+The 2026 implementation and review packet are in `reviews/federal/2026/README.md`.
+Planning uses the income calendar year from the server clock, independently of the
+calendar year a return is filed. Existing sessions retain their year across New Year.
+
+For each year, inventory actual document revisions and authority/effective dates,
+record a source-backed change register under `changes/federal/<year>/`, and distinguish
+parameter changes from calculation, interview, and scope changes. Final annual guidance
+and enacted statutes may support planning before all year-end publications are revised.
+Older sources need explicit applicability review. Draft IRS instructions stay discovery
+inputs and are not authoritative runtime dependencies.
+
+`tools/check_source_updates.py` compares known-source and IRS discovery-page hashes.
+It writes a separate observation report and optional content-addressed source copies;
+it never overwrites an approved baseline. The weekly/on-demand repository workflow
+preserves these observations for review. New listings are review signals, not authority.
+
+`tools/validate_artifact_provenance.py` now validates YAML structurally and checks exact
+source ownership, chunk identity, pages, and actual text hashes. `published` is treated
+as a release status alongside reviewed/approved/compiled. The year-scoped gate must have
+zero errors and warnings before packaging. Install `tools/requirements.txt` first.
+
+`tools/build_knowledge_release.py` packages a deterministic draft candidate with source,
+artifact, executable graph, and matching service-jar hashes plus exact raw source snapshots.
+It inventories XML from the built service jar and checks that its source matches; backend
+modules are included only when they actually ship on that classpath. Tax owners,
+content owners, and engineers still perform the approvals described above. After approval,
+record the reviewed content identity, promote reviewed root and nested artifact statuses,
+repeat validation, and deploy the matching service build and knowledge directory together.
+
+Runtime parameter/citation data are cached at startup. All interview artifact families
+are scoped by jurisdiction and income year. Default runtime policy excludes drafts;
+preview requires an explicit profile and is labeled. Sessions/exports carry the combined
+knowledge/XML digest, and a retained session from another version is rejected.
