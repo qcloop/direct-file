@@ -1,0 +1,38 @@
+{
+  "name": "Above the QBI threshold, single, TY2025 — simple-method result flagged as an upper bound",
+  "taxYear": 2025,
+  "filingStatus": "single",
+  "steps": [
+    {
+      "tool": "calculate_se_tax",
+      "args": {
+        "grossReceipts": "60000"
+      },
+      "expect": {
+        "deductibleHalf": 4239
+      }
+    },
+    {
+      "tool": "project_total_tax",
+      "args": {
+        "otherOrdinaryIncome": "200000"
+      },
+      "expect": {
+        "adjustedGrossIncome": 255761,
+        "taxableIncome": 228859
+      }
+    },
+    {
+      "tool": "estimate_qbi_deduction",
+      "args": {
+        "netCapitalGains": "0"
+      },
+      "expect": {
+        "qbiThreshold": 197300,
+        "qbiComponent": 11152,
+        "qbiDeduction": 11152,
+        "aboveThreshold": true
+      }
+    }
+  ]
+}

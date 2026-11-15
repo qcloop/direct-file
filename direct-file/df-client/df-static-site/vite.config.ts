@@ -38,6 +38,14 @@ export default defineConfig({
     preserveSymlinks: true,
     alias: {
       '@': path.resolve(__dirname, 'src'),
+      // @trussworks/react-uswds v8 ships lib/index.css but does not list it in
+      // its package `exports`, so the bare specifier is blocked by Vite/Node
+      // resolution. Point directly at the file (hoisted to the workspace root,
+      // matching the `../node_modules/@uswds` scss includePaths above).
+      '@trussworks/react-uswds/lib/index.css': path.resolve(
+        __dirname,
+        '../node_modules/@trussworks/react-uswds/lib/index.css'
+      ),
     },
   },
   envPrefix: ['STATIC_SITE'],

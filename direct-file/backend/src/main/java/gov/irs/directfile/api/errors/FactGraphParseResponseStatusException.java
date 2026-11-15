@@ -6,8 +6,7 @@ import gov.irs.directfile.api.taxreturn.ApiErrorKeys;
 import gov.irs.directfile.api.taxreturn.TaxReturnApi.FactsFailedToParseCorrectly;
 
 public class FactGraphParseResponseStatusException extends ApiResponseStatusException {
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
         {
             "status":"BAD_REQUEST",
             "message":"400 BAD_REQUEST \\"Could not parse facts for the provided fact graph.\\"",

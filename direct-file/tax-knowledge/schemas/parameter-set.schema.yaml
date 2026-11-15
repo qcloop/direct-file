@@ -1,0 +1,23 @@
+schema_id: parameter_set
+description: Year-scoped planning constants consumed by tax-advisor. Release status and source verification are separate.
+required:
+  - parameter_set_id
+  - tax_year
+  - jurisdiction
+  - status
+  - parameters
+fields:
+  parameter_set_id: stable topic/year identifier
+  tax_year: income year, independent of the calendar year a return is filed
+  jurisdiction: federal
+  status: draft | reviewed | approved | published | compiled | retired
+  source_ids: governing authorities
+  source_refs: exact source/chunk/pages/text hashes; required before release
+  parameters:
+    fact_path: known writable fact injected at session creation and protected from taxpayer overrides
+    type: dollar | rational | int | boolean
+    value: string; rationals use n/d and booleans use true/false
+    filing_status: optional single | mfj | mfs; omission means all supported statuses
+    source_id: citation registry entry
+    provisional: optional flag for an unverified value, distinct from artifact approval status
+    note: source interpretation and effective-period context

@@ -1,0 +1,43 @@
+tax_year: 2026
+jurisdiction: federal
+status: draft
+human_approvals: []
+requirement: User explicitly selected a labeled planning estimate when only total mileage
+  is known. This supersedes default-pending behavior in mileage-interview-20261112.yaml.
+  The IRS source establishes rates and their boundary, not the allocation assumption.
+source_refs:
+- source_id: irs_announcement_2026_11
+  chunk_id: irs_announcement_2026_11_chunk_0014
+  pages: [13]
+  text_sha256: e5b044a44b9f514e36d252a5e018bd8839ba95da0c0c54016ddd0e2c52e6fdfe
+changes:
+- change_id: labeled_unknown_mileage_allocation
+  status: draft
+  kind: planning_assumption_and_input_handling
+  implementation: Distribute total mileage by calendar days from January 1 through
+    the coverage date in the fact graph. For YTD projections, extend the observed
+    second-period pace through year-end. Keep income and other expense annualization
+    unchanged. Return the assumption and separate actual, estimated, and projected miles.
+  fact_paths:
+  - /planning/mileageAllocationEstimated
+  - /planning/mileageAllocationAssumption
+  - /planning/requireExactMileageAllocation
+  - /seMileageFirstPeriodShare
+  - /seMileageSecondPeriodShare
+  - /seProjectedBusinessMiles
+  validation:
+  - EstimatedMileageIntegrationTest
+  - MileageInterviewIntegrationTest
+  - TaxYear2026IntegrationTest
+  - ProjectNetProfitTest
+  safety_properties:
+  - Estimated period amounts never populate actual mileage facts.
+  - Either actual period answer can refine a saved estimate without repeating other inputs.
+  - An empty zero/zero period pair supplies no allocation of a positive total; default to the labeled estimate or exact-only pending state.
+  - Other invalid refinements leave the saved estimate unchanged.
+  - Exact-only mode returns needs_facts and invalidates prior dependent calculations.
+  - Tool results and exports disclose the assumption.
+  limitations:
+  - Assumes even mileage from January 1; seasonal or midyear starts need actual period refinement.
+  - Supports one rate or two periods at the configured month boundary.
+  - Not a mileage log or a substitute for filing substantiation.

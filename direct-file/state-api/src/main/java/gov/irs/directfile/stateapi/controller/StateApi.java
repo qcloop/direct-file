@@ -60,8 +60,7 @@ public interface StateApi {
                                             mediaType = "application/json",
                                             schema = @Schema(implementation = AuthCodeRequest.class),
                                             examples = @ExampleObject(value = AuthCodeRequest.docsExampleObject)))
-                    @Valid
-                    @RequestBody
+                    @Valid @RequestBody
                     AuthCodeRequest ac,
             HttpServletRequest request);
 

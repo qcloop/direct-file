@@ -1,0 +1,10 @@
+tax_year: 2026
+jurisdiction: "federal"
+status: "draft"
+generated_at: "2026-11-12T20:11:00.285443+00:00"
+inputs:
+  rules_dir: "direct-file/tax-knowledge/rules/federal/2026"
+  relevance: "direct-file/tax-knowledge/relevance/federal/2026/source-relevance.yaml"
+  sources_dir: "direct-file/tax-knowledge/sources/irs/2026"
+  runtime_resource_map: "direct-file/tax-knowledge/runtime-resources/direct-file-resource-map.yaml"
+artifacts: []

@@ -12,15 +12,12 @@ import org.springframework.validation.annotation.Validated;
 @Getter
 @AllArgsConstructor
 public class SnsConfigurationProperties {
-    @NotBlank
-    @URL
+    @NotBlank @URL
     private final String endpoint;
 
-    @NotBlank
-    private final String submissionConfirmationTopicArn;
+    @NotBlank private final String submissionConfirmationTopicArn;
 
     private final boolean submissionConfirmationPublishEnabled;
 
-    @NotBlank
-    private final String region;
+    @NotBlank private final String region;
 }

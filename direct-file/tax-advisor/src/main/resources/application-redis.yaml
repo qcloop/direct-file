@@ -1,0 +1,17 @@
+# Shared session store: planning sessions are kept in Redis (spring.data.redis.url, i.e. REDIS_URL)
+# instead of this JVM's memory, so several instances can serve the same sessions and a restart does
+# not lose them. Activate with --spring.profiles.active=redis (combine as `stdio,redis` if needed).
+#
+# This moves taxpayer-entered figures out of process memory. They are bounded by
+# tax-advisor.session-store.idle-timeout; protect them in transit and at rest through the store's own
+# configuration (a rediss:// URL, authentication, encryption at rest).
+tax-advisor:
+  session-store:
+    type: redis
+
+# With sessions in Redis, an unreachable Redis means the service cannot serve tool calls, so let it
+# show in /actuator/health (it is disabled in the default profile, where Redis is unused).
+management:
+  health:
+    redis:
+      enabled: true

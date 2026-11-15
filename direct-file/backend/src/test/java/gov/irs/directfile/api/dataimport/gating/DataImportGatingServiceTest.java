@@ -78,8 +78,7 @@ public class DataImportGatingServiceTest {
     void getBehavior_allowListEnabledButNotOnAllowList_inWindowing_thenReturnsPercentageBasedBehavior()
             throws Exception {
         // given
-        String dataImportGatingConfigString =
-                """
+        String dataImportGatingConfigString = """
 				{					
 					"percentages": [
 						{
@@ -127,8 +126,7 @@ public class DataImportGatingServiceTest {
     @Test
     void getBehavior_allowListEnabledButNotOnAllowList_notInWindowing_thenReturnsBasicIpPin() throws Exception {
         // given
-        String dataImportGatingConfigString =
-                """
+        String dataImportGatingConfigString = """
 				{					
 					"percentages": [
 						{
@@ -172,8 +170,7 @@ public class DataImportGatingServiceTest {
     @Test
     void getBehavior_notOnAllowlist_noWindowing_thenReturnsPercentageBasedBehavior() throws Exception {
         // given
-        String dataImportGatingConfigString =
-                """
+        String dataImportGatingConfigString = """
 				{					
 					"percentages": [
 						{

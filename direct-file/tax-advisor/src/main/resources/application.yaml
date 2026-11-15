@@ -1,0 +1,137 @@
+spring:
+  application:
+    name: tax-advisor
+  main:
+    banner-mode: off
+  data:
+    redis:
+      # Same endpoint the client web app uses for its conversational state. Only contacted when the
+      # `redis` profile is active. For AWS (ElastiCache / MemoryDB) set REDIS_URL to the cluster's
+      # endpoint with the TLS scheme and credentials, e.g. rediss://user:token@host:6379.
+      url: ${REDIS_URL:redis://localhost:6379}
+      # Fail fast when Redis is unreachable or slow. The client's default command timeout is 60s,
+      # which would leave a tool call (and the LLM waiting on it) hanging for a minute per attempt.
+      connect-timeout: 2s
+      timeout: 2s
+      # This service uses StringRedisTemplate directly; it declares no Spring Data repositories.
+      repositories:
+        enabled: false
+  ai:
+    mcp:
+      server:
+        # Identity advertised in the MCP initialize handshake.
+        name: tax-advisor
+        version: 0.0.1
+        # Guidance returned in the MCP initialize handshake. MCP clients typically
+        # surface this at system-prompt level, so it is the strongest lever for making
+        # the calling LLM DEFER to this server instead of answering tax questions from
+        # its own (often subtly wrong) priors. Keep it short and directive; the concrete
+        # mileage example is load-bearing — it is the canonical case a general model
+        # gets wrong.
+        instructions: >-
+          This server encodes IRS-correct tax-planning logic for self-employed and
+          gig/delivery filers. Defer to it: do not invent tax interview questions,
+          amounts, or rules from general knowledge.
+
+          Start with create_session and omit taxYear for current-year planning. The server reads
+          its clock and returns taxYear and planningDate: income earned during calendar year 2026
+          is planned as 2026, even though its return is filed later. Use that session's income year
+          for plan_questions. Supply another year only when the taxpayer explicitly requests it.
+          For current year-to-date figures, projection and payment tools can use the server date
+          when asOfDate is omitted; supply a date when the figures cover an earlier period.
+
+
+          Before asking the taxpayer any interview question, call plan_questions and ask
+          what it returns, in the order returned — its sequencing reflects tax rules a
+          general model gets wrong. Example: for a driver it asks for business MILES,
+          not gas/maintenance/phone receipts, because the standard mileage rate already
+          includes those costs, so itemizing them on top would double-count.
+
+          Collect total actual business mileage first and call project_net_profit with the date
+          the figures cover (or calculate_se_tax for full-year figures). Unknown rate-period splits
+          default to a labeled planning estimate spread evenly across the covered calendar days.
+          Disclose mileageAllocationNote when mileageAllocationStatus is estimated; do not demand
+          a cutoff breakdown or invent actual period miles. Users may refine with either period's
+          actual miles; retained inputs can be omitted for the same date and calculation mode.
+          If the taxpayer requires exact allocation, set /planning/requireExactMileageAllocation
+          to true (boolean) before calculating. Only then ask followUpQuestions on needs_facts.
+          Actual mileage, estimated period allocation, and projected future mileage stay distinct.
+
+
+          For any figure (self-employment tax, the QBI deduction, quarterly estimated
+          payments, net profit, total tax), call the matching calculation tool rather
+          than estimating, and use cite/explain to show the IRS source behind it. Treat
+          candidate facts as values to CONFIRM with the taxpayer, never as established.
+
+
+          Filing status: for a quick set-aside estimate, default to single and SAY SO —
+          self-employment tax (usually most of a gig driver's bill) does not depend on
+          filing status; only income tax does. Status is fixed when a session is created.
+          If the taxpayer is married or asks whether status changes their tax, do not
+          estimate the difference — call compare_filing_statuses to get computed totals
+          for single / MFJ / MFS on the same income.
+        # SYNC keeps the blocking tool implementations (fact-graph calls) as-is; the
+        # WebFlux transport dispatches them off the event loop. ASYNC is only useful
+        # if individual tools become non-blocking.
+        type: SYNC
+        # Streamable HTTP transport (MCP spec 2025-03-26+), served by the WebFlux
+        # starter: a single endpoint handles POST (JSON-RPC requests) and GET (SSE
+        # stream for server->client messages), replacing the older HTTP+SSE two-endpoint
+        # transport. An LLM gateway connects to this one URL.
+        enabled: true
+        protocol: STREAMABLE
+        streamable-http:
+          mcp-endpoint: /mcp
+        capabilities:
+          tool: true
+          resource: false
+          prompt: false
+          completion: false
+
+server:
+  port: 8090
+
+# Expose metrics alongside health so the PII-free tool-call telemetry (ToolCallTelemetry:
+# taxadvisor.tool.calls / .errors / .latency) is observable at /actuator/metrics. These
+# counters carry only tool name + outcome + exception class — never taxpayer values.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+  # The Redis client is on the classpath for the optional shared session store. With the default
+  # in-memory store there is no Redis to check, so its health indicator must not drag
+  # /actuator/health DOWN; the `redis` profile turns it back on.
+  health:
+    redis:
+      enabled: false
+
+tax-advisor:
+  tax-knowledge-root: ${DF_TAX_KNOWLEDGE_ROOT:../tax-knowledge}
+  # The income-year boundary follows this zone, not the deployment host's default zone.
+  planning-time-zone: ${DF_TAX_PLANNING_TIME_ZONE:America/New_York}
+  # Where planning sessions live between tool calls. `memory` (default): this JVM only, nothing is
+  # persisted, sessions are lost on restart and invisible to other instances. `redis`: shared through
+  # spring.data.redis.url so any instance can serve any session — activate the `redis` profile
+  # (application-redis.yaml) rather than setting this by hand, so the health check follows along.
+  session-store:
+    type: memory
+    # Redis store only: a session untouched this long expires (sliding — each use renews it).
+    idle-timeout: 60m
+    # Redis store only: namespaces this service's keys inside a Redis shared with other apps.
+    key-prefix: "tax-advisor:session:"
+  fact-xml-patterns:
+    - classpath*:/tax/*.xml
+    - classpath*:/tax-plan/*.xml
+
+# The production FactGraphService is reused for its XML processor; we disable its
+# own @PostConstruct loader so the planning service can control patterns itself.
+direct-file:
+  loader:
+    load-at-startup: false
+    fact-dictionary-xml-pattern: "classpath:/tax/*.xml"
+
+logging:
+  level:
+    com.realworld.tax.advisor: TRACE
+    org.springframework.web: TRACE

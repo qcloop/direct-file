@@ -1,0 +1,31 @@
+source_id: "irs_pub_1099_transition_2026"
+product_id: "publication_1099_transition"
+tax_year: 2026
+source_revision_year: 2026
+document_status: "final"
+disposition: "source_review_required"
+corrects_source_ids: []
+applicable_tax_years:
+  - 2026
+title: "New Publication 1099: tax year 2026 / processing year 2027"
+source_url: "https://www.irs.gov/forms-pubs/new-publication-1099-general-instructions-for-certain-information-returns-forms-1096-1097-1098-1099-3921-3922-5498-and-w-2g"
+pdf_sha256: null
+source_sha256: "c27b0e41d358643a440def7a7be85b096e6aa48111701eeafb7fa57a1c482bfc"
+document_format: "html"
+agency: "IRS"
+text_path: "direct-file/tax-knowledge/corpora/irs-2026/text/publication-1099-transition.txt"
+generated_at: "2026-11-12T20:10:18.889283+00:00"
+chunking:
+  max_words: 450
+chunks:
+  - chunk_id: "irs_pub_1099_transition_2026_chunk_0001"
+    source_id: "irs_pub_1099_transition_2026"
+    product_id: "publication_1099_transition"
+    title: "New Publication 1099: tax year 2026 / processing year 2027"
+    pages:
+      - 1
+    heading: null
+    text: "We have converted the General Instructions for Certain Information Returns (Forms 1096, 1097, 1098, 1099, 3921, 3922, 5498, and W-2G) from instructions to a publication. The new publication is named Publication 1099, General Instructions for Certain Information Returns (Forms 1096, 1097, 1098, 1099, 3921, 3922, 5498, and W-2G). This change is effective for tax year 2026 processing year 2027."
+    text_sha256: "4267cc2583071d913ab9beacdc1b7874863b180a2f088760ccced6bc2377576e"
+    source_url: "https://www.irs.gov/forms-pubs/new-publication-1099-general-instructions-for-certain-information-returns-forms-1096-1097-1098-1099-3921-3922-5498-and-w-2g"
+    pdf_sha256: "c27b0e41d358643a440def7a7be85b096e6aa48111701eeafb7fa57a1c482bfc"

@@ -1,0 +1,22 @@
+{
+  "name": "Additional Medicare, married filing separately, TY2025 — low $125K threshold",
+  "taxYear": 2025,
+  "filingStatus": "mfs",
+  "steps": [
+    {
+      "tool": "calculate_se_tax",
+      "args": { "grossReceipts": "200000" },
+      "expect": { "netEarningsFromSe": 184700 }
+    },
+    {
+      "tool": "calculate_additional_medicare",
+      "args": { "medicareWagesFromW2": "0" },
+      "expect": {
+        "additionalMedicareThreshold": 125000,
+        "seIncomeOverThreshold": 59700,
+        "additionalMedicareTaxOnSe": 537,
+        "additionalMedicareTax": 537
+      }
+    }
+  ]
+}

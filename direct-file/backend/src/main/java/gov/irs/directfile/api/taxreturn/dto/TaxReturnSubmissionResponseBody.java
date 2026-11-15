@@ -21,8 +21,7 @@ public class TaxReturnSubmissionResponseBody {
     private Date submissionReceivedAt;
 
     @JsonIgnore
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
             {
                "id": "2d59a07d-57ef-4392-8196-48ac29dce023",
                 "createdAt": "2023-10-26 15:04:47.197",

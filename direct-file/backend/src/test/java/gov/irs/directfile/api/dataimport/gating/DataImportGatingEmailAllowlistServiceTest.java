@@ -26,8 +26,7 @@ public class DataImportGatingEmailAllowlistServiceTest {
     // test@example.com
     // example2@example.com
     // EXAMPLE3@EXAMPLE.COM
-    private String allowListExportCsv =
-            """
+    private String allowListExportCsv = """
 			9bO/RaqAl1I4aeexSsadrHOkxKfiWNhpItXFc5KmIrs=
 			Zq5rD40EW55DnI35KYdK7f+u16lblwn+8H3YUdrxWsw=
 			9yO0gpET8JXfw45WC84bm4K2x7lXUo+CVmgTcv7/KzU=

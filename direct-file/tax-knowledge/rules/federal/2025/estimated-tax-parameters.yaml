@@ -1,0 +1,27 @@
+parameter_set_id: estimated_tax_parameters_ty2025
+tax_year: 2025
+jurisdiction: federal
+topic_id: estimated_tax
+status: published
+source_ids:
+  - irs_form_1040_es_2025
+  - irc_6654
+description: >
+  Year-indexed IRC §6654 estimated-tax safe-harbor percentages. Merged with the other
+  *-tax-parameters.yaml for this year by the topic-agnostic loader and injected into the
+  session fact graph at the given fact_path. The 100% base safe-harbor leg is the identity
+  branch in the dictionary (no multiplier), so only the high-income (110%) and current-year
+  (90%) rates carry values here.
+parameters:
+  - fact_path: /planning/highIncomeSafeHarborRate
+    name: High-income prior-year safe-harbor rate
+    type: rational
+    value: "110/100"
+    source_id: irc_6654
+    note: 110% of prior-year tax when prior-year AGI exceeds the high-income threshold (IRC 6654(d)(1)(C)).
+  - fact_path: /planning/currentYearSafeHarborRate
+    name: Current-year safe-harbor rate
+    type: rational
+    value: "90/100"
+    source_id: irc_6654
+    note: 90% of projected current-year tax — the alternative safe-harbor leg (IRC 6654(d)(1)(B)).

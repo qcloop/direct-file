@@ -26,7 +26,8 @@ public class DirectFileBackendService {
     public DirectFileBackendService(DirectFileEndpointProperties dfEndpointProperties) {
         webClient = WebClient.builder()
                 .defaultStatusHandler(
-                        HttpStatusCode::isError, resp -> resp.createException().flatMap(e -> {
+                        HttpStatusCode::isError,
+                        resp -> resp.createException().flatMap(e -> {
                             log.error(
                                     "DirectFileBackendService failed, {}, error: {}",
                                     e.getClass().getName(),

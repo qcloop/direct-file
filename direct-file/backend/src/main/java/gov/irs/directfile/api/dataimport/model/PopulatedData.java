@@ -58,8 +58,7 @@ public class PopulatedData {
     @CreationTimestamp
     private Date createdAt;
 
-    public static final String docsExampleObject =
-            """
+    public static final String docsExampleObject = """
                      {
                          "timeSinceCreation": 10000,
                          "aboutYouBasic": {

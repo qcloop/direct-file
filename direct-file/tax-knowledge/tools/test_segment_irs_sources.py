@@ -7,6 +7,11 @@ from segment_irs_sources import parse_pages, segment_manifest
 
 
 class SegmentIrsSourcesTest(unittest.TestCase):
+    def test_normalizes_pdf_control_artifacts_before_hashing_and_serialization(self):
+        pages = parse_pages("----- IRS_SOURCE_PAGE 1 -----\n\nTax\x1f source\x04 paragraph.")
+        self.assertNotIn("\x1f", pages[0].text)
+        self.assertNotIn("\x04", pages[0].text)
+
     def test_parse_page_markers(self):
         pages = parse_pages(
             """
@@ -43,6 +48,8 @@ Second page text.
                                 "url": "https://www.irs.gov/pub/irs-pdf/p334.pdf",
                                 "sha256": "abc123",
                                 "local_path": "downloads/p334.pdf",
+                                "disposition": "source_review_required",
+                                "corrects_source_ids": ["older_source"],
                             }
                         ]
                     }
@@ -73,6 +80,8 @@ Second page text.
             self.assertIn("source_id: \"irs_p334_2025\"", output)
             self.assertIn("chunk_id: \"irs_p334_2025_chunk_0001\"", output)
             self.assertIn("Business income text.", output)
+            self.assertIn('disposition: "source_review_required"', output)
+            self.assertIn('corrects_source_ids:\n  - "older_source"', output)
 
 
 if __name__ == "__main__":

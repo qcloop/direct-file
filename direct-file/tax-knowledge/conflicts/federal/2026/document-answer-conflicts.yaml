@@ -1,0 +1,90 @@
+conflicts:
+  - conflict_id: "w2_document_present_but_user_says_no_w2"
+    message: "A W-2 document is present, but the taxpayer said they did not receive a W-2."
+    owner: "federal_individual_income_tax_specialist"
+    resolution_prompt: "Confirm whether this W-2 belongs to the taxpayer for tax year 2026, or remove/reject the document."
+    severity: "review_required"
+    source_ids:
+      - "irs_form_1040_es_2026"
+    status: "draft"
+    when:
+      all:
+        - equals: false
+          fact: "/hasW2"
+          status: "confirmed"
+        - evidence: "form_w2"
+          exists: true
+  - conflict_id: "no_self_employment_but_1099_nec_present"
+    message: "A Form 1099-NEC is present, but the taxpayer said they did not have self-employment income."
+    owner: "small_business_tax_specialist"
+    resolution_prompt: "Ask whether the 1099-NEC income was for business, gig, freelance, hobby, or another activity."
+    severity: "review_required"
+    source_ids:
+      - "irs_form_1040_es_2026"
+    status: "draft"
+    when:
+      all:
+        - equals: false
+          fact: "/hasSelfEmploymentIncome"
+          status: "confirmed"
+        - evidence: "form_1099_nec"
+          exists: true
+  - conflict_id: "no_self_employment_but_1099_k_present"
+    message: "A Form 1099-K is present, but the taxpayer said they did not have self-employment income."
+    owner: "small_business_tax_specialist"
+    resolution_prompt: "Ask whether the 1099-K reflects business or gig sales or only personal payments; only the business portion belongs on Schedule C."
+    severity: "review_required"
+    source_ids:
+      - "irs_form_1040_es_2026"
+    status: "draft"
+    when:
+      all:
+        - equals: false
+          fact: "/hasSelfEmploymentIncome"
+          status: "confirmed"
+        - evidence: "form_1099_k"
+          exists: true
+  - conflict_id: "prior_year_schedule_c_but_current_year_denied"
+    message: "Prior-year profile indicates Schedule C activity, but current-year self-employment was denied."
+    owner: "small_business_tax_specialist"
+    resolution_prompt: "Confirm that the business or gig work ended before or during 2026 and there was no income or deductible activity to report."
+    severity: "info"
+    source_ids:
+      - "irs_form_1040_es_2026"
+    status: "draft"
+    when:
+      all:
+        - contains: "self_employment"
+          profile: "prior_year_topics"
+        - equals: false
+          fact: "/hasSelfEmploymentIncome"
+          status: "confirmed"
+jurisdiction: "federal"
+status: "draft"
+tax_year: 2026
+source_ids:
+  - "irs_form_1040_es_2026"
+  - "irs_announcement_2026_11"
+  - "irs_rev_proc_2025_32"
+source_refs:
+  - source_id: "irs_form_1040_es_2026"
+    chunk_id: "irs_form_1040_es_2026_chunk_0001"
+    pages:
+      - 1
+    text_sha256: "7cd45b5ef5ff0d5306ac070f94750011d7dbffe2dec8f47b0f37493da33c3f87"
+  - source_id: "irs_form_1040_es_2026"
+    chunk_id: "irs_form_1040_es_2026_chunk_0008"
+    pages:
+      - 8
+    text_sha256: "fd0a2c0a4a0451e92548c7c091b690c5ffb5225b0ad55b0a5833003c94f2acdd"
+  - source_id: "irs_announcement_2026_11"
+    chunk_id: "irs_announcement_2026_11_chunk_0014"
+    pages:
+      - 13
+    text_sha256: "e5b044a44b9f514e36d252a5e018bd8839ba95da0c0c54016ddd0e2c52e6fdfe"
+  - source_id: "irs_rev_proc_2025_32"
+    chunk_id: "irs_rev_proc_2025_32_chunk_0008"
+    pages:
+      - 7
+      - 8
+    text_sha256: "962330cb9364569cc4ff9916ec0f4c35fab0e63a074fd5b1e645124923ae21d0"

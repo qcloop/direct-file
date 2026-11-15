@@ -1,0 +1,58 @@
+source_id: "irs_8829_update_posted_2026"
+product_id: "8829_update"
+tax_year: 2026
+source_revision_year: 2026
+document_status: "final"
+disposition: "source_review_required"
+corrects_source_ids: []
+applicability_review: "Notice calls the instructions 2026; the linked current i8829.pdf is printed 2025. Applicability remains unresolved."
+applicable_tax_years:
+  - 2026
+title: "Updates to Form 8829 instructions"
+source_url: "https://www.irs.gov/forms-pubs/updates-to-the-instructions-for-form-8829"
+pdf_sha256: null
+source_sha256: "7baaa91d530e0be30135610aa6f8e9c1edadb0dbfb2fb31db311ba4da01213b3"
+document_format: "html"
+agency: "IRS"
+text_path: "direct-file/tax-knowledge/corpora/irs-2026/text/8829-update.txt"
+generated_at: "2026-11-12T20:10:18.890553+00:00"
+chunking:
+  max_words: 450
+chunks:
+  - chunk_id: "irs_8829_update_posted_2026_chunk_0001"
+    source_id: "irs_8829_update_posted_2026"
+    product_id: "8829_update"
+    title: "Updates to Form 8829 instructions"
+    pages:
+      - 1
+    heading: null
+    text: "If you downloaded or printed the 2026 Instructions for Form 8829 prior to March 5, 2026, please note the following two updates."
+    text_sha256: "03f5668cba0e17b3610f8340faae044cf0a4615563b9d086a6cb840c08dd6254"
+    source_url: "https://www.irs.gov/forms-pubs/updates-to-the-instructions-for-form-8829"
+    pdf_sha256: "7baaa91d530e0be30135610aa6f8e9c1edadb0dbfb2fb31db311ba4da01213b3"
+  - chunk_id: "irs_8829_update_posted_2026_chunk_0002"
+    source_id: "irs_8829_update_posted_2026"
+    product_id: "8829_update"
+    title: "Updates to Form 8829 instructions"
+    pages:
+      - 1
+    heading: "Line 11"
+    text: |
+      Line 11
+      Step 3 of the Iteration instructions for the Line 11 Worksheet was updated to include "student loan interest deduction (Schedule 1, line 21)” in the list of tax products in the second sentence.
+    text_sha256: "d33d2e6ec97c60080d2c0fb4fc6a2262d661ebd7137dc294052161ac0bf775c6"
+    source_url: "https://www.irs.gov/forms-pubs/updates-to-the-instructions-for-form-8829"
+    pdf_sha256: "7baaa91d530e0be30135610aa6f8e9c1edadb0dbfb2fb31db311ba4da01213b3"
+  - chunk_id: "irs_8829_update_posted_2026_chunk_0003"
+    source_id: "irs_8829_update_posted_2026"
+    product_id: "8829_update"
+    title: "Updates to Form 8829 instructions"
+    pages:
+      - 1
+    heading: "Line 17"
+    text: |
+      Line 17
+      Taxpayers itemizing deductions on Schedule A was updated to replace the incorrect reference to “line 10” of the Line 11 Worksheet with “line 11.” The text now reads: “If you used the Line 11 Worksheet to figure the amount to include in column (a) of line 11, then include the amount from line 11 of the Line 11 Worksheet in column (a) of line 17; otherwise, do not enter an amount on line 17.”
+    text_sha256: "6f7d2e70a100196326728da82444061d626d7a4d1bb039e7e6f04d84e771d6ae"
+    source_url: "https://www.irs.gov/forms-pubs/updates-to-the-instructions-for-form-8829"
+    pdf_sha256: "7baaa91d530e0be30135610aa6f8e9c1edadb0dbfb2fb31db311ba4da01213b3"

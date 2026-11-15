@@ -35,9 +35,8 @@ import gov.irs.directfile.models.message.email.payload.SendEmailPayloadV1;
 
 @Slf4j
 @SuppressFBWarnings(
-        value = {"EI_EXPOSE_REP2", "CT_CONSTRUCTOR_THROW", "REC_CATCH_EXCEPTION"},
-        justification =
-                "SQS Client is not exposed externally; Java 21 update; No requirements for individual exception handling at this time")
+        value = {"REC_CATCH_EXCEPTION"},
+        justification = "No requirements for individual exception handling at this time")
 @SuppressWarnings("PMD.UselessParentheses")
 public class SendEmailMessageQueueListener implements MessageListener {
     private final SqsClient sqsClient;

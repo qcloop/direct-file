@@ -1,0 +1,2 @@
+# Used for structural YAML/provenance validation. Ingestion utilities remain standard-library only.
+PyYAML>=6.0.3,<7

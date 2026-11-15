@@ -59,6 +59,32 @@ evidence_maps:
     source_ids:
       - irs_instruction_1040_schedule_c_2025
 
+  - evidence_map_id: form_1099_k_platform_income_2025
+    document_type: form_1099_k
+    status: draft
+    signals:
+      - topic_id: self_employment
+        confidence: high
+        reason: Third-party-network payments reported on Form 1099-K (gig/delivery platforms) commonly open Schedule C review.
+    candidate_facts:
+      - path: /hasSelfEmploymentIncome
+        value: true
+        source_field: document_type
+        requires_confirmation: true
+      - path: /seGrossReceipts
+        source_field: gross_amount
+        requires_confirmation: true
+    source_fields:
+      - gross_amount
+      - card_not_present_transactions
+      - filer_name
+      - payee_tin
+    confirmation_policy: always
+    conflict_rules:
+      - no_self_employment_but_1099_k_present
+    source_ids:
+      - irs_instruction_1040_schedule_c_2025
+
   - evidence_map_id: crypto_or_brokerage_1099_b_2025
     document_type: form_1099_b
     status: draft

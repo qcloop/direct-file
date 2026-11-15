@@ -1,0 +1,112 @@
+evidence_maps:
+  - candidate_facts:
+      - path: "/hasW2"
+        requires_confirmation: true
+        source_field: "document_type"
+        value: true
+      - path: "/formW2s/*/wages"
+        requires_confirmation: true
+        source_field: "box_1_wages_tips_other_compensation"
+      - path: "/formW2s/*/federalWithholding"
+        requires_confirmation: true
+        source_field: "box_2_federal_income_tax_withheld"
+    confirmation_policy: "always"
+    conflict_rules:
+      - "w2_document_present_but_user_says_no_w2"
+    document_type: "form_w2"
+    evidence_map_id: "form_w2_wages_2026"
+    signals:
+      - confidence: "high"
+        reason: "Form W-2 reports wages and withholding."
+        topic_id: "w2_income"
+    source_fields:
+      - "box_1_wages_tips_other_compensation"
+      - "box_2_federal_income_tax_withheld"
+      - "box_15_state"
+      - "box_16_state_wages"
+      - "box_17_state_income_tax"
+    source_ids:
+      - "irs_form_1040_es_2026"
+    status: "draft"
+    review_notes: "Confirm the document reports 2026 income. Import field names remain provider-contract inputs; this artifact does not redefine IRS box numbers."
+  - candidate_facts:
+      - path: "/hasSelfEmploymentIncome"
+        requires_confirmation: true
+        source_field: "document_type"
+        value: true
+      - path: "/seGrossReceipts"
+        requires_confirmation: true
+        source_field: "nonemployee_compensation"
+    confirmation_policy: "always"
+    conflict_rules:
+      - "no_self_employment_but_1099_nec_present"
+    document_type: "form_1099_nec"
+    evidence_map_id: "form_1099_nec_self_employment_2026"
+    signals:
+      - confidence: "high"
+        reason: "Nonemployee compensation commonly opens Schedule C review."
+        topic_id: "self_employment"
+    source_fields:
+      - "nonemployee_compensation"
+      - "payer_tin"
+      - "recipient_tin"
+      - "federal_income_tax_withheld"
+    source_ids:
+      - "irs_form_1040_es_2026"
+    status: "draft"
+    review_notes: "Confirm the document reports 2026 income. Import field names remain provider-contract inputs; this artifact does not redefine IRS box numbers."
+  - candidate_facts:
+      - path: "/hasSelfEmploymentIncome"
+        requires_confirmation: true
+        source_field: "document_type"
+        value: true
+      - path: "/seGrossReceipts"
+        requires_confirmation: true
+        source_field: "gross_amount"
+    confirmation_policy: "always"
+    conflict_rules:
+      - "no_self_employment_but_1099_k_present"
+    document_type: "form_1099_k"
+    evidence_map_id: "form_1099_k_platform_income_2026"
+    signals:
+      - confidence: "high"
+        reason: "Third-party-network payments reported on Form 1099-K (gig/delivery platforms) commonly open Schedule C review."
+        topic_id: "self_employment"
+    source_fields:
+      - "gross_amount"
+      - "card_not_present_transactions"
+      - "filer_name"
+      - "payee_tin"
+    source_ids:
+      - "irs_form_1040_es_2026"
+    status: "draft"
+    review_notes: "Confirm the document reports 2026 income. Import field names remain provider-contract inputs; this artifact does not redefine IRS box numbers."
+jurisdiction: "federal"
+status: "draft"
+tax_year: 2026
+source_ids:
+  - "irs_form_1040_es_2026"
+  - "irs_announcement_2026_11"
+  - "irs_rev_proc_2025_32"
+source_refs:
+  - source_id: "irs_form_1040_es_2026"
+    chunk_id: "irs_form_1040_es_2026_chunk_0001"
+    pages:
+      - 1
+    text_sha256: "7cd45b5ef5ff0d5306ac070f94750011d7dbffe2dec8f47b0f37493da33c3f87"
+  - source_id: "irs_form_1040_es_2026"
+    chunk_id: "irs_form_1040_es_2026_chunk_0008"
+    pages:
+      - 8
+    text_sha256: "fd0a2c0a4a0451e92548c7c091b690c5ffb5225b0ad55b0a5833003c94f2acdd"
+  - source_id: "irs_announcement_2026_11"
+    chunk_id: "irs_announcement_2026_11_chunk_0014"
+    pages:
+      - 13
+    text_sha256: "e5b044a44b9f514e36d252a5e018bd8839ba95da0c0c54016ddd0e2c52e6fdfe"
+  - source_id: "irs_rev_proc_2025_32"
+    chunk_id: "irs_rev_proc_2025_32_chunk_0008"
+    pages:
+      - 7
+      - 8
+    text_sha256: "962330cb9364569cc4ff9916ec0f4c35fab0e63a074fd5b1e645124923ae21d0"

@@ -15,7 +15,7 @@ jar_output_path_component="target"
 # build jar
 docker buildx build \
   --pull \
-  --build-context factgraph-repo="../fact-graph-scala" \
+  --build-context factgraph-repo="../../../fact-graph" \
   --build-context boms="../boms" \
   --build-context config="../config" \
   --build-context shared-libs="../libs" \
