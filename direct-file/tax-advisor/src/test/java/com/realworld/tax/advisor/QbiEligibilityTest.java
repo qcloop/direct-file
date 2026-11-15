@@ -97,6 +97,11 @@ class QbiEligibilityTest {
                         .checkQbiEligibility(sid, SOLE_PROPRIETOR, US_BUSINESS, NONE_APPLY, PARTICIPATES)
                         .deduction())
                 .isEqualByComparingTo("400");
+        assertThat(eligibility
+                        .checkQbiEligibility(
+                                sid, SOLE_PROPRIETOR, US_BUSINESS, NONE_APPLY, QbiEligibilityTools.Participation.UNSURE)
+                        .reason())
+                .isEqualTo("participation_uncertain");
         var noMinimum =
                 eligibility.checkQbiEligibility(sid, SOLE_PROPRIETOR, US_BUSINESS, NONE_APPLY, DOES_NOT_PARTICIPATE);
         assertThat(noMinimum.eligibility()).isEqualTo("no_deduction");

@@ -104,9 +104,10 @@ public class QbiEligibilityTools {
         if (participation == Participation.PARTICIPATES || participation == Participation.DOES_NOT_PARTICIPATE) {
             projections.estimateQbiDeduction(sessionId, null, participation == Participation.PARTICIPATES);
         }
+        // An explicitly uncertain reply must not reuse an earlier confirmed fact.
+        if (participation == Participation.UNSURE) return unsupported("participation_uncertain");
         var deduction = graph.readFact(session, FactPaths.QBI_DEDUCTION);
         if (!deduction.complete()) {
-            if (participation == Participation.UNSURE) return unsupported("participation_uncertain");
             return result("needs_facts", "unconfirmed", "participation_needed", List.of("qbi_participation"), null);
         }
         String eligibility = ((BigDecimal) deduction.value()).signum() == 0 ? "no_deduction" : "eligible";
