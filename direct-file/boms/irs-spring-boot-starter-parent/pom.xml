@@ -92,13 +92,13 @@
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.language>java</sonar.language>
 
-        <!-- IRS-internal artifact versions (built locally / via the standalone fact-graph repo) -->
+        <!-- First-party artifact versions; fact-graph 3.1.1 is built from the qcloop/fact-graph fork. -->
         <starter-boilerplate.version>0.0.1-SNAPSHOT</starter-boilerplate.version>
         <starter-validation.version>0.0.1-SNAPSHOT</starter-validation.version>
         <starter-test.version>0.0.1-SNAPSHOT</starter-test.version>
         <starter-openfeature.version>0.0.1-SNAPSHOT</starter-openfeature.version>
         <data-models.version>0.0.1-SNAPSHOT</data-models.version>
-        <fact-graph.version>3.1.0-SNAPSHOT</fact-graph.version>
+        <fact-graph.version>3.1.1</fact-graph.version>
         <loaders.version>0.0.1-SNAPSHOT</loaders.version>
         <xmlsec.version>4.0.2</xmlsec.version>
     </properties>

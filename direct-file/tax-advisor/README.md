@@ -193,8 +193,10 @@ it is deliberately left without a strict schema (no schema means no validation t
 This module depends on two things the open-source Direct File repo does not
 publish to Maven Central:
 
-1. **`gov.irs:factgraph_3`** — the Scala 3 engine, lives in the standalone
-   fact-graph repo ([`../../../fact-graph/`](../../../fact-graph/)) and ships via sbt.
+1. **`gov.irs:factgraph_3:3.1.1`** — the Scala 3 engine from the
+   [`qcloop/fact-graph`](https://github.com/qcloop/fact-graph) fork
+   ([local checkout](../../../fact-graph/)), built with sbt. The original Maven
+   namespace is retained; this patched release is maintained by qcloop, not IRS-Public.
 2. **`gov.irs.directfile:loaders`** — the shared XML loader extracted from
    the backend, lives in [`../libs/loaders/`](../libs/loaders/).
 
@@ -204,17 +206,17 @@ publish to Maven Central:
 # 1. Install sbt + Scala (see ../../ONBOARDING.md). On macOS:
 brew install sbt
 
-# 2. Publish the fact graph to your local Maven repo:
+# 2. Starting in direct-file/tax-advisor, install the fork's 3.1.1 engine:
 cd ../../../fact-graph
-sbt publishM2          # writes to ~/.m2/repository/gov/irs/factgraph_3/...
+sbt 'factGraphJVM/publishM2'
 
-# 3. Install Direct File's BOMs and shared libs:
-cd ../boms && ../backend/mvnw install -N
-cd ../libs/data-models && ../../backend/mvnw install
-cd ../loaders && ../../backend/mvnw install
+# 3. Install Direct File's parent and shared libs:
+cd ../direct-file/direct-file
+mvn -N install -f boms/irs-spring-boot-starter-parent/pom.xml
+mvn clean install -f libs/pom.xml
 
 # 4. Build the plan service:
-cd ../tax-advisor && ../backend/mvnw test
+mvn clean package -f tax-advisor/pom.xml
 ```
 
 ## Running
@@ -349,13 +351,39 @@ Property-test failure ledger (2026-11-17):
   UUID/empty segments with IllegalArgumentException/IndexOutOfBoundsException).
   Micrometer registries require
   explicit `close()` rather than try-with-resources in the installed version.
-- **Still exposed:** the separately maintained fact-graph `Rational` uses unchecked
-  32-bit products. Generated mileage properties remain enabled and fail on overflow;
-  their ranges and oracles have not been weakened. Examples include a 2026 December 31
-  projection disagreeing with full-year actuals at 16,366 miles, and a 2024 January
-  projection turning zero receipts into positive profit at 2,671,001 miles. The user
-  explicitly kept this change scoped to tax-advisor; fixing/rebuilding `../fact-graph`
-  remains separate work. See `.claude/docs/tech-debt.md` at the repository root.
+- **Engine fix:** the separately maintained fact-graph `Rational` now uses exact
+  arbitrary-precision arithmetic, with compatible legacy JSON and checked Int accessors.
+  Its operators no longer wrap before reduction. The original mileage properties remain
+  enabled at their original ranges, including the 16,366-mile December projection and
+  2,671,001-mile January projection counterexamples. Rebuild/install the corrected engine
+  before building tax-advisor. Remote builds require a published source pin as described below.
+
+### AWS builds and the fact-graph source pin
+
+The checked-in `.github/scripts/test-mcp.sh` pins `qcloop/fact-graph` release
+`3.1.1` at commit `fe41ec31b38e7d4389d8e0a5258941cdfdf19782`. It downloads the
+public fork's archive, verifies its SHA-256, runs `factGraphJVM/test` and
+`factGraphJVM/publishM2`, then builds the shared Maven dependencies and tax-advisor.
+The production Dockerfile copies that already-built jar; Docker alone does not
+rebuild the engine. AWS build infrastructure is not defined in this repository;
+CodeBuild must run the same dependency-build sequence before building the image.
+
+Local `publishM2` changes only the developer's Maven cache. Version `3.1.1` is
+already pushed to the fork and pinned here. To deliver a future engine release:
+
+1. Bump `factGraphVersion` in the fork's `build.sbt`, then commit and push the tested release.
+2. Update `<fact-graph.version>` in the shared parent POM, plus `factgraph_commit`
+   and the archive SHA-256 in `.github/scripts/test-mcp.sh`, to the matching release.
+   Do not use a moving branch or reuse a previously cached artifact version.
+3. Run the Java checks and image/transport checks, then run the normal AWS delivery
+   pipeline with the updated direct-file revision. Keep test failures fatal.
+
+The public archive download uses HTTPS and does not use the AWS GitHub App, so it
+needs no additional repository grant. If fact-graph becomes a private repository,
+or is configured as an authenticated CodePipeline/CodeBuild source, grant that
+repository to the existing AWS Connector installation and configure the source and
+role permissions. Adding repository access alone does not update the pinned source
+or trigger a dependency rebuild. No AWS connection settings are changed by this fix.
 
 ## Wiring to an LLM
 

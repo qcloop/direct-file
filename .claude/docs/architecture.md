@@ -52,8 +52,10 @@ PostgreSQL schema. Submission to the IRS goes through the **MeF** (Modernized e-
 | `tax-knowledge/` | YAML knowledge artifacts (topics, evidence maps, conflict rules, citations, year-indexed tax parameters) consumed by tax-advisor. |
 | `config/`, `docker/`, `monitoring/`, `scripts/` | Shared config, Docker assets, Prometheus/Grafana/OTel, helper scripts. |
 
-The fact graph engine itself (`gov.irs:factgraph_3`, Scala 3) is a **separate repo** published
-to local `~/.m2` via its own `make publish`. Treat it as an external dependency here.
+The fact graph engine itself (`gov.irs:factgraph_3:3.1.1`, Scala 3) comes from the
+**separate [`qcloop/fact-graph` fork](https://github.com/qcloop/fact-graph)**, built into
+local `~/.m2` with `sbt 'factGraphJVM/publishM2'`. The original Maven namespace is retained;
+the patched release and pinned CI source belong to qcloop, not IRS-Public.
 
 ## 3. The fact graph (central concept)
 

@@ -17,8 +17,12 @@
 
 First-party artifacts resolve from local `~/.m2`, so install in dependency order:
 
-1. **Fact graph** — published from the standalone fact-graph repo (`make publish`) →
-   `gov.irs:factgraph_3:3.1.0-SNAPSHOT`.
+1. **Fact graph** — build the `3.1.1` release from the
+   [`qcloop/fact-graph`](https://github.com/qcloop/fact-graph) fork with
+   `sbt 'factGraphJVM/publishM2'` → `gov.irs:factgraph_3:3.1.1` in `~/.m2`.
+   The Maven coordinates retain the original namespace; this is the fork's release,
+   not an IRS-Public release. CI pins the fork's exact commit and archive checksum
+   in `.github/scripts/test-mcp.sh`.
 2. **Parent POM** — after any edit to it, reinstall before building dependents:
    ```bash
    mvn -N install -f direct-file/boms/irs-spring-boot-starter-parent/pom.xml
