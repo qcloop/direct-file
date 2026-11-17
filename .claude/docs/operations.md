@@ -59,7 +59,7 @@ mvn clean package         # the authoritative build (tests + all gates)
 
 Default (reactive WebFlux/Netty, Streamable HTTP on `:8090`):
 ```bash
-java -jar direct-file/tax-advisor/target/tax-advisor-0.0.1-SNAPSHOT.jar
+java -jar direct-file/tax-advisor/target/tax-advisor-0.0.1.jar
 # or: cd direct-file/tax-advisor && ../backend/mvnw spring-boot:run
 ```
 - `DF_TAX_KNOWLEDGE_ROOT` (default `../tax-knowledge`) points at the YAML knowledge root.
@@ -87,7 +87,7 @@ curl -X POST http://localhost:8090/mcp \
 
 Shared session store (several instances, sessions survive restarts):
 ```bash
-REDIS_URL=redis://localhost:6379 java -jar .../tax-advisor-0.0.1-SNAPSHOT.jar --spring.profiles.active=redis
+REDIS_URL=redis://localhost:6379 java -jar .../tax-advisor-0.0.1.jar --spring.profiles.active=redis
 ```
 - `REDIS_URL` defaults to `redis://localhost:6379` — the same endpoint the client web app uses. Keys are
   namespaced `tax-advisor:session:<id>` and expire after `tax-advisor.session-store.idle-timeout` (60m,
@@ -105,7 +105,7 @@ REDIS_URL=redis://localhost:6379 java -jar .../tax-advisor-0.0.1-SNAPSHOT.jar --
 
 stdio transport (subprocess of a desktop MCP host):
 ```bash
-java -jar .../tax-advisor-0.0.1-SNAPSHOT.jar --spring.profiles.active=stdio
+java -jar .../tax-advisor-0.0.1.jar --spring.profiles.active=stdio
 ```
 - No HTTP listener; JSON-RPC over stdin/stdout. Application logs go to
   `~/.tax-advisor/tax-advisor.log` (stdout stays JSON-RPC-only). Wire into Claude

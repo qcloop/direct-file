@@ -13,7 +13,7 @@ ENV SPRING_PROFILES_ACTIVE=redis \
     SERVER_SHUTDOWN=graceful \
     SPRING_LIFECYCLE_TIMEOUT_PER_SHUTDOWN_PHASE=30s \
     JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=60 -Duser.home=/tmp"
-COPY --chown=10001:10001 tax-advisor/target/tax-advisor-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --chown=10001:10001 tax-advisor/target/tax-advisor-0.0.1.jar /app/app.jar
 COPY --chown=10001:10001 tax-knowledge/rules /app/tax-knowledge/rules
 COPY --chown=10001:10001 tax-knowledge/questions /app/tax-knowledge/questions
 COPY --chown=10001:10001 tax-knowledge/evidence /app/tax-knowledge/evidence

@@ -100,7 +100,7 @@ remains pending. Default runtime policy accepts `approved`, `published`, or `com
 artifacts. To exercise drafts explicitly during review:
 
 ```bash
-java -jar target/tax-advisor-0.0.1-SNAPSHOT.jar --spring.profiles.active=preview
+java -jar target/tax-advisor-0.0.1.jar --spring.profiles.active=preview
 # Combine with stdio or redis as needed: --spring.profiles.active=stdio,preview
 ```
 
@@ -253,7 +253,7 @@ config:
       "command": "java",
       "args": [
         "-jar",
-        "/path/to/tax-advisor/target/tax-advisor-0.0.1-SNAPSHOT.jar",
+        "/path/to/tax-advisor/target/tax-advisor-0.0.1.jar",
         "--spring.profiles.active=stdio"
       ]
     }
@@ -365,15 +365,18 @@ The checked-in `.github/scripts/test-mcp.sh` pins `qcloop/fact-graph` release
 public fork's archive, verifies its SHA-256, runs `factGraphJVM/test` and
 `factGraphJVM/publishM2`, then builds the shared Maven dependencies and tax-advisor.
 The production Dockerfile copies that already-built jar; Docker alone does not
-rebuild the engine. AWS build infrastructure is not defined in this repository;
-CodeBuild must run the same dependency-build sequence before building the image.
+rebuild the engine. AWS build infrastructure is maintained in the separate
+`TaxAdvisor-Infra` repository. Its trusted `scripts/cicd/test-mcp.sh` also pins
+the engine source; keep both pins aligned and deploy the updated infrastructure
+script bundle before starting a calculator release.
 
 Local `publishM2` changes only the developer's Maven cache. Version `3.1.1` is
 already pushed to the fork and pinned here. To deliver a future engine release:
 
 1. Bump `factGraphVersion` in the fork's `build.sbt`, then commit and push the tested release.
 2. Update `<fact-graph.version>` in the shared parent POM, plus `factgraph_commit`
-   and the archive SHA-256 in `.github/scripts/test-mcp.sh`, to the matching release.
+   and the archive SHA-256 in `.github/scripts/test-mcp.sh` and in
+   `TaxAdvisor-Infra/scripts/cicd/test-mcp.sh`, to the matching release.
    Do not use a moving branch or reuse a previously cached artifact version.
 3. Run the Java checks and image/transport checks, then run the normal AWS delivery
    pipeline with the updated direct-file revision. Keep test failures fatal.

@@ -11,7 +11,7 @@
 
     <groupId>com.realworld.tax</groupId>
     <artifactId>tax-advisor</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>Tax Advisor</name>
     <description>Tax-planning agent backend: extends the fact graph with self-employment
         facts and exposes MCP tools (get_fact, set_fact, explain, estimate_quarterly_payment)
