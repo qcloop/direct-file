@@ -19,6 +19,8 @@
 
     <properties>
         <config-folder.path>${project.basedir}/../config</config-folder.path>
+        <!-- Property testing is local to tax-advisor; other services need no native test engine. -->
+        <hegel.version>0.12.5</hegel.version>
     </properties>
 
     <dependencies>
@@ -131,10 +133,24 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>dev.hegel</groupId>
+            <artifactId>hegel</artifactId>
+            <version>${hegel.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Preserve the inherited JaCoCo agent while allowing Hegel's bundled native engine. -->
+                    <argLine>@{argLine} --enable-native-access=ALL-UNNAMED</argLine>
+                </configuration>
+            </plugin>
             <!-- Keep the real Apache commons-logging out of the repackaged fat jar: it does its
                  own log discovery and prints diagnostics straight to stdout on startup, which
                  corrupts the stdio MCP transport (stdout must carry only JSON-RPC frames). The

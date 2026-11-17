@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
  *
  * <p>A single {@code @Around} advice wraps every {@code @McpTool} method and records only three
  * things: the <b>tool name</b> (static), the <b>outcome</b> ({@code ok} / {@code needs_facts} /
- * {@code error}), and, on failure, the <b>exception class name</b>. It deliberately never touches the
+ * {@code unsupported} / {@code error}), and, on failure, the <b>exception class name</b>. It deliberately never touches the
  * method arguments or the result's field values — so dollar amounts, fact paths, session contents, and
  * even exception <i>messages</i> (which can carry a session id or path) never reach a meter or a log
  * line. What it does capture is exactly the signal the recent chat-transcript findings needed:
@@ -83,7 +83,7 @@ public class ToolCallTelemetry {
 
     /**
      * Derive the outcome from a result record's {@code status} component when it has one
-     * ({@code "ok"} / {@code "needs_facts"}); everything else is {@code ok}. Reads only the status
+     * ({@code "ok"} / {@code "needs_facts"} / {@code "unsupported"} / {@code "error"}); everything else is {@code ok}. Reads only the status
      * string — never any other component — so no taxpayer value is inspected.
      */
     private static String outcomeOf(Object result) {
@@ -94,7 +94,13 @@ public class ToolCallTelemetry {
             if ("status".equals(c.getName()) && c.getType() == String.class) {
                 try {
                     Object v = c.getAccessor().invoke(result);
-                    if (v instanceof String s && !s.isBlank()) {
+                    // Only static outcomes may become metric labels or logs, even if a future tool
+                    // accidentally puts caller-controlled text in its status field.
+                    if (v instanceof String s
+                            && ("ok".equals(s)
+                                    || "needs_facts".equals(s)
+                                    || "unsupported".equals(s)
+                                    || "error".equals(s))) {
                         return s;
                     }
                 } catch (ReflectiveOperationException ignored) {

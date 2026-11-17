@@ -2,14 +2,18 @@ package com.realworld.tax.advisor;
 
 import java.math.BigDecimal;
 
+import com.realworld.tax.advisor.graph.PlanningGraphService;
 import com.realworld.tax.advisor.mcp.QuarterlyPaymentTools;
 import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
 import com.realworld.tax.advisor.mcp.SessionTools;
 import com.realworld.tax.advisor.mcp.TaxProjectionTools;
+import dev.hegel.HegelTest;
+import dev.hegel.TestCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static com.realworld.tax.advisor.PropertySupport.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -25,6 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TotalTaxConsistencyTest {
 
     @Autowired
+    PlanningGraphService graph;
+
+    @Autowired
     SessionTools sessionTools;
 
     @Autowired
@@ -35,6 +42,47 @@ class TotalTaxConsistencyTest {
 
     @Autowired
     QuarterlyPaymentTools quarterlyPaymentTools;
+
+    @HegelTest(testCases = 1000)
+    void totalTaxEqualsItsPartsForEveryIncomeAndFilingStatus(TestCase tc) {
+        String gross = dollars(tc, "gross").toPlainString();
+        String other = dollars(tc, "otherIncome").toPlainString();
+        String gains = dollars(tc, "capitalGains").toPlainString();
+        try (var session = session(graph, tc)) {
+            selfEmploymentTools.calculateSeTax(session.id(), gross, null, null, null, null, null, null);
+            taxProjectionTools.estimateQbiDeduction(session.id(), gains, true);
+            var result = taxProjectionTools.projectTotalTax(session.id(), other, null);
+            assertThat(result.status()).isEqualTo("ok");
+            assertThat((BigDecimal) result.projectedTotalTax())
+                    .isEqualByComparingTo(((BigDecimal) result.incomeTax())
+                            .add((BigDecimal) result.selfEmploymentTax())
+                            .add((BigDecimal) result.additionalMedicareTax()));
+        }
+    }
+
+    @HegelTest(testCases = 1000)
+    void filingBalanceSubtractsPaymentsWithoutClippingRefunds(TestCase tc) {
+        String gross = dollars(tc, "gross").toPlainString();
+        BigDecimal withheld = dollars(tc, "withheld");
+        BigDecimal paid = dollars(tc, "paid");
+        try (var session = session(graph, tc)) {
+            selfEmploymentTools.calculateSeTax(session.id(), gross, null, null, null, null, null, null);
+            taxProjectionTools.estimateQbiDeduction(session.id(), null, true);
+            sessionTools.setFact(session.id(), "/planning/priorYearTotalTax", "dollar", null, "0", null);
+            sessionTools.setFact(session.id(), "/planning/priorYearAGI", "dollar", null, "0", null);
+            sessionTools.setFact(
+                    session.id(), "/planning/ytdWithholding", "dollar", null, withheld.toPlainString(), null);
+            sessionTools.setFact(
+                    session.id(), "/planning/ytdEstimatedPaymentsMade", "dollar", null, paid.toPlainString(), null);
+            var result = quarterlyPaymentTools.estimateQuarterlyPayment(
+                    session.id(), graph.taxYearOf(session.sessionId()) + "-08-20");
+            assertThat(result.status()).isEqualTo("ok");
+            assertThat((BigDecimal) result.projectedBalanceDueAtFiling())
+                    .isEqualByComparingTo(((BigDecimal) result.projectedTotalTax())
+                            .subtract(withheld)
+                            .subtract(paid));
+        }
+    }
 
     @Test
     void derivedTotalTaxEqualsItsPartsAndQbiIsCapped() {

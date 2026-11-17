@@ -291,6 +291,72 @@ tool calls with expected output fields), driven through the real MCP tool surfac
 deterministic regression check for what an agent actually receives. Add a scenario by dropping a
 new JSON file in that directory; no Java changes needed.
 
+### Property-based tests
+
+The variable-input contracts use `dev.hegel:hegel` (test scope only). `@HegelTest`
+works with the existing JUnit/Spring context; Surefire enables native access and
+preserves the inherited JaCoCo agent. Run the suite with JDK 26:
+
+```bash
+mvn clean package
+# A focused property run:
+mvn test -Dtest=ProjectNetProfitTest
+```
+
+Properties request 1,000 cases each (3,000 for the inexpensive parsing contracts),
+including shrinking and replay of failures saved under the ignored `.hegel/` directory.
+Hegel prints labeled inputs and a `reproduceFailure` annotation for a failing case.
+Copy that annotation onto the same property to replay it; remove it after investigation.
+`PropertySupport` supplies all supported years/statuses, nonnegative amounts through
+the full positive Java-int range plus cents, and per-example session cleanup.
+Mileage covers the nonnegative fact-graph Int range. Text/list generators retain
+their general domains, including empty strings, control characters and duplicates.
+The money oracles model the engine's cents precision (HALF_EVEN) followed by explicit
+whole-dollar Round nodes (HALF_UP); they do not introduce tolerances.
+
+| Public surface | Generated contracts and retained checks |
+| --- | --- |
+| Schedule C/SE, annualization and period mileage | Independent amount/rate oracles, December projection versus full-year actuals, estimated-to-actual refinement, stale-allocation clearing, invalid dates/allocations and rollback. Exact transcript/year regressions remain. |
+| Total tax, QBI, Additional Medicare, status comparison and quarterly payments | Tax components, signed filing balances, both QBI caps, participation completeness, threshold-adjacent values, independent status sessions, deadline transitions and payment repartitioning. Scope-screening and prerequisite wording fixtures remain deterministic. |
+| Graph sessions, persister shaping and filing statuses | Atomic single/batch writes, protected parameters, provenance, locale-independent aliases, integer/rational shaping, Boolean rejection, opaque identifiers and concurrent writes. Knowledge-version and clock boundaries retain their fixed integration tests. |
+| Session snapshots and both stores | Nested immutability, metadata/JSON roundtrips, insertion order with duplicate paths, versioned CAS, isolation and deletion. Both stores inherit the same properties; Redis connection/expiry tests retain their infrastructure-dependent lifecycle. A 100,000-fact snapshot exercises copying and serialization at scale. |
+| Citation registry/service | Independent XML dependency traversal, parameter ordering/deduplication, both overload families and unresolved IDs. The exhaustive parameter-to-registry gate remains deterministic. |
+| Telemetry | Exact call counts through Spring AOP; return/exception identity, one timer event, static outcomes, and absence of generated sensitive text from meters/logs. |
+| Interview knowledge, releases, reports, application/configuration and tool inventory | Existing authored-fixture, release-policy, report-seal, architecture and boot/transport checks remain deterministic: their finite content and environment contracts are not strengthened by random resampling. Golden evals additionally check that arbitrary accepted/rejected reads leave subsequent tool results unchanged. |
+
+An independent implementation-only Hegel review supplied additional rejection,
+equivalent-path, state-isolation and privacy cases. Constructor knobs and sibling
+entry points are covered above; finite publication/wording and operational-clock
+checks remain explicit fixtures. There is no recursive public input or documented
+complexity bound here; the snapshot scale probe covers the principal bulk-copy path.
+
+Property-test failure ledger (2026-11-17):
+
+- **Fixed:** omitted mileage periods unboxed a null `Long`; nullable control flow now
+  preserves the absent input.
+- **Fixed:** status/type aliases depended on the JVM default locale; normalization now
+  uses `Locale.ROOT`, including Turkish-locale counterexamples.
+- **Fixed:** snapshot map copies shared mutable Jackson nodes; constructors and accessors
+  now defensively copy nested values.
+- **Fixed:** unexpected result status text could enter telemetry labels/logs; the aspect
+  now allows only static outcomes, including the QBI scope tool's `unsupported` outcome.
+- **Fixed:** graph parser stack traces could echo malformed taxpayer values; logs now
+  retain only the exception class, while the caller still receives the cause.
+- **Test-oracle corrections:** the Medicare model must round projected receipts before
+  net earnings; annualization observes the engine's cents precision before whole-dollar
+  rounding. Malformed fact paths may reject a read; the eval property checks state
+  preservation for both accepted and rejected reads (the engine rejects malformed
+  UUID/empty segments with IllegalArgumentException/IndexOutOfBoundsException).
+  Micrometer registries require
+  explicit `close()` rather than try-with-resources in the installed version.
+- **Still exposed:** the separately maintained fact-graph `Rational` uses unchecked
+  32-bit products. Generated mileage properties remain enabled and fail on overflow;
+  their ranges and oracles have not been weakened. Examples include a 2026 December 31
+  projection disagreeing with full-year actuals at 16,366 miles, and a 2024 January
+  projection turning zero receipts into positive profit at 2,671,001 miles. The user
+  explicitly kept this change scoped to tax-advisor; fixing/rebuilding `../fact-graph`
+  remains separate work. See `.claude/docs/tech-debt.md` at the repository root.
+
 ## Wiring to an LLM
 
 This service is the *MCP server* side. An LLM gateway (Azure OpenAI Gov,

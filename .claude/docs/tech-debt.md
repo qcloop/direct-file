@@ -15,6 +15,15 @@ is resolved, delete it (git history keeps the record).
 
 ## tax-advisor — tax modeling (MVP scope)
 
+- **Fact-graph Rational arithmetic can overflow on planning mileage.** Hegel properties
+  in `ProjectNetProfitTest` and `EstimatedMileageIntegrationTest` expose unchecked
+  32-bit numerator/denominator products in the separate `fact-graph` repo. For example,
+  a zero-receipts 2026 December 31 projection with 16,366 unallocated miles reports
+  positive profit while full-year actuals report zero; a 2024 January projection with
+  2,671,001 miles also overflows. These properties intentionally remain enabled/red.
+  Fix the engine's arithmetic and rebuild/publish it; do not narrow generators to
+  hide the defect. The 2026 estimated-mileage calendar-day property also catches it.
+  The user explicitly excluded changes to `../fact-graph` from this test rewrite.
 - **QBI is the simple method only (Form 8995).** Above the filing-status threshold, Form 8995-A
   (SSTB / W-2-wage / UBIA limits) governs; the tool returns an upper bound and flags it. Not modeled:
   the 8995-A limits and the expanded 2026 phase-in range. The eligible 2026 $400 minimum is now

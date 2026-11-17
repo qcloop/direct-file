@@ -35,9 +35,27 @@ public record SessionSnapshot(
     }
 
     public SessionSnapshot {
-        facts = Collections.unmodifiableMap(new LinkedHashMap<>(facts));
+        facts = copyFacts(facts);
         sourceNotes = Collections.unmodifiableMap(new LinkedHashMap<>(sourceNotes));
         knowledgeVersion = knowledgeVersion == null ? "" : knowledgeVersion;
+    }
+
+    /** Jackson object/array nodes are mutable; neither callers nor stores may mutate a saved snapshot. */
+    @Override
+    public Map<String, FactTypeWithItem> facts() {
+        return copyFacts(facts);
+    }
+
+    private static Map<String, FactTypeWithItem> copyFacts(Map<String, FactTypeWithItem> source) {
+        Map<String, FactTypeWithItem> copy = new LinkedHashMap<>();
+        source.forEach((path, fact) -> copy.put(
+                path,
+                fact == null
+                        ? null
+                        : new FactTypeWithItem(
+                                fact.type(),
+                                fact.item() == null ? null : fact.item().deepCopy())));
+        return Collections.unmodifiableMap(copy);
     }
 
     /** This session with {@code path} set to {@code fact} (replacing any earlier value in place). */

@@ -1,22 +1,32 @@
 package com.realworld.tax.advisor.graph;
 
+import java.util.UUID;
+
+import dev.hegel.HegelTest;
+import dev.hegel.TestCase;
 import org.junit.jupiter.api.Test;
 
+import static dev.hegel.Generators.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SessionIdTest {
 
-    @Test
-    void idsWithTheSameValueAreTheSameSession() {
-        assertThat(SessionId.of("abc")).isEqualTo(SessionId.of("abc")).hasSameHashCodeAs(SessionId.of("abc"));
-        assertThat(SessionId.of("abc")).isNotEqualTo(SessionId.of("abd"));
-    }
-
-    @Test
-    void rendersAsTheBareIdSoMessagesAndLogsAreUnchanged() {
-        assertThat(SessionId.of("abc")).hasToString("abc");
-        assertThat("session " + SessionId.of("abc")).isEqualTo("session abc");
+    @HegelTest(testCases = 3000)
+    void idsPreserveTheirExactValueAndEquality(TestCase tc) {
+        String raw = tc.draw(text(), "id");
+        if (raw.isBlank()) {
+            assertThatThrownBy(() -> SessionId.of(raw))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("create_session");
+        } else {
+            assertThat(SessionId.of(raw))
+                    .isEqualTo(new SessionId(raw))
+                    .hasSameHashCodeAs(new SessionId(raw))
+                    .hasToString(raw);
+            assertThat(SessionId.of(raw).value()).isEqualTo(raw);
+            assertThat(SessionId.of(raw)).isNotEqualTo(SessionId.of(raw + "x"));
+        }
     }
 
     @Test
@@ -27,8 +37,20 @@ class SessionIdTest {
         assertThatThrownBy(() -> SessionId.of("  ")).isInstanceOf(IllegalArgumentException.class);
     }
 
+    @HegelTest(testCases = 1000)
+    void whitespaceOnlyIdsAreRejectedWithGuidance(TestCase tc) {
+        String blank = tc.draw(lists(sampledFrom(" ", "\t", "\n", "\r", "\u2003")), "whitespace").stream()
+                .reduce("", String::concat);
+        assertThatThrownBy(() -> new SessionId(blank))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("create_session");
+        assertThatThrownBy(() -> SessionId.of(blank)).isInstanceOf(IllegalArgumentException.class);
+    }
+
     @Test
-    void freshIdsAreDistinct() {
-        assertThat(SessionId.random()).isNotEqualTo(SessionId.random());
+    void freshIdsAreDistinctVersionFourUuids() {
+        SessionId fresh = SessionId.random();
+        assertThat(UUID.fromString(fresh.value()).version()).isEqualTo(4);
+        assertThat(fresh).isNotEqualTo(SessionId.random());
     }
 }

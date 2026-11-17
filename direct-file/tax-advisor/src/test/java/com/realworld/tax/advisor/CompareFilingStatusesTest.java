@@ -4,14 +4,18 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.realworld.tax.advisor.graph.PlanningGraphService;
 import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
 import com.realworld.tax.advisor.mcp.SessionTools;
 import com.realworld.tax.advisor.mcp.TaxProjectionTools;
 import com.realworld.tax.advisor.mcp.TaxProjectionTools.FilingStatusProjection;
+import dev.hegel.HegelTest;
+import dev.hegel.TestCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static com.realworld.tax.advisor.PropertySupport.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -22,6 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest
 class CompareFilingStatusesTest {
+    @Autowired
+    PlanningGraphService graph;
 
     @Autowired
     SessionTools sessionTools;
@@ -67,5 +73,40 @@ class CompareFilingStatusesTest {
                 .isGreaterThan((BigDecimal) byStatus.get("single").standardDeduction());
         assertThat((BigDecimal) byStatus.get("single").incomeTax()).isGreaterThan(BigDecimal.ZERO);
         assertThat((BigDecimal) byStatus.get("mfj").incomeTax()).isEqualByComparingTo("0");
+    }
+
+    @HegelTest(testCases = 1000)
+    void comparisonsAgreeWithIndependentSessionsAndLeaveTheSourceUntouched(TestCase tc) {
+        int year = year(tc);
+        String gross = dollars(tc, "gross").toPlainString();
+        String other = dollars(tc, "otherIncome").toPlainString();
+        String wages = dollars(tc, "medicareWages").toPlainString();
+        try (var source = session(graph, year, filingStatus(tc))) {
+            selfEmploymentTools.calculateSeTax(source.id(), gross, null, null, null, null, null, null);
+            taxProjectionTools.calculateAdditionalMedicare(source.id(), wages);
+            taxProjectionTools.estimateQbiDeduction(source.id(), null, true);
+            taxProjectionTools.projectTotalTax(source.id(), other, null);
+            graph.setSourceNote(
+                    source.sessionId(), "/seGrossReceipts", tc.draw(dev.hegel.Generators.text(), "sourceNote"));
+            var facts = graph.sessionFacts(source.sessionId());
+            var notes = graph.sourceNotes(source.sessionId());
+            var result = taxProjectionTools.compareFilingStatuses(source.id());
+            assertThat(result.projections())
+                    .extracting(FilingStatusProjection::filingStatus)
+                    .containsExactly("single", "mfj", "mfs");
+            for (var row : result.projections()) {
+                try (var independent = session(graph, year, row.filingStatus())) {
+                    selfEmploymentTools.calculateSeTax(independent.id(), gross, null, null, null, null, null, null);
+                    taxProjectionTools.calculateAdditionalMedicare(independent.id(), wages);
+                    taxProjectionTools.estimateQbiDeduction(independent.id(), null, true);
+                    var expected = taxProjectionTools.projectTotalTax(independent.id(), other, null);
+                    assertThat(row.projectedTotalTax()).isEqualTo(expected.projectedTotalTax());
+                    assertThat(row.selfEmploymentTax()).isEqualTo(expected.selfEmploymentTax());
+                    assertThat(row.incomeTax()).isEqualTo(expected.incomeTax());
+                }
+            }
+            assertThat(graph.sessionFacts(source.sessionId())).isEqualTo(facts);
+            assertThat(graph.sourceNotes(source.sessionId())).isEqualTo(notes);
+        }
     }
 }

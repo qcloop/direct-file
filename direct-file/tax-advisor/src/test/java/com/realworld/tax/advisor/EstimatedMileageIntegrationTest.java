@@ -1,6 +1,8 @@
 package com.realworld.tax.advisor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 
 import com.realworld.tax.advisor.graph.FactPaths;
 import com.realworld.tax.advisor.graph.PlanningGraphService;
@@ -8,10 +10,14 @@ import com.realworld.tax.advisor.graph.SessionId;
 import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
 import com.realworld.tax.advisor.mcp.SessionTools;
 import com.realworld.tax.advisor.report.PlanReportService;
+import dev.hegel.HegelTest;
+import dev.hegel.TestCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static com.realworld.tax.advisor.PropertySupport.*;
+import static dev.hegel.Generators.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -137,5 +143,151 @@ class EstimatedMileageIntegrationTest {
         assertThatThrownBy(() -> se.calculateSeTax(id, null, null, null, null, null, "10001", null))
                 .isInstanceOf(IllegalArgumentException.class);
         assertThat(graph.sessionFacts(SessionId.of(id))).isEqualTo(saved);
+    }
+
+    @HegelTest(testCases = 1000)
+    void generatedTotalOnlyMileageUsesCalendarDaySharesWithoutActualRecords(TestCase tc) {
+        int miles = tc.draw(integers().min(1), "totalMiles");
+        LocalDate date = tc.draw(dates().min(LocalDate.of(2026, 7, 1)).max(LocalDate.of(2026, 12, 31)), "asOf");
+        try (var session = PropertySupport.session(graph, 2026, filingStatus(tc))) {
+            var result = se.projectNetProfit(
+                    session.id(), date.toString(), "50000", Integer.toString(miles), "0", "0", "0", null, null);
+            assertThat(result.mileageAllocationStatus()).isEqualTo("estimated");
+            assertThat(result.mileagePeriods())
+                    .allSatisfy(p -> assertThat(p.actualBusinessMiles()).isNull());
+            assertThat(graph.readFact(session.sessionId(), FactPaths.SE_MILES_BEFORE_CHANGE)
+                            .complete())
+                    .isFalse();
+            assertThat(graph.readFact(session.sessionId(), FactPaths.SE_MILES_AFTER_CHANGE)
+                            .complete())
+                    .isFalse();
+            // Mileage projection follows calendar days, independently of receipt annualization by month.
+            BigDecimal expected = BigDecimal.valueOf(miles)
+                    .multiply(BigDecimal.valueOf(365))
+                    .divide(BigDecimal.valueOf(date.getDayOfYear()), 10, RoundingMode.HALF_UP);
+            assertThat((BigDecimal) result.projectedBusinessMiles()).isEqualByComparingTo(expected);
+        }
+    }
+
+    @HegelTest(testCases = 1000)
+    void aSinglePeriodRefinementAgreesWithCompleteActualInput(TestCase tc) {
+        int total = tc.draw(integers().min(1), "totalMiles");
+        int before = tc.draw(integers().min(0).max(total), "beforeMiles");
+        boolean answerFirst = tc.draw(booleans(), "answerFirstPeriod");
+        boolean projection = tc.draw(booleans(), "projection");
+        String gross = dollars(tc, "gross").toPlainString();
+        String fees = dollars(tc, "fees").toPlainString();
+        String status = filingStatus(tc);
+        try (var refined = PropertySupport.session(graph, 2026, status);
+                var fresh = PropertySupport.session(graph, 2026, status)) {
+            String b = Integer.toString(before);
+            String a = Integer.toString(total - before);
+            if (projection) {
+                se.projectNetProfit(
+                        refined.id(), "2026-08-31", gross, Integer.toString(total), fees, "0", "0", null, null);
+                se.projectNetProfit(
+                        refined.id(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        answerFirst ? b : null,
+                        answerFirst ? null : a);
+                se.projectNetProfit(fresh.id(), "2026-08-31", gross, Integer.toString(total), fees, "0", "0", b, a);
+            } else {
+                se.calculateSeTax(refined.id(), gross, Integer.toString(total), fees, "0", "0", null, null);
+                se.calculateSeTax(
+                        refined.id(), null, null, null, null, null, answerFirst ? b : null, answerFirst ? null : a);
+                se.calculateSeTax(fresh.id(), gross, Integer.toString(total), fees, "0", "0", b, a);
+            }
+            for (String path : new String[] {
+                FactPaths.SE_NET_PROFIT,
+                FactPaths.SE_TAX,
+                FactPaths.SE_MILES_BEFORE_CHANGE,
+                FactPaths.SE_MILES_AFTER_CHANGE,
+                FactPaths.SE_GROSS_RECEIPTS,
+                FactPaths.SE_PLATFORM_FEES
+            }) {
+                assertThat(graph.readFact(refined.sessionId(), path).value())
+                        .as(path)
+                        .isEqualTo(graph.readFact(fresh.sessionId(), path).value());
+            }
+        }
+    }
+
+    @HegelTest(testCases = 1000)
+    void invalidRefinementLeavesTheWholeSavedEstimateUnchanged(TestCase tc) {
+        int total = tc.draw(integers().min(1), "totalMiles");
+        String invalid = tc.draw(
+                sampledFrom("-1", "0.5", "9223372036854775808", Long.toString((long) total + 1)), "invalidPeriod");
+        boolean projection = tc.draw(booleans(), "projection");
+        try (var session = PropertySupport.session(graph, 2026, filingStatus(tc))) {
+            if (projection)
+                se.projectNetProfit(
+                        session.id(), "2026-08-31", "50000", Integer.toString(total), "0", "0", "0", null, null);
+            else se.calculateSeTax(session.id(), "50000", Integer.toString(total), "0", "0", "0", null, null);
+            var saved = graph.sessionFacts(session.sessionId());
+            if (projection)
+                assertThatThrownBy(() ->
+                                se.projectNetProfit(session.id(), null, null, null, null, null, null, invalid, null))
+                        .isInstanceOf(IllegalArgumentException.class);
+            else
+                assertThatThrownBy(() -> se.calculateSeTax(session.id(), null, null, null, null, null, invalid, null))
+                        .isInstanceOf(IllegalArgumentException.class);
+            assertThat(graph.sessionFacts(session.sessionId())).isEqualTo(saved);
+        }
+    }
+
+    @HegelTest(testCases = 1000)
+    void replacingActualsClearsStaleAllocationAndExactOnlyWithholdsTax(TestCase tc) {
+        int total = tc.draw(integers().min(1), "totalMiles");
+        int before = tc.draw(integers().min(0).max(total), "beforeMiles");
+        boolean exact = tc.draw(booleans(), "requireExact");
+        try (var session = PropertySupport.session(graph, 2026, filingStatus(tc))) {
+            se.projectNetProfit(
+                    session.id(),
+                    "2026-08-31",
+                    "50000",
+                    Integer.toString(total),
+                    "0",
+                    "0",
+                    "0",
+                    Integer.toString(before),
+                    Integer.toString(total - before));
+            sessions.setFact(
+                    session.id(), FactPaths.SE_MILEAGE_REQUIRE_EXACT, "boolean", null, Boolean.toString(exact), null);
+            var replaced = se.calculateSeTax(session.id(), "50000", Integer.toString(total), "0", "0", "0", null, null);
+            assertThat(replaced.mileageAllocationStatus()).isEqualTo(exact ? "pending" : "estimated");
+            assertThat(graph.readFact(session.sessionId(), FactPaths.SE_MILES_BEFORE_CHANGE)
+                            .complete())
+                    .isFalse();
+            assertThat(graph.readFact(session.sessionId(), FactPaths.SE_MILES_AFTER_CHANGE)
+                            .complete())
+                    .isFalse();
+            if (exact) assertThat(replaced.selfEmploymentTax()).isNull();
+        }
+    }
+
+    @HegelTest(testCases = 1000)
+    void actualPeriodDeductionAppliesEachReleasedRate(TestCase tc) {
+        int total = tc.draw(integers().min(0), "totalMiles");
+        int before = tc.draw(integers().min(0).max(total), "beforeMiles");
+        try (var session = PropertySupport.session(graph, 2026, filingStatus(tc))) {
+            se.calculateSeTax(
+                    session.id(),
+                    "50000",
+                    Integer.toString(total),
+                    "0",
+                    "0",
+                    "0",
+                    Integer.toString(before),
+                    Integer.toString(total - before));
+            BigDecimal first = money(BigDecimal.valueOf(before).multiply(new BigDecimal("0.725")));
+            BigDecimal second = money(BigDecimal.valueOf(total - before).multiply(new BigDecimal("0.76")));
+            assertThat(graph.readDecimal(session.sessionId(), "/seVehicleDeduction"))
+                    .isEqualByComparingTo(rounded(first.add(second)));
+        }
     }
 }
