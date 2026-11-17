@@ -2,6 +2,7 @@ package com.realworld.tax.advisor.graph;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Filing statuses recognized for status-scoped parameters (standard deduction, bracket widths, the
@@ -33,7 +34,7 @@ public enum FilingStatus {
         if (raw == null || raw.isBlank()) {
             return SINGLE;
         }
-        String normalized = raw.trim().toLowerCase();
+        String normalized = raw.trim().toLowerCase(Locale.ROOT);
         return Arrays.stream(values())
                 .filter(status -> status.code.equals(normalized))
                 .findFirst()

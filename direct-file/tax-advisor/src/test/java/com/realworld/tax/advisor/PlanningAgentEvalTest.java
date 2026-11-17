@@ -7,9 +7,12 @@ import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.realworld.tax.advisor.graph.PlanningGraphService;
 import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
 import com.realworld.tax.advisor.mcp.SessionTools;
 import com.realworld.tax.advisor.mcp.TaxProjectionTools;
+import dev.hegel.HegelTest;
+import dev.hegel.TestCase;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
+import static dev.hegel.Generators.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -34,6 +38,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest
 class PlanningAgentEvalTest {
+
+    @Autowired
+    PlanningGraphService graph;
 
     @Autowired
     SessionTools sessionTools;
@@ -121,5 +128,36 @@ class PlanningAgentEvalTest {
 
     private static String txt(JsonNode a, String key) {
         return a.has(key) ? a.get(key).asText() : null;
+    }
+
+    @HegelTest(testCases = 1000)
+    void readOnlyToolCallsCannotChangeScenarioResults(TestCase tc) throws Exception {
+        List<JsonNode> scenarios = new ArrayList<>();
+        for (Resource fixture : new PathMatchingResourcePatternResolver().getResources("classpath*:/evals/*.json")) {
+            try (var input = fixture.getInputStream()) {
+                scenarios.add(objectMapper.readTree(input));
+            }
+        }
+        JsonNode scenario = tc.draw(sampledFrom(scenarios), "scenario");
+        List<String> probes = tc.draw(lists(text()), "readOnlyPaths");
+        int year = scenario.get("taxYear").asInt();
+        String status = scenario.get("filingStatus").asText();
+        try (var baseline = PropertySupport.session(graph, year, status);
+                var observed = PropertySupport.session(graph, year, status)) {
+            for (JsonNode step : scenario.get("steps")) {
+                String tool = step.get("tool").asText();
+                JsonNode args = step.has("args") ? step.get("args") : objectMapper.createObjectNode();
+                for (String path : probes) {
+                    try {
+                        sessionTools.getFact(observed.id(), "/unknown/" + path);
+                    } catch (IllegalArgumentException | IndexOutOfBoundsException ignored) {
+                        // Malformed paths may be rejected; both accepted and rejected reads must leave state alone.
+                    }
+                }
+                JsonNode expected = objectMapper.valueToTree(invoke(baseline.id(), tool, args));
+                JsonNode actual = objectMapper.valueToTree(invoke(observed.id(), tool, args));
+                assertThat(actual).as("%s after read-only calls", tool).isEqualTo(expected);
+            }
+        }
     }
 }

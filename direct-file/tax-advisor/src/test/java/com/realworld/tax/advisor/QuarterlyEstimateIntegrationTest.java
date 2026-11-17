@@ -1,33 +1,28 @@
 package com.realworld.tax.advisor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.List;
 
+import com.realworld.tax.advisor.graph.FactPaths;
 import com.realworld.tax.advisor.graph.PlanningGraphService;
-import com.realworld.tax.advisor.graph.SessionId;
 import com.realworld.tax.advisor.mcp.QuarterlyPaymentTools;
 import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
 import com.realworld.tax.advisor.mcp.SessionTools;
-import org.junit.jupiter.api.Test;
+import com.realworld.tax.advisor.mcp.TaxProjectionTools;
+import dev.hegel.HegelTest;
+import dev.hegel.TestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.realworld.tax.advisor.PropertySupport.*;
+import static dev.hegel.Generators.*;
+import static org.assertj.core.api.Assertions.*;
 
-/**
- * Exercises a full agentic flow end-to-end through the Spring AI tool surface:
- *
- *   1. Create a planning session via the create_session tool.
- *   2. Initial call to estimate_quarterly_payment returns 'needs_facts'.
- *   3. Agent writes each required fact via set_fact.
- *   4. Second call returns a recommended Q3 payment with a derivation chain.
- *
- * Uses a realistic gig-worker scenario: Uber + DoorDash driver in TY2025,
- * netting ~$32K SE profit, prior-year tax $3,800, AGI $58K (not high-income),
- * has $400 in 1099 withholding YTD, has paid Q1+Q2 already.
- */
+/** Safe harbor is a prepayment target, distinct from total tax and from the signed filing balance. */
 @SpringBootTest
 class QuarterlyEstimateIntegrationTest {
-
     @Autowired
     PlanningGraphService graph;
 
@@ -38,71 +33,86 @@ class QuarterlyEstimateIntegrationTest {
     SelfEmploymentTools selfEmploymentTools;
 
     @Autowired
+    TaxProjectionTools projections;
+
+    @Autowired
     QuarterlyPaymentTools quarterlyPaymentTools;
 
-    @Test
-    void quarterlyEstimateFlow() {
-        String sid = sessionTools.createSession("2025", null).sessionId();
-
-        // 1) Without any facts populated, the tool should ask for what's missing.
-        var before = quarterlyPaymentTools.estimateQuarterlyPayment(sid, "2025-08-20");
-        assertThat(before.status()).isEqualTo("needs_facts");
-        assertThat(before.missingFacts()).isNotEmpty();
-
-        // 2) Gather facts the way the LLM agent would after a short interview.
-        writeDollar(sid, "/planning/priorYearTotalTax", 3800);
-        writeDollar(sid, "/planning/priorYearAGI", 58000);
-        // projectedCurrentYearTax is now DERIVED (was an agent-entered guess). Populate the Schedule C
-        // inputs so it computes: ~$32K net profit -> total tax (income + SE) comfortably above the
-        // $4,222 the 90% leg would need to beat the $3,800 prior-year leg, so the prior-year leg governs.
-        selfEmploymentTools.calculateSeTax(sid, "32000", null, null, null, null, null, null);
-        writeDollar(sid, "/planning/ytdWithholding", 400);
-        writeDollar(sid, "/planning/ytdEstimatedPaymentsMade", 1800); // Q1 + Q2 already paid
-
-        // 3) Run again — now we should get a real recommendation.
-        var after = quarterlyPaymentTools.estimateQuarterlyPayment(sid, "2025-08-20");
-        assertThat(after.status()).isEqualTo("ok");
-        assertThat(after.nextDeadline()).isEqualTo("2025-09-15");
-        assertThat(after.quarter()).isEqualTo("Q3");
-
-        BigDecimal recommended = (BigDecimal) after.recommendedPayment();
-        // Safe harbor = lesser of (100% of $3,800 = $3,800) and (90% of $7,200 = $6,480) -> $3,800.
-        // Remaining due = $3,800 - $2,200 (withholding + paid) = $1,600.
-        // Split across remaining 2 quarters (Q3 + Q4) -> $800 per quarter.
-        assertThat(recommended).isEqualByComparingTo("800");
+    @HegelTest(testCases = 1000)
+    void recommendationMatchesSafeHarborAcrossIncomeTiersAndDeadlines(TestCase tc) {
+        int year = year(tc);
+        String status = filingStatus(tc);
+        BigDecimal gross = dollars(tc, "profit");
+        BigDecimal priorTax = dollars(tc, "priorTax");
+        BigDecimal threshold = new BigDecimal(status.equals("mfs") ? "75000" : "150000");
+        BigDecimal agi = tc.draw(booleans(), "nearThreshold")
+                ? threshold.add(BigDecimal.valueOf(tc.draw(integers().min(-1).max(1), "thresholdCents"), 2))
+                : dollars(tc, "priorAgi");
+        BigDecimal withheld = dollars(tc, "withheld");
+        BigDecimal paid = dollars(tc, "paid");
+        LocalDate date = tc.draw(dates().min(LocalDate.of(year, 1, 1)).max(LocalDate.of(year + 1, 2, 1)), "asOf");
+        try (var session = session(graph, year, status)) {
+            selfEmploymentTools.calculateSeTax(session.id(), gross.toPlainString(), null, null, null, null, null, null);
+            projections.estimateQbiDeduction(session.id(), null, true);
+            write(session.id(), FactPaths.PRIOR_YEAR_TOTAL_TAX, priorTax);
+            write(session.id(), FactPaths.PRIOR_YEAR_AGI, agi);
+            write(session.id(), FactPaths.YTD_WITHHOLDING, withheld);
+            write(session.id(), FactPaths.YTD_ESTIMATED_PAYMENTS_MADE, paid);
+            var result = quarterlyPaymentTools.estimateQuarterlyPayment(session.id(), date.toString());
+            List<LocalDate> deadlines = List.of(
+                            LocalDate.of(year, 4, 15),
+                            LocalDate.of(year, 6, 15),
+                            LocalDate.of(year, 9, 15),
+                            LocalDate.of(year + 1, 1, 15))
+                    .stream()
+                    .map(d -> {
+                        while (d.getDayOfWeek().getValue() > 5) d = d.plusDays(1);
+                        return d;
+                    })
+                    .toList();
+            long remaining = Math.max(
+                    1, deadlines.stream().filter(d -> !d.isBefore(date)).count());
+            LocalDate next = deadlines.stream()
+                    .filter(d -> !d.isBefore(date))
+                    .findFirst()
+                    .orElse(deadlines.getLast());
+            BigDecimal prior =
+                    rounded(agi.compareTo(threshold) > 0 ? money(priorTax.multiply(new BigDecimal("1.10"))) : priorTax);
+            BigDecimal current =
+                    rounded(money(((BigDecimal) result.projectedTotalTax()).multiply(new BigDecimal("0.90"))));
+            BigDecimal due =
+                    prior.min(current).subtract(withheld).subtract(paid).max(BigDecimal.ZERO);
+            BigDecimal expected = rounded(due.divide(BigDecimal.valueOf(remaining), 2, RoundingMode.HALF_EVEN));
+            assertThat((BigDecimal) result.recommendedPayment()).isEqualByComparingTo(expected);
+            assertThat(result.nextDeadline()).isEqualTo(next.toString());
+        }
     }
 
-    /**
-     * Exercises the high-income (110%) safe-harbor leg, which the gig-worker scenario above
-     * never reaches (its AGI is below the threshold, so the 100% identity branch wins). With
-     * prior-year AGI over the $150K threshold, the injected {@code highIncomeSafeHarborRate}
-     * (110/100, from estimated-tax-parameters.yaml) must multiply prior-year tax — proving the
-     * rate is wired through from tax-knowledge and not a dictionary literal.
-     */
-    @Test
-    void highIncomeSafeHarborMultipliesPriorYearTaxBy110Percent() {
-        SessionId sid = graph.createSession(2025);
-
-        writeDollar(sid.value(), "/planning/priorYearTotalTax", 20000);
-        writeDollar(sid.value(), "/planning/priorYearAGI", 200000); // over the $150K high-income threshold
-        // Derived current-year tax: ~$130K net profit yields total tax well above $24,445, so the 90%
-        // current-year leg (>= ~$28K) exceeds the 110% prior-year leg ($22,000) and the prior-year leg wins.
-        selfEmploymentTools.calculateSeTax(sid.value(), "130000", null, null, null, null, null, null);
-
-        // High-income tier engaged.
-        assertThat(graph.readFact(sid, "/planning/highIncomeSafeHarborApplies").value())
-                .isEqualTo(true);
-        // Prior-year leg = 110% x $20,000 = $22,000 (would be $20,000 if the rate weren't applied).
-        assertThat((BigDecimal) graph.readFact(sid, "/planning/priorYearSafeHarborTarget")
-                        .value())
-                .isEqualByComparingTo("22000");
-        // Overall target = lesser of ($22,000, 90% x $30,000 = $27,000) = $22,000.
-        assertThat((BigDecimal)
-                        graph.readFact(sid, "/planning/safeHarborTarget").value())
-                .isEqualByComparingTo("22000");
+    @HegelTest(testCases = 1000)
+    void repartitioningPaymentsPreservesRecommendationAndBalance(TestCase tc) {
+        BigDecimal withheld = dollars(tc, "withheld");
+        BigDecimal paid = dollars(tc, "paid");
+        try (var session = session(graph, tc)) {
+            selfEmploymentTools.calculateSeTax(
+                    session.id(), dollars(tc, "profit").toPlainString(), null, null, null, null, null, null);
+            projections.estimateQbiDeduction(session.id(), null, true);
+            write(session.id(), FactPaths.PRIOR_YEAR_TOTAL_TAX, dollars(tc, "priorTax"));
+            write(session.id(), FactPaths.PRIOR_YEAR_AGI, dollars(tc, "priorAgi"));
+            write(session.id(), FactPaths.YTD_WITHHOLDING, withheld);
+            write(session.id(), FactPaths.YTD_ESTIMATED_PAYMENTS_MADE, paid);
+            String date = graph.taxYearOf(session.sessionId()) + "-08-20";
+            var first = quarterlyPaymentTools.estimateQuarterlyPayment(session.id(), date);
+            write(session.id(), FactPaths.YTD_WITHHOLDING, BigDecimal.ZERO);
+            write(session.id(), FactPaths.YTD_ESTIMATED_PAYMENTS_MADE, withheld.add(paid));
+            var second = quarterlyPaymentTools.estimateQuarterlyPayment(session.id(), date);
+            assertThat((BigDecimal) second.recommendedPayment())
+                    .isEqualByComparingTo((BigDecimal) first.recommendedPayment());
+            assertThat((BigDecimal) second.projectedBalanceDueAtFiling())
+                    .isEqualByComparingTo((BigDecimal) first.projectedBalanceDueAtFiling());
+        }
     }
 
-    private void writeDollar(String sid, String path, int dollars) {
-        sessionTools.setFact(sid, path, "dollar", null, Integer.toString(dollars), null);
+    private void write(String sid, String path, BigDecimal amount) {
+        sessionTools.setFact(sid, path, "dollar", null, amount.toPlainString(), null);
     }
 }

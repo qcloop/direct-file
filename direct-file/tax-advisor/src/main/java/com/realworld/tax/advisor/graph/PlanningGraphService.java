@@ -307,9 +307,9 @@ public class PlanningGraphService {
             String json = objectMapper.writeValueAsString(facts);
             return new Graph(dictionary, InMemoryPersister.apply(json));
         } catch (Exception e) {
-            // Log the underlying cause (and fact paths, not values) so build failures are
-            // diagnosable; the cause was previously swallowed behind the generic message.
-            log.error("Failed to build fact graph for session {} (fact paths: {})", sessionId, facts.keySet(), e);
+            // Parser exceptions can echo taxpayer values. Keep logs aggregate and retain the cause
+            // only in the exception returned to the caller, never in a log message or stack trace.
+            log.error("Failed to build fact graph (errorClass={})", e.getClass().getName());
             // Distinct from an expired/unknown session (which require() reports): the session
             // exists, but these facts could not be assembled into a graph — usually the most
             // recent write was malformed for its declared type.

@@ -12,6 +12,11 @@ is resolved, delete it (git history keeps the record).
   (same pattern already applied to `backend`).
 - **state-api `org.testcontainers:junit-jupiter` is declared but unused** — candidate for removal
   (the Testcontainers BOM is pinned in the parent pom regardless).
+- **backend/state-api/email-service have test-configuration gaps.** The 3.1.1 dependency
+  validation reproduced the same failing tests with `-Dfact-graph.version=3.1.0-SNAPSHOT`:
+  backend's H2 tests lack users/taxreturns tables; state-api lacks a Jackson 2 mapper
+  in some contexts and an S3 encryption-client mock; email-service's H2 schema lacks
+  email tables. These are independent of the fact-graph version upgrade.
 
 ## tax-advisor — tax modeling (MVP scope)
 

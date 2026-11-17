@@ -193,8 +193,10 @@ it is deliberately left without a strict schema (no schema means no validation t
 This module depends on two things the open-source Direct File repo does not
 publish to Maven Central:
 
-1. **`gov.irs:factgraph_3`** — the Scala 3 engine, lives in the standalone
-   fact-graph repo ([`../../../fact-graph/`](../../../fact-graph/)) and ships via sbt.
+1. **`gov.irs:factgraph_3:3.1.1`** — the Scala 3 engine from the
+   [`qcloop/fact-graph`](https://github.com/qcloop/fact-graph) fork
+   ([local checkout](../../../fact-graph/)), built with sbt. The original Maven
+   namespace is retained; this patched release is maintained by qcloop, not IRS-Public.
 2. **`gov.irs.directfile:loaders`** — the shared XML loader extracted from
    the backend, lives in [`../libs/loaders/`](../libs/loaders/).
 
@@ -204,17 +206,17 @@ publish to Maven Central:
 # 1. Install sbt + Scala (see ../../ONBOARDING.md). On macOS:
 brew install sbt
 
-# 2. Publish the fact graph to your local Maven repo:
+# 2. Starting in direct-file/tax-advisor, install the fork's 3.1.1 engine:
 cd ../../../fact-graph
-sbt publishM2          # writes to ~/.m2/repository/gov/irs/factgraph_3/...
+sbt 'factGraphJVM/publishM2'
 
-# 3. Install Direct File's BOMs and shared libs:
-cd ../boms && ../backend/mvnw install -N
-cd ../libs/data-models && ../../backend/mvnw install
-cd ../loaders && ../../backend/mvnw install
+# 3. Install Direct File's parent and shared libs:
+cd ../direct-file/direct-file
+mvn -N install -f boms/irs-spring-boot-starter-parent/pom.xml
+mvn clean install -f libs/pom.xml
 
 # 4. Build the plan service:
-cd ../tax-advisor && ../backend/mvnw test
+mvn clean package -f tax-advisor/pom.xml
 ```
 
 ## Running
@@ -290,6 +292,98 @@ Golden-scenario **evals** live in `src/test/resources/evals/*.json` and are run 
 tool calls with expected output fields), driven through the real MCP tool surface as JSON — the
 deterministic regression check for what an agent actually receives. Add a scenario by dropping a
 new JSON file in that directory; no Java changes needed.
+
+### Property-based tests
+
+The variable-input contracts use `dev.hegel:hegel` (test scope only). `@HegelTest`
+works with the existing JUnit/Spring context; Surefire enables native access and
+preserves the inherited JaCoCo agent. Run the suite with JDK 26:
+
+```bash
+mvn clean package
+# A focused property run:
+mvn test -Dtest=ProjectNetProfitTest
+```
+
+Properties request 1,000 cases each (3,000 for the inexpensive parsing contracts),
+including shrinking and replay of failures saved under the ignored `.hegel/` directory.
+Hegel prints labeled inputs and a `reproduceFailure` annotation for a failing case.
+Copy that annotation onto the same property to replay it; remove it after investigation.
+`PropertySupport` supplies all supported years/statuses, nonnegative amounts through
+the full positive Java-int range plus cents, and per-example session cleanup.
+Mileage covers the nonnegative fact-graph Int range. Text/list generators retain
+their general domains, including empty strings, control characters and duplicates.
+The money oracles model the engine's cents precision (HALF_EVEN) followed by explicit
+whole-dollar Round nodes (HALF_UP); they do not introduce tolerances.
+
+| Public surface | Generated contracts and retained checks |
+| --- | --- |
+| Schedule C/SE, annualization and period mileage | Independent amount/rate oracles, December projection versus full-year actuals, estimated-to-actual refinement, stale-allocation clearing, invalid dates/allocations and rollback. Exact transcript/year regressions remain. |
+| Total tax, QBI, Additional Medicare, status comparison and quarterly payments | Tax components, signed filing balances, both QBI caps, participation completeness, threshold-adjacent values, independent status sessions, deadline transitions and payment repartitioning. Scope-screening and prerequisite wording fixtures remain deterministic. |
+| Graph sessions, persister shaping and filing statuses | Atomic single/batch writes, protected parameters, provenance, locale-independent aliases, integer/rational shaping, Boolean rejection, opaque identifiers and concurrent writes. Knowledge-version and clock boundaries retain their fixed integration tests. |
+| Session snapshots and both stores | Nested immutability, metadata/JSON roundtrips, insertion order with duplicate paths, versioned CAS, isolation and deletion. Both stores inherit the same properties; Redis connection/expiry tests retain their infrastructure-dependent lifecycle. A 100,000-fact snapshot exercises copying and serialization at scale. |
+| Citation registry/service | Independent XML dependency traversal, parameter ordering/deduplication, both overload families and unresolved IDs. The exhaustive parameter-to-registry gate remains deterministic. |
+| Telemetry | Exact call counts through Spring AOP; return/exception identity, one timer event, static outcomes, and absence of generated sensitive text from meters/logs. |
+| Interview knowledge, releases, reports, application/configuration and tool inventory | Existing authored-fixture, release-policy, report-seal, architecture and boot/transport checks remain deterministic: their finite content and environment contracts are not strengthened by random resampling. Golden evals additionally check that arbitrary accepted/rejected reads leave subsequent tool results unchanged. |
+
+An independent implementation-only Hegel review supplied additional rejection,
+equivalent-path, state-isolation and privacy cases. Constructor knobs and sibling
+entry points are covered above; finite publication/wording and operational-clock
+checks remain explicit fixtures. There is no recursive public input or documented
+complexity bound here; the snapshot scale probe covers the principal bulk-copy path.
+
+Property-test failure ledger (2026-11-17):
+
+- **Fixed:** omitted mileage periods unboxed a null `Long`; nullable control flow now
+  preserves the absent input.
+- **Fixed:** status/type aliases depended on the JVM default locale; normalization now
+  uses `Locale.ROOT`, including Turkish-locale counterexamples.
+- **Fixed:** snapshot map copies shared mutable Jackson nodes; constructors and accessors
+  now defensively copy nested values.
+- **Fixed:** unexpected result status text could enter telemetry labels/logs; the aspect
+  now allows only static outcomes, including the QBI scope tool's `unsupported` outcome.
+- **Fixed:** graph parser stack traces could echo malformed taxpayer values; logs now
+  retain only the exception class, while the caller still receives the cause.
+- **Test-oracle corrections:** the Medicare model must round projected receipts before
+  net earnings; annualization observes the engine's cents precision before whole-dollar
+  rounding. Malformed fact paths may reject a read; the eval property checks state
+  preservation for both accepted and rejected reads (the engine rejects malformed
+  UUID/empty segments with IllegalArgumentException/IndexOutOfBoundsException).
+  Micrometer registries require
+  explicit `close()` rather than try-with-resources in the installed version.
+- **Engine fix:** the separately maintained fact-graph `Rational` now uses exact
+  arbitrary-precision arithmetic, with compatible legacy JSON and checked Int accessors.
+  Its operators no longer wrap before reduction. The original mileage properties remain
+  enabled at their original ranges, including the 16,366-mile December projection and
+  2,671,001-mile January projection counterexamples. Rebuild/install the corrected engine
+  before building tax-advisor. Remote builds require a published source pin as described below.
+
+### AWS builds and the fact-graph source pin
+
+The checked-in `.github/scripts/test-mcp.sh` pins `qcloop/fact-graph` release
+`3.1.1` at commit `fe41ec31b38e7d4389d8e0a5258941cdfdf19782`. It downloads the
+public fork's archive, verifies its SHA-256, runs `factGraphJVM/test` and
+`factGraphJVM/publishM2`, then builds the shared Maven dependencies and tax-advisor.
+The production Dockerfile copies that already-built jar; Docker alone does not
+rebuild the engine. AWS build infrastructure is not defined in this repository;
+CodeBuild must run the same dependency-build sequence before building the image.
+
+Local `publishM2` changes only the developer's Maven cache. Version `3.1.1` is
+already pushed to the fork and pinned here. To deliver a future engine release:
+
+1. Bump `factGraphVersion` in the fork's `build.sbt`, then commit and push the tested release.
+2. Update `<fact-graph.version>` in the shared parent POM, plus `factgraph_commit`
+   and the archive SHA-256 in `.github/scripts/test-mcp.sh`, to the matching release.
+   Do not use a moving branch or reuse a previously cached artifact version.
+3. Run the Java checks and image/transport checks, then run the normal AWS delivery
+   pipeline with the updated direct-file revision. Keep test failures fatal.
+
+The public archive download uses HTTPS and does not use the AWS GitHub App, so it
+needs no additional repository grant. If fact-graph becomes a private repository,
+or is configured as an authenticated CodePipeline/CodeBuild source, grant that
+repository to the existing AWS Connector installation and configure the source and
+role permissions. Adding repository access alone does not update the pinned source
+or trigger a dependency rebuild. No AWS connection settings are changed by this fix.
 
 ## Wiring to an LLM
 

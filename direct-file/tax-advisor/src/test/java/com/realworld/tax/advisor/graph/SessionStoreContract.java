@@ -1,21 +1,19 @@
 package com.realworld.tax.advisor.graph;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
+import dev.hegel.HegelTest;
+import dev.hegel.TestCase;
 
 import gov.irs.directfile.models.FactTypeWithItem;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static dev.hegel.Generators.*;
+import static org.assertj.core.api.Assertions.*;
 
-/**
- * What every {@link SessionStore} must do, whatever it stores sessions in. Each implementation's test
- * class extends this, so the in-memory and Redis stores are held to the same behavior — the service
- * above them cannot tell which one it is talking to.
- */
+/** Both store implementations run the same generated roundtrip, ordering, and optimistic-update contracts. */
 abstract class SessionStoreContract {
-
     protected static final ObjectMapper MAPPER = new ObjectMapper().findAndRegisterModules();
 
     protected abstract SessionStore store();
@@ -24,94 +22,98 @@ abstract class SessionStoreContract {
         return new FactTypeWithItem(PersisterTypes.DOLLAR, MAPPER.valueToTree(amount));
     }
 
-    private static SessionSnapshot newSession() {
+    private static SessionSnapshot newSession(TestCase tc) {
+        var ratio = MAPPER.createObjectNode()
+                .put("n", tc.draw(integers(), "numerator"))
+                .put("d", tc.draw(integers().min(1), "denominator"));
         return new SessionSnapshot(
-                2025,
-                FilingStatus.MFJ,
-                Map.of("/seGrossReceipts", dollars("60000")),
-                Map.of("/seGrossReceipts", "2025 1099-K"));
+                tc.draw(integers(), "year"),
+                tc.draw(sampledFrom(FilingStatus.values()), "status"),
+                Map.of(
+                        "/amount",
+                        dollars(tc.draw(integers(), "amount").toString()),
+                        "/ratio",
+                        new FactTypeWithItem(PersisterTypes.RATIONAL, ratio)),
+                Map.of("/amount", tc.draw(text(), "note")),
+                tc.draw(text(), "knowledgeVersion"));
     }
 
-    @Test
-    void aCreatedSessionIsReadBackIntact() {
+    @HegelTest(testCases = 1000)
+    void aCreatedSessionRoundtripsAllMetadataFactsAndProvenance(TestCase tc) {
         SessionId id = SessionId.random();
-        store().create(id, newSession());
-
-        SessionSnapshot read = store().find(id).orElseThrow().snapshot();
-        assertThat(read.taxYear()).isEqualTo(2025);
-        assertThat(read.filingStatus()).isEqualTo(FilingStatus.MFJ);
-        assertThat(read.facts()).isEqualTo(newSession().facts());
-        assertThat(read.sourceNotes()).containsEntry("/seGrossReceipts", "2025 1099-K");
-        store().delete(id);
+        SessionSnapshot expected = newSession(tc);
+        try {
+            store().create(id, expected);
+            SessionStore.Stored read = store().find(id).orElseThrow();
+            assertThat(read.snapshot()).isEqualTo(expected);
+            assertThat(read.version()).isZero();
+        } finally {
+            store().delete(id);
+        }
     }
 
-    @Test
-    void factsKeepTheOrderTheyWereWrittenIn() {
+    @HegelTest(testCases = 1000)
+    void replacementPreservesInsertionOrderIncludingDuplicatePaths(TestCase tc) {
         SessionId id = SessionId.random();
-        SessionSnapshot ordered = newSession()
-                .withFact("/zLast", dollars("1"))
-                .withFact("/aFirst", dollars("2"))
-                .withFact("/mMiddle", dollars("3"));
-        store().create(id, ordered);
-
-        assertThat(store().find(id).orElseThrow().snapshot().facts().keySet())
-                .containsExactly("/seGrossReceipts", "/zLast", "/aFirst", "/mMiddle");
-        store().delete(id);
+        SessionSnapshot snapshot = newSession(tc);
+        Map<String, FactTypeWithItem> expected = new LinkedHashMap<>(snapshot.facts());
+        for (String suffix : tc.draw(lists(text()), "paths")) {
+            String path = "/" + suffix;
+            FactTypeWithItem value = dollars(tc.draw(integers(), "value").toString());
+            snapshot = snapshot.withFact(path, value);
+            expected.put(path, value);
+        }
+        try {
+            store().create(id, snapshot);
+            var actual = store().find(id).orElseThrow().snapshot();
+            assertThat(actual.facts()).containsExactlyEntriesOf(expected);
+        } finally {
+            store().delete(id);
+        }
     }
 
-    @Test
-    void anUnknownSessionIsAbsent() {
-        assertThat(store().find(SessionId.random())).isEmpty();
-    }
-
-    @Test
-    void replaceStoresTheUpdateWhenTheSessionIsUnchanged() {
+    @HegelTest(testCases = 1000)
+    void exactlyOneWriterCanReplaceTheVersionItRead(TestCase tc) {
         SessionId id = SessionId.random();
-        store().create(id, newSession());
-        SessionStore.Stored read = store().find(id).orElseThrow();
-
-        boolean replaced = store().replace(id, read, read.snapshot().withFact("/sePlatformFees", dollars("1500")));
-
-        assertThat(replaced).isTrue();
-        SessionStore.Stored after = store().find(id).orElseThrow();
-        assertThat(after.snapshot().facts()).containsKey("/sePlatformFees");
-        assertThat(after.version()).isGreaterThan(read.version());
-        store().delete(id);
+        SessionSnapshot snapshot = newSession(tc);
+        SessionId unrelated = SessionId.random();
+        try {
+            store().create(id, snapshot);
+            store().create(unrelated, snapshot);
+            SessionStore.Stored first = store().find(id).orElseThrow();
+            SessionStore.Stored second = store().find(id).orElseThrow();
+            String winner = tc.draw(text(), "winningNote");
+            String loser = winner + "loser";
+            assertThat(store().replace(id, first, snapshot.withSourceNote("/winner", winner)))
+                    .isTrue();
+            assertThat(store().replace(id, second, snapshot.withSourceNote("/loser", loser)))
+                    .isFalse();
+            SessionStore.Stored after = store().find(id).orElseThrow();
+            assertThat(after.snapshot()).isEqualTo(snapshot.withSourceNote("/winner", winner));
+            assertThat(after.version()).isEqualTo(first.version() + 1);
+            assertThat(store().find(unrelated).orElseThrow().snapshot()).isEqualTo(snapshot);
+        } finally {
+            store().delete(id);
+            store().delete(unrelated);
+        }
     }
 
-    @Test
-    void replaceRefusesAStaleReadSoAConcurrentWriteIsNotLost() {
+    @HegelTest(testCases = 1000)
+    void deletionIsIdempotentAndStaleWritesCannotResurrectSessions(TestCase tc) {
         SessionId id = SessionId.random();
-        store().create(id, newSession());
-        SessionStore.Stored first = store().find(id).orElseThrow();
-        SessionStore.Stored second = store().find(id).orElseThrow();
-
-        assertThat(store().replace(id, first, first.snapshot().withFact("/a", dollars("1"))))
-                .isTrue();
-        // `second` was read before that write landed; applying it would silently drop /a.
-        assertThat(store().replace(id, second, second.snapshot().withFact("/b", dollars("2"))))
-                .isFalse();
-
-        assertThat(store().find(id).orElseThrow().snapshot().facts())
-                .containsKey("/a")
-                .doesNotContainKey("/b");
-        store().delete(id);
-    }
-
-    @Test
-    void replaceDoesNotResurrectADeletedSession() {
-        SessionId id = SessionId.random();
-        store().create(id, newSession());
-        SessionStore.Stored read = store().find(id).orElseThrow();
-        store().delete(id);
-
-        assertThat(store().replace(id, read, read.snapshot().withFact("/a", dollars("1"))))
-                .isFalse();
-        assertThat(store().find(id)).isEmpty();
-    }
-
-    @Test
-    void deletingAnUnknownSessionIsHarmless() {
-        store().delete(SessionId.random());
+        SessionSnapshot snapshot = newSession(tc);
+        try {
+            assertThat(store().find(id)).isEmpty();
+            store().delete(id);
+            store().create(id, snapshot);
+            SessionStore.Stored read = store().find(id).orElseThrow();
+            store().delete(id);
+            store().delete(id);
+            assertThat(store().replace(id, read, snapshot.withSourceNote("/deleted", tc.draw(text(), "note"))))
+                    .isFalse();
+            assertThat(store().find(id)).isEmpty();
+        } finally {
+            store().delete(id);
+        }
     }
 }

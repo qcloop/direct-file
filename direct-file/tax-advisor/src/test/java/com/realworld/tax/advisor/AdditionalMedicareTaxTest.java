@@ -4,28 +4,21 @@ import java.math.BigDecimal;
 
 import com.realworld.tax.advisor.graph.PlanningGraphService;
 import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
-import com.realworld.tax.advisor.mcp.SessionTools;
 import com.realworld.tax.advisor.mcp.TaxProjectionTools;
-import org.junit.jupiter.api.Test;
+import dev.hegel.HegelTest;
+import dev.hegel.TestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static com.realworld.tax.advisor.PropertySupport.*;
+import static dev.hegel.Generators.*;
+import static org.assertj.core.api.Assertions.*;
 
-/**
- * Exercises the Additional Medicare Tax (Form 8959) end-to-end through the MCP tool surface,
- * including the filing-status-dependent threshold ($200K single / $250K MFJ / $125K MFS) injected
- * at session creation. Every figure below is hand-verifiable from the form's mechanics.
- */
+/** Form 8959 counts wages first, then SE earnings against the remaining status-specific threshold. */
 @SpringBootTest
 class AdditionalMedicareTaxTest {
-
     @Autowired
     PlanningGraphService graph;
-
-    @Autowired
-    SessionTools sessionTools;
 
     @Autowired
     SelfEmploymentTools selfEmploymentTools;
@@ -33,69 +26,40 @@ class AdditionalMedicareTaxTest {
     @Autowired
     TaxProjectionTools taxProjectionTools;
 
-    @Test
-    void singleFilerSeOnlyOverTheTwoHundredKThreshold() {
-        String sid = sessionTools.createSession("2025", "single").sessionId();
-        // Net profit $300,000, no expenses -> net earnings = 300,000 x 92.35% = $277,050.
-        selfEmploymentTools.calculateSeTax(sid, "300000", null, null, null, null, null, null);
-
-        var r = taxProjectionTools.calculateAdditionalMedicare(sid, "0");
-
-        assertThat((BigDecimal) r.additionalMedicareThreshold()).isEqualByComparingTo("200000");
-        // SE earnings over the threshold = 277,050 - 200,000 = 77,050; x 0.9% = $693.45 -> $693.
-        assertThat((BigDecimal) r.seIncomeOverThreshold()).isEqualByComparingTo("77050");
-        assertThat((BigDecimal) r.additionalMedicareTaxOnSe()).isEqualByComparingTo("693");
-        assertThat((BigDecimal) r.additionalMedicareTaxOnWages()).isEqualByComparingTo("0");
-        assertThat((BigDecimal) r.additionalMedicareTax()).isEqualByComparingTo("693");
+    @HegelTest(testCases = 1000)
+    void surtaxUsesOneCombinedThresholdAndRoundsEachComponent(TestCase tc) {
+        String status = filingStatus(tc);
+        BigDecimal threshold = new BigDecimal(
+                switch (status) {
+                    case "mfj" -> "250000";
+                    case "mfs" -> "125000";
+                    default -> "200000";
+                });
+        BigDecimal gross = dollars(tc, "profit");
+        BigDecimal wages = tc.draw(booleans(), "nearThreshold")
+                ? threshold.add(BigDecimal.valueOf(tc.draw(integers().min(-1).max(1), "thresholdCents"), 2))
+                : dollars(tc, "wages");
+        try (var session = session(graph, year(tc), status)) {
+            selfEmploymentTools.calculateSeTax(session.id(), gross.toPlainString(), null, null, null, null, null, null);
+            var result = taxProjectionTools.calculateAdditionalMedicare(session.id(), wages.toPlainString());
+            BigDecimal earnings = rounded(money(rounded(gross).multiply(new BigDecimal("0.9235"))));
+            BigDecimal seBase = earnings.subtract(threshold.subtract(wages).max(BigDecimal.ZERO))
+                    .max(BigDecimal.ZERO);
+            BigDecimal wageTax =
+                    rounded(money(wages.subtract(threshold).max(BigDecimal.ZERO).multiply(new BigDecimal("0.009"))));
+            BigDecimal seTax = rounded(money(seBase.multiply(new BigDecimal("0.009"))));
+            assertThat((BigDecimal) result.additionalMedicareThreshold()).isEqualByComparingTo(threshold);
+            assertThat((BigDecimal) result.additionalMedicareTaxOnWages()).isEqualByComparingTo(wageTax);
+            assertThat((BigDecimal) result.additionalMedicareTaxOnSe()).isEqualByComparingTo(seTax);
+            assertThat((BigDecimal) result.additionalMedicareTax()).isEqualByComparingTo(wageTax.add(seTax));
+        }
     }
 
-    @Test
-    void mfjW2WagesReduceTheThresholdRemainingForSeIncome() {
-        String sid = sessionTools.createSession("2025", "mfj").sessionId();
-        // Net profit $200,000 -> net earnings = 200,000 x 92.35% = $184,700.
-        selfEmploymentTools.calculateSeTax(sid, "200000", null, null, null, null, null, null);
-
-        // $100,000 W-2 Medicare wages. MFJ threshold $250,000; wages counted first leave $150,000
-        // of threshold for SE income. SE over remaining = 184,700 - 150,000 = 34,700; x 0.9% = $312.30 -> $312.
-        var r = taxProjectionTools.calculateAdditionalMedicare(sid, "100000");
-
-        assertThat((BigDecimal) r.additionalMedicareThreshold()).isEqualByComparingTo("250000");
-        assertThat((BigDecimal) r.seIncomeOverThreshold()).isEqualByComparingTo("34700");
-        assertThat((BigDecimal) r.additionalMedicareTaxOnSe()).isEqualByComparingTo("312");
-        // Wages ($100K) are below the threshold, so there is no wage-portion surtax.
-        assertThat((BigDecimal) r.additionalMedicareTaxOnWages()).isEqualByComparingTo("0");
-        assertThat((BigDecimal) r.additionalMedicareTax()).isEqualByComparingTo("312");
-    }
-
-    @Test
-    void wagePortionAppliesWhenW2WagesAloneExceedTheThreshold() {
-        String sid = sessionTools.createSession("2025", "single").sessionId();
-        selfEmploymentTools.calculateSeTax(sid, "0", null, null, null, null, null, null); // no SE income
-
-        // $220,000 Medicare wages, single threshold $200,000: wage portion = 20,000 x 0.9% = $180.
-        var r = taxProjectionTools.calculateAdditionalMedicare(sid, "220000");
-
-        assertThat((BigDecimal) r.additionalMedicareTaxOnWages()).isEqualByComparingTo("180");
-        assertThat((BigDecimal) r.additionalMedicareTaxOnSe()).isEqualByComparingTo("0");
-        assertThat((BigDecimal) r.additionalMedicareTax()).isEqualByComparingTo("180");
-    }
-
-    @Test
-    void filingStatusSelectsTheInjectedThreshold() {
-        assertThat((BigDecimal) graph.readFact(graph.createSession(2025, "single"), "/additionalMedicareThreshold")
-                        .value())
-                .isEqualByComparingTo("200000");
-        assertThat((BigDecimal) graph.readFact(graph.createSession(2025, "mfj"), "/additionalMedicareThreshold")
-                        .value())
-                .isEqualByComparingTo("250000");
-        assertThat((BigDecimal) graph.readFact(graph.createSession(2025, "mfs"), "/additionalMedicareThreshold")
-                        .value())
-                .isEqualByComparingTo("125000");
-    }
-
-    @Test
-    void rejectsAnUnknownFilingStatus() {
-        assertThatThrownBy(() -> graph.createSession(2025, "household"))
+    @HegelTest(testCases = 1000)
+    void rejectsUnsupportedFilingStatuses(TestCase tc) {
+        String status = "unsupported:" + tc.draw(text(), "status");
+        int year = year(tc);
+        assertThatThrownBy(() -> graph.createSession(year, status))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("filing status");
     }

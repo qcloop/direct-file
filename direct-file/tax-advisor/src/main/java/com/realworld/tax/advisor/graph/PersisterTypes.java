@@ -2,6 +2,7 @@ package com.realworld.tax.advisor.graph;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -64,7 +65,7 @@ public final class PersisterTypes {
         if (alias == null) {
             throw new IllegalArgumentException("Must supply 'type' or 'typeCode'.");
         }
-        String typeCode = ALIASES.get(alias.toLowerCase());
+        String typeCode = ALIASES.get(alias.toLowerCase(Locale.ROOT));
         if (typeCode == null) {
             throw new IllegalArgumentException("Unknown type alias: " + alias);
         }
@@ -104,7 +105,7 @@ public final class PersisterTypes {
      * (the default) stays the string as-is.
      */
     public static TypedValue forParameter(String type, String value, String factPath) {
-        return switch (type == null ? "dollar" : type.toLowerCase()) {
+        return switch (type == null ? "dollar" : type.toLowerCase(Locale.ROOT)) {
             case "int" -> new TypedValue(INT, Long.parseLong(value.trim()));
             case "rational" -> new TypedValue(RATIONAL, parseRational(value, factPath));
             case "boolean" -> {

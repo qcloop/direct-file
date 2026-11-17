@@ -279,9 +279,14 @@ public class MileageService {
     }
 
     private static Long suppliedMiles(String supplied, Map<String, Object> existing, String path, boolean resume) {
-        return !ToolSupport.isBlank(supplied)
-                ? miles(supplied)
-                : resume && existing.get(path) instanceof Number number ? number.longValue() : null;
+        // Keep the absent value boxed: a nested numeric conditional unboxes null when no period was supplied.
+        if (!ToolSupport.isBlank(supplied)) {
+            return miles(supplied);
+        }
+        if (resume && existing.get(path) instanceof Number number) {
+            return number.longValue();
+        }
+        return null;
     }
 
     private static long miles(String value) {

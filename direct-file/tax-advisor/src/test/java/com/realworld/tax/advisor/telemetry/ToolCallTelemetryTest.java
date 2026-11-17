@@ -1,25 +1,31 @@
 package com.realworld.tax.advisor.telemetry;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import com.realworld.tax.advisor.graph.PlanningGraphService;
 import com.realworld.tax.advisor.mcp.QuarterlyPaymentTools;
 import com.realworld.tax.advisor.mcp.SelfEmploymentTools;
 import com.realworld.tax.advisor.mcp.SessionTools;
-import io.micrometer.core.instrument.Counter;
+import dev.hegel.HegelTest;
+import dev.hegel.TestCase;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
-import org.junit.jupiter.api.Test;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.realworld.tax.advisor.PropertySupport.*;
+import static dev.hegel.Generators.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-/**
- * Proves the tool-call telemetry aspect actually intercepts MCP tool calls (the AOP proxy is wired),
- * records the right {tool, outcome} signal — including the misuse outcomes the transcript findings cared
- * about (needs_facts, error) — and leaks no value-bearing tags (the privacy guard).
- */
+/** Check exact event counts through the Spring proxy and privacy at the aspect boundary. */
 @SpringBootTest
 class ToolCallTelemetryTest {
-
     @Autowired
     SessionTools sessionTools;
 
@@ -30,62 +36,111 @@ class ToolCallTelemetryTest {
     QuarterlyPaymentTools quarterlyPaymentTools;
 
     @Autowired
+    PlanningGraphService graph;
+
+    @Autowired
     MeterRegistry meters;
 
-    private double calls(String tool, String outcome) {
-        Counter c = meters.find("taxadvisor.tool.calls")
-                .tag("tool", tool)
-                .tag("outcome", outcome)
-                .counter();
-        return c == null ? 0.0 : c.count();
-    }
-
-    private double errors(String tool, String errorClass) {
-        Counter c = meters.find("taxadvisor.tool.errors")
-                .tag("tool", tool)
-                .tag("errorClass", errorClass)
-                .counter();
-        return c == null ? 0.0 : c.count();
-    }
-
-    @Test
-    void recordsOkNeedsFactsAndErrorOutcomes() {
-        // Baselines — the MeterRegistry is shared across the test context, so assert on deltas.
-        double okBefore = calls("calculate_se_tax", "ok");
-        double needsBefore = calls("estimate_quarterly_payment", "needs_facts");
-        double errBefore = errors("get_fact", "IllegalArgumentException");
-
-        String s = sessionTools.createSession("2025", "single").sessionId();
-        selfEmploymentTools.calculateSeTax(s, "60000", null, null, null, null, null, null); // -> ok
-
-        // Quarterly on a fresh session has no prior-year facts -> needs_facts (a real misuse signal).
-        String fresh = sessionTools.createSession("2025", "single").sessionId();
-        assertThat(quarterlyPaymentTools
-                        .estimateQuarterlyPayment(fresh, "2025-08-20")
-                        .status())
-                .isEqualTo("needs_facts");
-
-        // Unknown session -> the tool throws; the aspect records outcome=error + the exception class.
-        try {
-            sessionTools.getFact("no-such-session", "/seTax");
-        } catch (RuntimeException ignored) {
-            // expected
+    @HegelTest(testCases = 1000)
+    void recordsExactlyOneEventForEachProxiedOutcome(TestCase tc) {
+        int year = year(tc);
+        String status = filingStatus(tc);
+        double ok = calls("calculate_se_tax", "ok");
+        double needs = calls("estimate_quarterly_payment", "needs_facts");
+        double errors = calls("get_fact", "error");
+        try (var session = session(graph, year, status);
+                var fresh = session(graph, year, status)) {
+            selfEmploymentTools.calculateSeTax(
+                    session.id(), dollars(tc, "profit").toPlainString(), null, null, null, null, null, null);
+            assertThat(quarterlyPaymentTools
+                            .estimateQuarterlyPayment(fresh.id(), year + "-08-20")
+                            .status())
+                    .isEqualTo("needs_facts");
+            assertThatThrownBy(() -> sessionTools.getFact("unknown:" + tc.draw(text(), "unknownSession"), "/seTax"))
+                    .isInstanceOf(IllegalArgumentException.class);
+            assertThat(calls("calculate_se_tax", "ok")).isEqualTo(ok + 1);
+            assertThat(calls("estimate_quarterly_payment", "needs_facts")).isEqualTo(needs + 1);
+            assertThat(calls("get_fact", "error")).isEqualTo(errors + 1);
         }
-
-        assertThat(calls("calculate_se_tax", "ok")).isGreaterThan(okBefore);
-        assertThat(calls("estimate_quarterly_payment", "needs_facts")).isGreaterThan(needsBefore);
-        assertThat(errors("get_fact", "IllegalArgumentException")).isGreaterThan(errBefore);
     }
 
-    @Test
-    void carriesNoValueBearingTags() {
-        // Drive at least one call so the meter exists.
-        sessionTools.createSession("2025", "single");
+    private double calls(String tool, String outcome) {
+        var counter = meters.find("taxadvisor.tool.calls")
+                .tags("tool", tool, "outcome", outcome)
+                .counter();
+        return counter == null ? 0 : counter.count();
+    }
 
-        // Privacy guard: the only tags on the call counters are the static {tool, outcome} — never a
-        // dollar amount, fact path, or session id. If a future change tags a meter with a value, this fails.
-        for (Counter c : meters.find("taxadvisor.tool.calls").counters()) {
-            assertThat(c.getId().getTags().stream().map(Tag::getKey)).containsOnly("tool", "outcome");
+    @McpTool(name = "privacy_probe")
+    public Probe probe() {
+        return null;
+    }
+
+    public record Probe(String status, String taxpayerValue) {}
+
+    @HegelTest(testCases = 1000)
+    void resultFieldsAndExceptionMessagesCannotReachMetersOrLogs(TestCase tc) throws Throwable {
+        String sentinel = "private:" + tc.draw(text(), "taxpayerValue");
+        boolean fail = tc.draw(booleans(), "throws");
+        boolean unexpected = tc.draw(booleans(), "unexpectedStatus");
+        String outcome = tc.draw(sampledFrom("ok", "needs_facts", "unsupported"), "knownStatus");
+        Probe result = new Probe(unexpected ? sentinel : outcome, sentinel);
+        RuntimeException failure = new IllegalArgumentException(sentinel, new RuntimeException(sentinel));
+        ProceedingJoinPoint point = mock(ProceedingJoinPoint.class);
+        when(point.getArgs()).thenReturn(new Object[] {sentinel});
+        if (fail) when(point.proceed()).thenThrow(failure);
+        else when(point.proceed()).thenReturn(result);
+        var annotation = getClass().getMethod("probe").getAnnotation(McpTool.class);
+        Logger logger = (Logger) LoggerFactory.getLogger(ToolCallTelemetry.class);
+        Level original = logger.getLevel();
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        logger.setLevel(Level.INFO);
+        var registry = new SimpleMeterRegistry();
+        try {
+            var telemetry = new ToolCallTelemetry(registry);
+            if (fail)
+                assertThatThrownBy(() -> telemetry.recordToolCall(point, annotation))
+                        .isSameAs(failure);
+            else assertThat(telemetry.recordToolCall(point, annotation)).isSameAs(result);
+            String expected = fail ? "error" : unexpected ? "ok" : outcome;
+            assertThat(registry.get("taxadvisor.tool.calls")
+                            .tags("tool", "privacy_probe", "outcome", expected)
+                            .counter()
+                            .count())
+                    .isEqualTo(1);
+            assertThat(registry.get("taxadvisor.tool.latency")
+                            .tag("tool", "privacy_probe")
+                            .timer()
+                            .count())
+                    .isEqualTo(1);
+            for (var meter : registry.getMeters()) {
+                assertThat(meter.getId().getTags().toString()).doesNotContain(sentinel);
+                var keys = meter.getId().getTags().stream().map(io.micrometer.core.instrument.Tag::getKey);
+                switch (meter.getId().getName()) {
+                    case "taxadvisor.tool.calls" -> assertThat(keys).containsOnly("tool", "outcome");
+                    case "taxadvisor.tool.errors" -> assertThat(keys).containsOnly("tool", "errorClass");
+                    case "taxadvisor.tool.latency" -> assertThat(keys).containsOnly("tool");
+                    default -> throw new AssertionError("Unexpected telemetry meter: " + meter.getId());
+                }
+            }
+            assertThat(appender.list).hasSize(1).allSatisfy(event -> {
+                assertThat(event.getFormattedMessage()).doesNotContain(sentinel);
+                assertThat(event.getThrowableProxy()).isNull();
+            });
+            if (fail)
+                assertThat(registry.get("taxadvisor.tool.errors")
+                                .tag("errorClass", "IllegalArgumentException")
+                                .counter()
+                                .count())
+                        .isEqualTo(1);
+            else assertThat(registry.find("taxadvisor.tool.errors").counters()).isEmpty();
+        } finally {
+            registry.close();
+            logger.detachAppender(appender);
+            appender.stop();
+            logger.setLevel(original);
         }
     }
 }
