@@ -21,6 +21,7 @@
         <config-folder.path>${project.basedir}/../config</config-folder.path>
         <!-- Property testing is local to tax-advisor; other services need no native test engine. -->
         <hegel.version>0.12.5</hegel.version>
+        <jedis-mock.version>1.1.21</jedis-mock.version>
     </properties>
 
     <dependencies>
@@ -131,6 +132,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Local RESP server for Redis contracts; production still uses Lettuce. -->
+        <dependency>
+            <groupId>com.github.fppt</groupId>
+            <artifactId>jedis-mock</artifactId>
+            <version>${jedis-mock.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

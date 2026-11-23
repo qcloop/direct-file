@@ -142,6 +142,21 @@ The 2026 QBI minimum can require a taxpayer-confirmed `materiallyParticipates` a
 `estimate_qbi_deduction`. Unknown eligibility produces `needs_facts`; it is not inferred
 from a 1099. Form 8995-A limits/phase-in calculations remain outside this planning model.
 
+## Redis tests without a Redis installation
+
+`mvn verify` starts test-only Jedis-Mock servers on random loopback ports. The
+production Spring `StringRedisTemplate`/Lettuce client, JSON mapper, and Lua scripts
+are unchanged. Store contracts cover snapshot/provenance roundtrips, versioned
+updates, independent clients, deletion, expiry and sliding TTL. Each generated
+store property runs 3,000 cases; `RedisPlanningGraphIntegrationTest` adds 3,000
+Spring-service cases rebuilding Fact Graph from Redis-persisted facts.
+
+Set `REDIS_URL=redis://127.0.0.1:6379` to run the store contracts against a real
+Redis instead. An explicit unreachable endpoint fails, rather than skipping or
+falling back. CI retains this real-Redis layer. Neither mode flushes a database.
+Jedis-Mock verifies the exercised application commands; it does not qualify Redis
+restart durability, eviction, TLS/auth, failover, or production cluster routing.
+
 ## Tools
 
 Spring AI exposes the following tools at the MCP `tools/list` endpoint. Names

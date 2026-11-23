@@ -1,11 +1,13 @@
 package com.realworld.tax.advisor.graph;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 
+import com.github.fppt.jedismock.RedisServer;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -14,41 +16,51 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Runs the {@link SessionStoreContract} — plus the Redis-only expiry behavior — against a real Redis:
- * the one at {@code REDIS_URL}, defaulting to the local development endpoint
- * {@code redis://localhost:6379} that the client web app also uses.
- *
- * <p>If no Redis answers there the tests are skipped rather than failed, so the build does not
- * depend on local infrastructure. Every key written here sits under a prefix unique to this run and
- * is deleted (or expires within seconds), so a shared Redis is left as it was found.
+ * Runs the production Redis adapter through Lettuce against a local Jedis-Mock RESP server.
+ * An explicit REDIS_URL uses that real endpoint instead, and connection failures fail the tests.
+ * Keys are isolated under a unique prefix; neither mode flushes an existing database.
  */
 class RedisSessionStoreTest extends SessionStoreContract {
 
     private static final String PREFIX = "tax-advisor:test:" + UUID.randomUUID() + ":";
 
+    private static RedisServer server;
     private static LettuceConnectionFactory connectionFactory;
     private static StringRedisTemplate redis;
+    private static LettuceConnectionFactory peerFactory;
+    private static StringRedisTemplate peerRedis;
     private static SessionStore store;
 
     @BeforeAll
-    static void connect() {
-        String url = System.getenv().getOrDefault("REDIS_URL", "redis://localhost:6379");
-        try {
-            connectionFactory = new LettuceConnectionFactory(LettuceConnectionFactory.createRedisConfiguration(url));
-            connectionFactory.afterPropertiesSet();
-            redis = new StringRedisTemplate(connectionFactory);
-            redis.afterPropertiesSet();
-            redis.hasKey(PREFIX + "ping");
-        } catch (RuntimeException e) {
-            Assumptions.abort("No Redis reachable at " + url + " — skipping the Redis session-store tests");
+    static void connect() throws IOException {
+        String url = System.getenv("REDIS_URL");
+        if (url == null || url.isBlank()) {
+            server = RedisServer.newRedisServer(0, InetAddress.getLoopbackAddress())
+                    .start();
+            url = "redis://" + server.getHost() + ":" + server.getBindPort();
         }
+        connectionFactory = new LettuceConnectionFactory(LettuceConnectionFactory.createRedisConfiguration(url));
+        connectionFactory.afterPropertiesSet();
+        redis = new StringRedisTemplate(connectionFactory);
+        redis.afterPropertiesSet();
+        redis.hasKey(PREFIX + "ping");
+        peerFactory = new LettuceConnectionFactory(LettuceConnectionFactory.createRedisConfiguration(url));
+        peerFactory.afterPropertiesSet();
+        peerRedis = new StringRedisTemplate(peerFactory);
+        peerRedis.afterPropertiesSet();
         store = new RedisSessionStore(redis, MAPPER, PREFIX, Duration.ofMinutes(5));
     }
 
     @AfterAll
-    static void disconnect() {
+    static void disconnect() throws IOException {
         if (connectionFactory != null) {
             connectionFactory.destroy();
+        }
+        if (peerFactory != null) {
+            peerFactory.destroy();
+        }
+        if (server != null) {
+            server.stop();
         }
     }
 
@@ -77,10 +89,12 @@ class RedisSessionStoreTest extends SessionStoreContract {
         SessionStore shortLived = new RedisSessionStore(redis, MAPPER, PREFIX, Duration.ofMillis(300));
         SessionId id = SessionId.random();
         shortLived.create(id, anySession());
+        SessionStore.Stored beforeExpiry = shortLived.find(id).orElseThrow();
 
         Thread.sleep(700);
 
         assertThat(shortLived.find(id)).isEmpty();
+        assertThat(shortLived.replace(id, beforeExpiry, anySession())).isFalse();
     }
 
     @Test
@@ -100,11 +114,17 @@ class RedisSessionStoreTest extends SessionStoreContract {
     @Test
     void aSecondStoreOnTheSameRedisSeesTheSameSession() {
         // Stands in for a second instance of the service: separate store object, same Redis.
-        SessionStore otherInstance = new RedisSessionStore(redis, MAPPER, PREFIX, Duration.ofMinutes(5));
+        SessionStore otherInstance = new RedisSessionStore(peerRedis, MAPPER, PREFIX, Duration.ofMinutes(5));
         SessionId id = SessionId.random();
         store.create(id, anySession());
 
-        assertThat(otherInstance.find(id)).isPresent();
+        SessionStore.Stored firstRead = store.find(id).orElseThrow();
+        SessionStore.Stored peerRead = otherInstance.find(id).orElseThrow();
+        assertThat(otherInstance.replace(id, peerRead, anySession().withSourceNote("/winner", "peer")))
+                .isTrue();
+        assertThat(store.replace(id, firstRead, anySession().withSourceNote("/loser", "stale")))
+                .isFalse();
+        assertThat(store.find(id).orElseThrow().snapshot().sourceNotes()).containsEntry("/winner", "peer");
         otherInstance.delete(id);
         assertThat(store.find(id)).isEmpty();
     }

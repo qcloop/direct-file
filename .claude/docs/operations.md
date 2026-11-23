@@ -100,8 +100,13 @@ REDIS_URL=redis://localhost:6379 java -jar .../tax-advisor-0.0.1.jar --spring.pr
   uses only single-key commands and scripts, so it is compatible with cluster mode, but a
   cluster-mode-enabled endpoint needs Spring's cluster settings (`spring.data.redis.cluster.nodes`)
   rather than just the URL. IAM-token auth (short-lived tokens) is not wired up.
-- `RedisSessionStoreTest` runs against `REDIS_URL` and is **skipped** when no Redis answers, so a green
-  build without Redis running has not exercised the Redis store.
+- `RedisSessionStoreTest` starts an in-memory Jedis-Mock RESP server on a random
+  loopback port by default. The production Lettuce client and Lua scripts run unchanged.
+  An explicit `REDIS_URL` selects real Redis; connection failures fail instead of skipping.
+  `RedisPlanningGraphIntegrationTest` also runs the Spring service with Redis-backed
+  sessions and 3,000 generated fact reconstruction cases against Jedis-Mock.
+  Mock results do not replace CI's real-Redis checks or qualify TLS, failover, cluster
+  routing, eviction, and durability across a Redis restart.
 
 stdio transport (subprocess of a desktop MCP host):
 ```bash
