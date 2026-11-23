@@ -64,8 +64,11 @@ is resolved, delete it (git history keeps the record).
   endpoints need extra config, IAM-token auth is not implemented, and nothing here has been run against
   ElastiCache/MemoryDB. On a Redis shared with other apps, its eviction policy can drop sessions before
   the idle timeout (behaves as an early expiry).
-- **Redis tests need a Redis.** `RedisSessionStoreTest` skips when `REDIS_URL` is unreachable; CI should
-  provide one (the repo's compose file already defines a `redis` service) or the store goes untested.
+- **Real-Redis qualification remains a separate layer.** Default contracts and
+  graph reconstruction now use Jedis-Mock; an explicit `REDIS_URL` runs the store
+  contracts against real Redis and fails if unreachable. CI still provides Redis.
+  Lua long-version precision, delete/recreate ABA with reused IDs, and concurrent
+  create/delete behavior are not covered by the mock migration.
 
 ## Harness / process (from the harness-engineering adoption)
 

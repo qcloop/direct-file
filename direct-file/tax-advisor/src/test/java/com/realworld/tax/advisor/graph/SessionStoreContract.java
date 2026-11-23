@@ -38,7 +38,7 @@ abstract class SessionStoreContract {
                 tc.draw(text(), "knowledgeVersion"));
     }
 
-    @HegelTest(testCases = 1000)
+    @HegelTest(testCases = 3000)
     void aCreatedSessionRoundtripsAllMetadataFactsAndProvenance(TestCase tc) {
         SessionId id = SessionId.random();
         SessionSnapshot expected = newSession(tc);
@@ -52,7 +52,7 @@ abstract class SessionStoreContract {
         }
     }
 
-    @HegelTest(testCases = 1000)
+    @HegelTest(testCases = 3000)
     void replacementPreservesInsertionOrderIncludingDuplicatePaths(TestCase tc) {
         SessionId id = SessionId.random();
         SessionSnapshot snapshot = newSession(tc);
@@ -72,7 +72,7 @@ abstract class SessionStoreContract {
         }
     }
 
-    @HegelTest(testCases = 1000)
+    @HegelTest(testCases = 3000)
     void exactlyOneWriterCanReplaceTheVersionItRead(TestCase tc) {
         SessionId id = SessionId.random();
         SessionSnapshot snapshot = newSession(tc);
@@ -98,7 +98,7 @@ abstract class SessionStoreContract {
         }
     }
 
-    @HegelTest(testCases = 1000)
+    @HegelTest(testCases = 3000)
     void deletionIsIdempotentAndStaleWritesCannotResurrectSessions(TestCase tc) {
         SessionId id = SessionId.random();
         SessionSnapshot snapshot = newSession(tc);
